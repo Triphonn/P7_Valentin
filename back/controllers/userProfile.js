@@ -90,8 +90,6 @@ exports.uploadAvatar = (req, res) => {
     const profilePicture = `${req.protocol}://${req.get('host')}/images/${
         req.file.filename
     }`;
-    console.log(userId);
-    console.log(profilePicture);
     mysql.query(
         `SELECT * FROM userProfiles WHERE userId = ?`,
         userId,
@@ -99,7 +97,6 @@ exports.uploadAvatar = (req, res) => {
             if (error || results == 0) {
                 res.json({ error });
             } else {
-                console.log(results);
                 if (results[0].profilePicture != null) {
                     const filename =
                         results[0].profilePicture.split('/images/')[1];
@@ -133,8 +130,6 @@ exports.uploadBanner = (req, res) => {
     const banner = `${req.protocol}://${req.get('host')}/images/${
         req.file.filename
     }`;
-    console.log(userId);
-    console.log(banner);
     mysql.query(
         `SELECT * FROM userProfiles WHERE userId = ?`,
         userId,
@@ -185,8 +180,8 @@ exports.deleteProfile = (req, res) => {
 };
 
 exports.getOneProfile = (req, res) => {
-    const sqlRequest = `SELECT * FROM userProfiles WHERE userId = ?`;
-    mysql.query(sqlRequest, req.params.id, (error, results) => {
+    const sqlRequest = `SELECT * FROM userProfiles WHERE username = ?`;
+    mysql.query(sqlRequest, req.params.username, (error, results) => {
         if (error || results == 0) {
             res.json({ error });
         } else {

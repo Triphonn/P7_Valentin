@@ -89,7 +89,7 @@ export default {
           },
           logout: function() {
             this.$store.dispatch('logout')
-            this.$router.go()
+            this.$router.push('/')
          },
          signup: function () {
            this.$emit('login', 1)

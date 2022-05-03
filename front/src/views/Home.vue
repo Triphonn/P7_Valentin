@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <div v-if="user != null">
-      <nav-bar :username="user.username" :profilePicture="user.profilePicture" @createpost="postOverlay" />
+      <nav-bar :username="user.username" :profilePicture="user.profilePicture" :loading="loading" @createpost="postOverlay" />
     </div>
     <div v-else>
       <nav-bar @login="overlayLogin" />
@@ -17,7 +17,7 @@
                               fab
                               icon
                               color="primary"
-                              @click="overlayClosingVerif = true"
+                              @click="draftTab"
                               >
                                  <v-icon dense color="secondary">
                                     mdi-close
@@ -44,7 +44,7 @@
                                  <v-btn
                                     text
                                     class="button"
-                                    @click="postTextArea = ''"
+                                    @click="clearPost"
                                  >
                                  Supprimer
                                  </v-btn>
@@ -62,6 +62,8 @@
                                  v-model="postTextArea"
                                  auto-grow
                                  dense
+                                 counter="120"
+                                 :rules="[rules.length(120)]"
                               >
                               </v-textarea>
                               <img v-if="previewImage" class="img-file" width="100%" height="200px" :src="previewImage" />
@@ -74,7 +76,7 @@
                            v-model="snackbar"
                            :timeout="1500"
                         >
-                           {{ loginError }}
+                           {{ postError }}
                         </v-snackbar>
                         <v-card-actions class="form-row">
                            <v-file-input hide-input prepend-icon="mdi-image-outline" @change="previewImageContent" accept="image/*" />       
@@ -178,12 +180,16 @@ export default {
           snackbar: false,
           overlayLog: false,
           overlayPost: false,
-          zIndex: 0,
+          zIndex: 1,
           post: '',
           imagePost: null,
           previewImage: null,
           postTextArea: '',
+          postError: '',
           overlayClosingVerif: false,
+          rules: {
+             length: len => v => (v || '').length <= len || `Vous avez atteint le maximum de charactères (${len})`,
+          }
         };
       },
       components: {
@@ -256,7 +262,7 @@ export default {
                   return false;
                }
             } else if (this.mode == 'createPost'){
-               if (this.postTextArea != "") {
+               if (this.postTextArea != "" && this.postTextArea.length >= 5 && this.postTextArea.length <= 120) {
                   return true;
                } else {
                   return false;
@@ -267,8 +273,32 @@ export default {
          ...mapState(['status', 'profileInfos'])
       },
       methods: {
+         draftTab(){
+            if (!this.validatedFields) {
+               this.overlayPost = false;
+               this.clearPost();
+               
+            } else {
+               this.overlayClosingVerif = true
+            }
+         },
+         clearPost () {
+            this.postTextArea = '', this.overlayPost = false, this.overlayClosingVerif = false, this.imagePost = null, this.previewImage = null
+         },
          saveDrafts() {
+            const self = this;
             this.$store.dispatch('saveDrafts', {postText: this.postTextArea, postImage: this.imagePost})
+            .then(function () {
+               if (self.status != 'error_save'){
+                  self.$router.go();
+               }
+            })
+            .catch((error) => {
+               console.log('bite');
+              console.log(error);
+              this.snackbar = true;
+              this.postError = error;
+            })
          },
          postOverlay() {
             this.mode = 'createPost'

@@ -49,6 +49,9 @@ export default new Vuex.Store({
         getUserId(state) {
             return state.user.userId;
         },
+        getToken(state) {
+            return state.user.token;
+        },
     },
     mutations: {
         setStatus: function (state, status) {
@@ -155,6 +158,24 @@ export default new Vuex.Store({
                 });
             }
         },
+        getOneProfile: async ({ commit }, username) => {
+            try {
+                await instance
+                    .get(`/profile/${username}`)
+                    .then(async (response) => {
+                        console.log(response);
+                        commit('profileInfos', response.data[0]);
+                        commit('setStatus', '');
+                    })
+                    .catch(function (error) {
+                        commit('setStatus', 'error_get');
+                        console.log(error);
+                    });
+            } catch (err) {
+                commit('setStatus', 'error_get');
+                throw 'Unable to get the profile ';
+            }
+        },
         modifyProfile: async ({ commit, getters, dispatch }, ProfileInfos) => {
             const userId = getters.getUserId;
             console.log(ProfileInfos);
@@ -234,29 +255,62 @@ export default new Vuex.Store({
                 throw 'Unable to modify your profile 3 ';
             }
         },
-        saveDrafts: async ({ commit }, postData) => {
+        saveDrafts: async ({ commit, getters }, postData) => {
+            commit('setStatus', 'loading.saving');
+
             const userId = getters.getUserId;
+
+            let postDraftData = {
+                userId: userId,
+                postText: postData.postText,
+            };
 
             let draftFormData = new FormData();
             draftFormData.append('image', postData.postImage);
-            draftFormData.append('content', {
-                userId: userId,
-                postText: postData.postText,
-            });
-            try {
-                await instance
-                    .post('/post/savedraft', draftFormData, {
-                        headers: { 'Content-Type': 'multipart/form-data' },
-                    })
-                    .then(async () => {
-                        commit('setStatus', '');
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            } catch (err) {
-                commit('setStatus', 'error_save');
-                throw 'Unable to save your draft ';
+            draftFormData.append('content', JSON.stringify(postDraftData));
+
+            console.log(postData.postImage);
+            console.log(postDraftData);
+
+            if (postData.postImage == null) {
+                try {
+                    await instance
+                        .post('/post/savedraft', postDraftData, {
+                            headers: {
+                                Authorization: 'Bearer ' + getters.getToken,
+                            },
+                        })
+                        .then(async () => {
+                            commit('setStatus', '');
+                        })
+                        .catch(function (error) {
+                            commit('setStatus', 'error_save');
+                            console.log(error);
+                        });
+                } catch (err) {
+                    commit('setStatus', 'error_save');
+                    throw 'Unable to save your draft ';
+                }
+            } else {
+                try {
+                    await instance
+                        .post('/post/savedraft', draftFormData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                                Authorization: 'Bearer ' + getters.getToken,
+                            },
+                        })
+                        .then(async () => {
+                            commit('setStatus', '');
+                        })
+                        .catch(function (error) {
+                            commit('setStatus', 'error_save');
+                            console.log(error);
+                        });
+                } catch (err) {
+                    commit('setStatus', 'error_save');
+                    throw 'Unable to save your draft ';
+                }
             }
         },
         logout: ({ commit }) => {

@@ -2,7 +2,18 @@
     <v-app>
         <nav-bar :username="userInfos.username" :profilePicture="userInfos.profilePicture"/>
         <v-main>
-            <v-card class="mx-auto" max-width="950" tile>
+            <v-col
+                cols="12"
+                md="4"
+                v-if="loading"
+                style="margin: 0 auto; max-width: 950px"
+            >
+
+                <v-skeleton-loader
+                type="image, table-heading, list-item-two-line"
+                ></v-skeleton-loader>
+            </v-col>
+            <v-card v-else class="mx-auto" max-width="950" tile>
                 <v-row style="margin: 0;">
                     <v-img
                         v-if="userInfos.banner == null"
@@ -41,7 +52,7 @@
                             </v-list-item-content>
                         </v-list-item>
                     </v-col>
-                    <v-btn style="postition: absolute; top: 35px; right: 20px;" color="primary" @click="overlay = !overlay" class="button">      
+                    <v-btn v-if="userInfos.userId == user.userId" style="postition: absolute; top: 35px; right: 20px;" color="primary" @click="overlay = !overlay" class="button">      
                       <span>Editer le profil</span>
                     </v-btn>
                     <v-overlay :z-index="zIndex" :value="overlay">
@@ -62,9 +73,6 @@
                                 </v-app-bar-nav-icon>
                                 <v-toolbar-title>Éditer le profil</v-toolbar-title>
                                 <v-spacer></v-spacer>
-                                <div class="form-row" v-if="status == 'error_modify'">
-                                    Impossible de modifier le profil
-                                </div>
                                 <v-btn
                                     depressed
                                     color="primary"
@@ -145,6 +153,7 @@ export default {
             overlay: false,
             zIndex: 0,
             mode: 'home',
+            loading: false,
             userInfos: this.$store.state.profileInfos,
             
             defaultBanner:
@@ -157,10 +166,17 @@ export default {
     props: {
         source: String,
     },
-    mounted: function () {
-        // let profileInfos = sessionStorage.getItem('vuex');
-        // profileInfos = JSON.parse(profileInfos);
-        // this.userInfos = profileInfos.profileInfos;
+    mounted () {
+        if (this.userInfos.username != this.$route.params.username){
+            this.getProfile();
+            this.loading = true
+            console.log(this.loading);
+            setTimeout(() => {
+                this.$router.go()
+            }, 50);
+        } else {
+            this.loading = false
+        }
     },
     computed: {
         profileInfos() {
@@ -196,19 +212,20 @@ export default {
             this.avatar = e;
             this.profilePicture = urlCreator.createObjectURL(this.avatar);
         },
-        verifyProfile: function () {
-            this.verifyProfile;
-        },
         modifyProfile: function () {
             const self = this;
             this.$store.dispatch('modifyProfile', {banner: this.banner, avatar: this.avatar, name: this.name, bio: this.bio})
-            // .then(function () {
-            //    self.$router.go()
-            // }, function (error) {
-            // console.log(error);
-            // })
+            .then(function () {
+               self.$router.go()
+            }, function (error) {
+            console.log(error);
+            })
         },
-        ...mapActions(['verifyProfile'])
+        getProfile: function () {
+            const username = this.$route.params.username;
+            this.getOneProfile(username);
+        },
+        ...mapActions(['getOneProfile'])
     },
 };
 </script>
