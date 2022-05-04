@@ -34,13 +34,14 @@ export default new Vuex.Store({
     plugins: [
         createPersistedState({
             storage: window.sessionStorage,
-            paths: ['user', 'profileInfos'],
+            paths: ['user', 'profileInfos', 'userInfos'],
         }),
     ],
     state: {
         status: '',
         user: user,
         profileInfos: null,
+        userInfos: null,
     },
     getters: {
         getProfileInfos(state) {
@@ -65,6 +66,9 @@ export default new Vuex.Store({
         profileInfos: function (state, profileInfos) {
             state.profileInfos = profileInfos;
         },
+        setUserInfos: function (state, userInfos) {
+            state.userInfos = userInfos;
+        },
         updateBanner: function (state, banner) {
             state.profileInfos.banner = banner;
         },
@@ -78,6 +82,7 @@ export default new Vuex.Store({
                 isLoggedIn: false,
             };
             state.profileInfos = null;
+            state.userInfos = null;
             sessionStorage.removeItem('vuex');
         },
         setIsLoggedIn(state) {
@@ -128,6 +133,7 @@ export default new Vuex.Store({
                         commit('setStatus', 'profileCreated');
                         console.log(response);
                         commit('profileInfos', response.data.Profile);
+                        commit('setUserInfos', response.data.Profile);
                         console.log('Profil crée');
                         resolve(response);
                     })
@@ -148,6 +154,7 @@ export default new Vuex.Store({
                         .then(function (response) {
                             commit('setStatus', 'profileCreated');
                             commit('profileInfos', response.data[0]);
+                            commit('setUserInfos', response.data[0]);
                             console.log('Profil déjà crée');
                             resolve(response);
                         })
@@ -163,11 +170,12 @@ export default new Vuex.Store({
                 await instance
                     .get(`/profile/${username}`)
                     .then(async (response) => {
-                        console.log(response);
+                        console.log(response.data);
                         commit('profileInfos', response.data[0]);
                         commit('setStatus', '');
                     })
                     .catch(function (error) {
+                        commit('profileInfos', null);
                         commit('setStatus', 'error_get');
                         console.log(error);
                     });

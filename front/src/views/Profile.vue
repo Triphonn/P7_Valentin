@@ -1,7 +1,26 @@
 <template>
     <v-app>
-        <nav-bar :username="userInfos.username" :profilePicture="userInfos.profilePicture"/>
-        <v-main>
+        <nav-bar :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture"/>
+        <v-main v-if="mode == 'not_found'">
+            <v-snackbar
+                    v-model="snackbar"
+                    :timeout="2500"
+                >
+                    {{ getProfileError }}
+                </v-snackbar>
+            <v-col
+                cols="12"
+                md="4"
+                v-if="loading"
+                style="margin: 0 auto; max-width: 950px"
+            >
+                <v-skeleton-loader
+                type="image, table-heading, list-item-two-line"
+                ></v-skeleton-loader>
+            </v-col>
+        </v-main>
+
+        <v-main v-else>
             <v-col
                 cols="12"
                 md="4"
@@ -16,7 +35,7 @@
             <v-card v-else class="mx-auto" max-width="950" tile>
                 <v-row style="margin: 0;">
                     <v-img
-                        v-if="userInfos.banner == null"
+                        v-if="!userInfos || userInfos.banner == null "
                         class="img-file"
                         height="200"
                         src="https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg"
@@ -154,28 +173,42 @@ export default {
             zIndex: 0,
             mode: 'home',
             loading: false,
+            getProfileError: '',
+            snackbar: false,
+
+            getUsernameAvatar: this.$store.state.userInfos,
+
             userInfos: this.$store.state.profileInfos,
             
-            defaultBanner:
-                this.$store.state.profileInfos.banner ||
-                'https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg',
-            profilePicture:
-                this.$store.state.profileInfos.profilePicture,
+            defaultBanner: 'https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg' || this.$store.state.profileInfos.banner,
+            profilePicture: 'https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg' || this.$store.state.profileInfos.profilePicture,
         };
     },
     props: {
         source: String,
     },
     mounted () {
-        if (this.userInfos.username != this.$route.params.username){
+        if (this.userInfos == null && this.mode != 'not_found') {
+            console.log('test 1');
             this.getProfile();
+            this.mode = 'not_found'
             this.loading = true
-            console.log(this.loading);
             setTimeout(() => {
-                this.$router.go()
-            }, 50);
-        } else {
-            this.loading = false
+                this.loading = false
+                this.$router.push('/')
+            }, 2500);
+        } else if (this.userInfos != null) {
+            if (this.userInfos.username != this.$route.params.username){
+                console.log('test 2');
+                this.getProfile();
+                this.loading = true
+                setTimeout(() => {
+                    this.$router.go()
+                }, 50);
+            } else {
+                console.log('test 3');
+                this.loading = false
+            }
         }
     },
     computed: {
@@ -197,7 +230,7 @@ export default {
             }
         },
         ...mapGetters(['getProfileInfos']),
-        ...mapState(['status', 'user', 'profileInfos']),
+        ...mapState(['status', 'user']),
     },
     methods: {
         onBannerChange(e) {
@@ -221,9 +254,21 @@ export default {
             console.log(error);
             })
         },
-        getProfile: function () {
+        getProfile () {
+            const self = this;
             const username = this.$route.params.username;
-            this.getOneProfile(username);
+            this.getOneProfile(username)
+            .then(function () {
+               if (self.status != 'error_get'){
+                  self.$router.go();
+               } else {
+                    self.snackbar = true;
+                    self.getProfileError = 'Profil inconnu, retour à l\'accueil.';
+               }
+            })
+            .catch((error) => {
+              console.log(error);
+            })
         },
         ...mapActions(['getOneProfile'])
     },

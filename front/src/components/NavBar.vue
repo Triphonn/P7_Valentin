@@ -26,7 +26,6 @@
           <v-icon>mdi-plus-box</v-icon>
           </v-btn>
           <v-skeleton-loader
-            v-bind="attrs"
             type="avatar"
             v-if="profilePicture == null"
           ></v-skeleton-loader>
@@ -86,10 +85,12 @@ export default {
       methods: {
           goToProfile: function () {
             this.$router.push(`/profile/${this.username}`);
+            this.$router.go()
           },
           logout: function() {
             this.$store.dispatch('logout')
             this.$router.push('/')
+            this.$router.go()
          },
          signup: function () {
            this.$emit('login', 1)

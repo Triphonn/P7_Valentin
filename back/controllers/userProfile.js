@@ -183,7 +183,7 @@ exports.getOneProfile = (req, res) => {
     const sqlRequest = `SELECT * FROM userProfiles WHERE username = ?`;
     mysql.query(sqlRequest, req.params.username, (error, results) => {
         if (error || results == 0) {
-            res.json({ error });
+            res.status(404).json(error);
         } else {
             res.status(200).json(results);
         }

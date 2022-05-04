@@ -1,7 +1,7 @@
 <template>
   <v-app>
-    <div v-if="user != null">
-      <nav-bar :username="user.username" :profilePicture="user.profilePicture" :loading="loading" @createpost="postOverlay" />
+    <div v-if="getUsernameAvatar != null">
+      <nav-bar :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @createpost="postOverlay" />
     </div>
     <div v-else>
       <nav-bar @login="overlayLogin" />
@@ -73,7 +73,7 @@
                            </v-form>
                         </v-card-text>
                         <v-snackbar
-                           v-model="snackbar"
+                           v-model="snackbarPost"
                            :timeout="1500"
                         >
                            {{ postError }}
@@ -168,7 +168,7 @@ export default {
     name: 'Home',
     data () {
       return {
-          user: this.$store.state.profileInfos,
+          getUsernameAvatar: this.$store.state.userInfos,
           mode: 'signup',
           email: '',
           password: '',
@@ -178,6 +178,7 @@ export default {
           passwordFeedback: '',
           loginError: '',
           snackbar: false,
+          snackbarPost: false,
           overlayLog: false,
           overlayPost: false,
           zIndex: 1,
@@ -294,9 +295,8 @@ export default {
                }
             })
             .catch((error) => {
-               console.log('bite');
               console.log(error);
-              this.snackbar = true;
+              this.snackbarPost = true;
               this.postError = error;
             })
          },
