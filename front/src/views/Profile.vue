@@ -180,8 +180,8 @@ export default {
 
             userInfos: this.$store.state.profileInfos,
             
-            defaultBanner: 'https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg' || this.$store.state.profileInfos.banner,
-            profilePicture: 'https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg' || this.$store.state.profileInfos.profilePicture,
+            defaultBanner: this.$store.state.profileInfos.banner || 'https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg',
+            profilePicture: this.$store.state.profileInfos.profilePicture || 'https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg',
         };
     },
     props: {
@@ -216,14 +216,14 @@ export default {
             return this.$store.getters.getProfileInfos;
         },
         userBanner: function () {
-            if (this.$store.state.profileInfos.banner != null && this.mode != 'modifying') {
+            if (this.$store.state.profileInfos.banner != null && this.mode != 'modifying_banner') {
                 return this.$store.state.profileInfos.banner;
             } else {
                 return this.defaultBanner;
             }
         },
         userAvatar: function() {
-            if (this.$store.state.profileInfos.banner != null && this.mode != 'modifying') {
+            if (this.$store.state.profileInfos.banner != null && this.mode != 'modifying_avatar') {
                 return this.$store.state.profileInfos.profilePicture;
             } else {
                 return this.profilePicture;
@@ -234,13 +234,13 @@ export default {
     },
     methods: {
         onBannerChange(e) {
-            this.mode = 'modifying';
+            this.mode = 'modifying_banner';
             let urlCreator = window.URL || window.webkitURL;
             this.banner = e;
             this.defaultBanner = urlCreator.createObjectURL(this.banner);
         },
         onPPChange(e) {
-            this.mode = 'modifying';
+            this.mode = 'modifying_avatar';
             let urlCreator = window.URL || window.webkitURL;
             this.avatar = e;
             this.profilePicture = urlCreator.createObjectURL(this.avatar);

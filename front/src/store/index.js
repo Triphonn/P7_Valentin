@@ -71,9 +71,11 @@ export default new Vuex.Store({
         },
         updateBanner: function (state, banner) {
             state.profileInfos.banner = banner;
+            state.userInfos.banner = banner;
         },
         updateAvatar: function (state, profilePicture) {
             state.profileInfos.profilePicture = profilePicture;
+            state.userInfos.profilePicture = profilePicture;
         },
         logout: function (state) {
             state.user = {
@@ -214,6 +216,7 @@ export default new Vuex.Store({
                         .put('/profile/modifyProfile', userInfos)
                         .then(async (response) => {
                             commit('profileInfos', response.data[0]);
+                            commit('userInfos', response.data[0]);
                             commit('setStatus', '');
                         })
                         .catch(function (error) {
