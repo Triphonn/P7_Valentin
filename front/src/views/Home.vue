@@ -67,9 +67,6 @@
                               >
                               </v-textarea>
                               <img v-if="previewImage" class="img-file" width="100%" height="200px" :src="previewImage" />
-                              <v-alert dense type="info" v-if="passwordFeedback && mode == 'signup'" color='primary'>
-                                 {{ passwordFeedback }}
-                              </v-alert>
                            </v-form>
                         </v-card-text>
                         <v-snackbar
@@ -274,6 +271,23 @@ export default {
          ...mapState(['status', 'profileInfos'])
       },
       methods: {
+         createSinglePost(){
+            const self = this;
+            this.$store.dispatch('createPost', {postText: this.postTextArea, postImage: this.imagePost})
+            .then(function () {
+               if (self.status != 'error_save'){
+                  self.$router.go();
+               } else {
+                  self.snackbarPost = true;
+                  self.postError = 'Erreur de sauvegarde du brouillon';
+               }
+            })
+            .catch((error) => {
+              console.log(error);
+              this.snackbarPost = true;
+              this.postError = 'Erreur de sauvegarde du brouillon';
+            })
+         },
          draftTab(){
             if (!this.validatedFields) {
                this.overlayPost = false;
@@ -292,12 +306,15 @@ export default {
             .then(function () {
                if (self.status != 'error_save'){
                   self.$router.go();
+               } else {
+                  self.snackbarPost = true;
+                  self.postError = 'Erreur de sauvegarde du brouillon';
                }
             })
             .catch((error) => {
               console.log(error);
-              this.snackbarPost = true;
-              this.postError = error;
+              self.snackbarPost = true;
+              self.postError = 'Erreur de sauvegarde du brouillon';
             })
          },
          postOverlay() {

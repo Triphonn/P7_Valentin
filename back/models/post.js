@@ -1,16 +1,18 @@
 class Post {
     constructor(
-        _id,
         creator,
-        description,
+        _id,
+        content,
+        file,
         upvotes,
         downvotes,
         usersUpvoted,
         usersDownvoted
     ) {
-        this._id = _id;
         this.creator = creator;
-        this.description = description;
+        this._id = _id;
+        this.content = content;
+        this.file = file;
         this.upvotes = upvotes;
         this.downvotes = downvotes;
         this.usersUpvoted = usersUpvoted;

@@ -324,6 +324,64 @@ export default new Vuex.Store({
                 }
             }
         },
+        createPost: async ({ commit, getters }, postData) => {
+            commit('setStatus', 'loading.saving');
+
+            const userId = getters.getUserId;
+
+            let postDraftData = {
+                userId: userId,
+                postText: postData.postText,
+            };
+
+            let draftFormData = new FormData();
+            draftFormData.append('image', postData.postImage);
+            draftFormData.append('content', JSON.stringify(postDraftData));
+
+            console.log(postData.postImage);
+            console.log(postDraftData);
+
+            if (postData.postImage == null) {
+                try {
+                    await instance
+                        .post('/post/create', postDraftData, {
+                            headers: {
+                                Authorization: 'Bearer ' + getters.getToken,
+                            },
+                        })
+                        .then(async () => {
+                            commit('setStatus', '');
+                        })
+                        .catch(function (error) {
+                            commit('setStatus', 'error_save');
+                            console.log(error);
+                        });
+                } catch (err) {
+                    commit('setStatus', 'error_save');
+                    throw 'Unable to save your draft ';
+                }
+            } else {
+                try {
+                    await instance
+                        .post('/post/create', draftFormData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                                Authorization: 'Bearer ' + getters.getToken,
+                            },
+                        })
+                        .then(async () => {
+                            commit('setStatus', '');
+                        })
+                        .catch(function (error) {
+                            commit('setStatus', 'error_save');
+                            console.log(error);
+                        });
+                } catch (err) {
+                    commit('setStatus', 'error_save');
+                    throw 'Unable to save your draft ';
+                }
+            }
+        },
         logout: ({ commit }) => {
             commit('setStatus', '');
             commit('logout');
