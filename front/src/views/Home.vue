@@ -100,12 +100,12 @@
                <v-flex xs12 sm8 md4>
                   <v-card class="elevation-12" rounded="lg">
                      <v-toolbar dark color="primary" class="layout align-center justify-center">
-                        <v-toolbar-title v-if="mode == 'signup'">Inscription</v-toolbar-title>
+                        <v-toolbar-title v-if="mode == 'signup'" >Inscription</v-toolbar-title>
                         <v-toolbar-title v-else>Connexion</v-toolbar-title>
                      </v-toolbar>
                      <div style="margin: 10px auto; margin-bottom: 0px;" class="layout align-center justify-center">
-                        <span class="login_btn" v-if="mode == 'signup'">Vous avez déjà un compte ? <span class="card__action" @click="switchToLogin()">Se connecter</span></span>
-                        <span class="login_btn" v-else>Tu n'as pas encore de compte ? <span class="card__action" @click="switchToCreateAccount()">Créer un compte</span></span>
+                        <span class="login_btn" v-if="mode == 'signup'">Vous avez déjà un compte ? <span class="card__action" @click="switchToLogin">Se connecter</span></span>
+                        <span class="login_btn" v-else>Tu n'as pas encore de compte ? <span class="card__action" @click="switchToCreateAccount">Créer un compte</span></span>
                      </div>
                      <v-card-text style="padding-top: 0px">
                         <v-form>
@@ -360,9 +360,11 @@ export default {
             }
         },
         switchToCreateAccount () {
+            this.email = '', this.password = ''
             this.mode = 'signup';
         },
         switchToLogin () {
+            this.email = '', this.password = ''
             this.mode = 'login';
         },
         verifyProfile () {

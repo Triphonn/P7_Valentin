@@ -65,9 +65,15 @@
                                 <v-list-item-subtitle
                                     >@{{ userInfos.username }}</v-list-item-subtitle
                                 >
-                                <v-list-item-action-text
+                                <v-list-item-action-text style="margin: 2px 0 10px 0"
                                     >{{ userInfos.bio }}</v-list-item-action-text
                                 >
+                                <span>
+                                    <v-icon>mdi-calendar-month</v-icon>
+                                    <v-list-item-action-text style="margin-left: 5px;"
+                                        >A rejoint Groupomania en {{ dateProfile }}</v-list-item-action-text
+                                    >
+                                </span>
                             </v-list-item-content>
                         </v-list-item>
                     </v-col>
@@ -299,10 +305,18 @@ export default {
                 this.loading = false
             }
         }
+
     },
     computed: {
         profileInfos() {
             return this.$store.getters.getProfileInfos;
+        },
+        dateProfile: function () {
+            const month = parseInt(this.userInfos.date.substring(6, 7));
+            const year = parseInt(this.userInfos.date.substring(0, 4));
+            const arr = [{id: 1, val: 'janvier'}, {id: 2, val: 'février'}, {id: 3, val: 'mars'}, {id: 4, val: 'avril'}, {id: 5, val: 'mai'}, {id: 6, val: 'juin'}, {id: 7, val: 'juillet'}, {id: 8, val: 'août'}, {id: 9, val: 'septembre'}, {id: 10, val: 'octobre'}, {id: 11, val: 'novembre'}, {id: 12, val: 'décembre'}]
+            const index = arr.find((el) => el.id === month)
+            return `${index.val}`+ ` ${year}`;
         },
         userBanner: function () {
             if (this.$store.state.profileInfos.banner != null && this.mode != 'modifying') {

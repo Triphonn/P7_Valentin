@@ -253,7 +253,7 @@ export default new Vuex.Store({
                 throw 'Unable to modify your profile 2 ';
             }
         },
-        uploadBanner: async ({ commit }, bannerFormData) => {
+        uploadBanner: async ({ commit, getters }, bannerFormData) => {
             try {
                 await instance
                     .put('/profile/uploadBanner', bannerFormData, {
