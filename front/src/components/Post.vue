@@ -14,7 +14,7 @@
                 height="25vh"
               >
               <v-card-title>{{ name }}</v-card-title>
-              <v-card-subtitle>@{{ username }}</v-card-subtitle>
+              <v-card-subtitle style="cursor: pointer" @click="goToProfile()">@{{ username }}</v-card-subtitle>
               <v-card-text>{{ content }}</v-card-text>
               <v-img v-if="file" :src="file" style="height: 15vh"></v-img>
               </v-card>
