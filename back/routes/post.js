@@ -10,6 +10,6 @@ router.post('/savedraft', auth, multer, post.saveDraft);
 // router.post('/modify', auth, post.modifyPost);
 router.post('/delete', auth, post.deletePost);
 router.get('/:username/status/:id', auth, post.getOnePost);
-router.get('/', post.getAllPosts);
+router.get('/getAllPosts', post.getAllPosts);
 
 module.exports = router;

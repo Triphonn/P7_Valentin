@@ -2,9 +2,15 @@
   <v-app>
     <div v-if="getUsernameAvatar != null">
       <nav-bar :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @createpost="postOverlay" />
+      <v-main>
+         <posts v-for="post in posts" :key="post._id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" />
+      </v-main>
     </div>
     <div v-else>
       <nav-bar @login="overlayLogin" />
+      <v-main>
+         <posts v-for="post in posts" :key="post._id" :content="post.content" :file="post.file" :name="post.name" :username="post.username"/>
+      </v-main>
     </div>
     <v-main>
          <v-overlay :z-index="zIndex" :value="overlayPost">
@@ -55,8 +61,8 @@
                            <v-form>
                               <v-textarea
                                  class="form-row"
-                                 id="post"
-                                 name="post"
+                                 id="postTextArea"
+                                 name="postTextArea"
                                  label="Quoi de neuf ?"
                                  type="post"
                                  v-model="postTextArea"
@@ -160,6 +166,7 @@ import { required, minLength, email } from 'vuelidate/lib/validators'
 import zxcvbn from 'zxcvbn'
 
 import NavBar from '../components/NavBar.vue';
+import Posts from '../components/Post.vue';
 
 export default {
     name: 'Home',
@@ -179,7 +186,7 @@ export default {
           overlayLog: false,
           overlayPost: false,
           zIndex: 1,
-          post: '',
+          posts: [],
           imagePost: null,
           previewImage: null,
           postTextArea: '',
@@ -192,11 +199,16 @@ export default {
       },
       components: {
       NavBar,
+      Posts,
       },
       props: {
          source: String,
       },
       mounted () {
+         this.getAllPosts()
+         setInterval(() => {
+            this.getAllPosts()
+         }, 1800000);
          const userId = this.$store.state.user.userId;
          if (userId != -1) {
             this.overlayLog = false;
@@ -271,9 +283,20 @@ export default {
          ...mapState(['status', 'profileInfos'])
       },
       methods: {
+         async getAllPosts(){
+            const response = await fetch('http://localhost:3000/post/getAllPosts')
+            const data = await response.json();
+            this.posts = data;
+            console.log(this.posts);
+         },
          createSinglePost(){
             const self = this;
-            this.$store.dispatch('createPost', {postText: this.postTextArea, postImage: this.imagePost})
+
+            let today = new Date();
+            let dateToday = today.toISOString().substring(0, 19).split('T').join(' ');
+
+            console.log(dateToday);
+            this.$store.dispatch('createPost', {postText: this.postTextArea, postImage: this.imagePost, date: dateToday})
             .then(function () {
                if (self.status != 'error_save'){
                   self.$router.go();

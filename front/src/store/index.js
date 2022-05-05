@@ -332,6 +332,7 @@ export default new Vuex.Store({
             let postDraftData = {
                 userId: userId,
                 postText: postData.postText,
+                date: postData.date,
             };
 
             let draftFormData = new FormData();

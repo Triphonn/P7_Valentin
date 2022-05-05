@@ -7,35 +7,90 @@ exports.createPost = (req, res) => {
     function between(min, max) {
         return Math.floor(Math.random() * (max - min) + min);
     }
+
     if (req.file != null) {
-        const { userId, postText } = JSON.parse(req.body.content);
+        const { userId, postText, date } = JSON.parse(req.body.content);
         const file = `${req.protocol}://${req.get('host')}/images/${
             req.file.filename
         }`;
-        const _id = between(1000000000000000, 1999999999999999);
-        console.log(_id);
-        const Draft = new Post(userId, _id, postText, file, 0, 0, '', '');
-        console.log(Draft);
-        mysql.query('INSERT INTO posts SET ?', Draft, (error) => {
-            if (error) {
-                res.json({ error });
-            } else {
-                res.json({ message: 'Votre publication a été sauvegardé' });
+
+        mysql.query(
+            'SELECT * FROM userprofiles WHERE userId = ? ',
+            userId,
+            (error, results) => {
+                if (error) {
+                    res.json({ error });
+                } else {
+                    console.log(results);
+                    const _id = between(1000000000000000, 1999999999999999);
+                    console.log(_id);
+                    const Draft = new Post(
+                        results[0].username,
+                        results[0].name,
+                        _id,
+                        postText,
+                        file,
+                        date,
+                        0,
+                        0,
+                        '',
+                        ''
+                    );
+                    console.log(Draft);
+                    mysql.query('INSERT INTO posts SET ?', Draft, (error) => {
+                        if (error) {
+                            res.json({ error });
+                        } else {
+                            res.json({
+                                message: 'Votre publication a été sauvegardé',
+                            });
+                        }
+                    });
+                }
             }
-        });
+        );
     } else {
-        const { userId, postText } = req.body;
-        const _id = between(1000000000000000, 1999999999999999);
-        console.log('test 1 :' + _id);
-        const noImageDraft = new Post(userId, _id, postText, '', 0, 0, '', '');
-        console.log(noImageDraft);
-        mysql.query('INSERT INTO posts SET ?', noImageDraft, (error) => {
-            if (error) {
-                res.json({ error });
-            } else {
-                res.json({ message: 'Votre publication a été sauvegardé' });
+        const { userId, postText, date } = req.body;
+        mysql.query(
+            'SELECT * FROM userprofiles WHERE userId = ? ',
+            userId,
+            (error, results) => {
+                if (error) {
+                    res.json({ error });
+                } else {
+                    console.log(results);
+                    const _id = between(1000000000000000, 1999999999999999);
+                    console.log('test 1 :' + _id);
+                    const noImageDraft = new Post(
+                        results[0].username,
+                        results[0].name,
+                        _id,
+                        postText,
+                        '',
+                        date,
+                        0,
+                        0,
+                        '',
+                        ''
+                    );
+                    console.log(noImageDraft);
+                    mysql.query(
+                        'INSERT INTO posts SET ?',
+                        noImageDraft,
+                        (error) => {
+                            if (error) {
+                                res.json({ error });
+                            } else {
+                                res.json({
+                                    message:
+                                        'Votre publication a été sauvegardé',
+                                });
+                            }
+                        }
+                    );
+                }
             }
-        });
+        );
     }
 };
 
