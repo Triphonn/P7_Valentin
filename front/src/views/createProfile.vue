@@ -158,7 +158,7 @@ export default {
         createProfile () {
             const self = this;
             let today = new Date();
-            let dateToday = today.toISOString().substring(0, 10);
+            let dateToday = today.toISOString().substring(0, 19).split('T').join(' ');
             
             const profileInfos = {
                 userId: this.$store.state.user.userId,

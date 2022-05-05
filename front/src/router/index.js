@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
-import Login from '../views/Login.vue';
 import CreateProfile from '../views/createProfile.vue';
 import Profile from '../views/Profile.vue';
 
@@ -12,11 +11,6 @@ const routes = [
         name: 'Home',
         path: '/home',
         component: Home,
-    },
-    {
-        name: 'Login',
-        path: '/login',
-        component: Login,
     },
     {
         name: 'CreateProfile',

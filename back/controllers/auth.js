@@ -90,14 +90,3 @@ exports.login = (req, res) => {
         }
     );
 };
-
-exports.verifyProfile = (req, res) => {
-    const sqlRequest = `SELECT * FROM userprofiles WHERE userId = ?`;
-    mysql.query(sqlRequest, req.params.id, (error, results) => {
-        if (error || results == 0) {
-            res.status(404).json({ error });
-        } else {
-            res.status(200).json(results);
-        }
-    });
-};

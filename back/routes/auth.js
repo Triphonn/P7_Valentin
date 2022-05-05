@@ -22,10 +22,8 @@ const router = express.Router();
 // //
 
 const user = require('../controllers/auth');
-const auth = require('../middleware/auth');
 
 router.post('/signup', user.signUp);
 router.post('/login', user.login);
-router.get('/verifyprofile/:id', user.verifyProfile);
 
 module.exports = router;

@@ -5,11 +5,12 @@ const userProfile = require('../controllers/userProfile');
 const auth = require('../middleware/auth');
 const multer = require('../middleware/multer-config');
 
-router.post('/create', multer, userProfile.createProfile);
-router.put('/modifyProfile', userProfile.modifyProfile);
-router.put('/uploadAvatar', multer, userProfile.uploadAvatar);
-router.put('/uploadBanner', multer, userProfile.uploadBanner);
-router.post('/delete', userProfile.deleteProfile);
+router.post('/create', auth, multer, userProfile.createProfile);
+router.put('/modifyProfile', auth, userProfile.modifyProfile);
+router.put('/uploadAvatar', auth, multer, userProfile.uploadAvatar);
+router.put('/uploadBanner', auth, multer, userProfile.uploadBanner);
+router.post('/delete', auth, userProfile.deleteProfile);
 router.get('/:username', userProfile.getOneProfile);
+router.get('/verifyprofile/:id', auth, userProfile.verifyProfile);
 
 module.exports = router;

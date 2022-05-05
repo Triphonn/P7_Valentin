@@ -79,6 +79,11 @@ exports.modifyProfile = (req, res) => {
             if (error || results == 0) {
                 res.json({ error });
             } else {
+                results[0].date = results[0].date
+                    .toISOString()
+                    .substring(0, 19)
+                    .split('T')
+                    .join(' ');
                 res.status(200).json(results);
             }
         }
@@ -185,6 +190,22 @@ exports.getOneProfile = (req, res) => {
         if (error || results == 0) {
             res.status(404).json(error);
         } else {
+            res.status(200).json(results);
+        }
+    });
+};
+
+exports.verifyProfile = (req, res) => {
+    const sqlRequest = `SELECT * FROM userprofiles WHERE userId = ?`;
+    mysql.query(sqlRequest, req.params.id, (error, results) => {
+        if (error || results == 0) {
+            res.status(404).json({ error });
+        } else {
+            results[0].date = results[0].date
+                .toISOString()
+                .substring(0, 19)
+                .split('T')
+                .join(' ');
             res.status(200).json(results);
         }
     });

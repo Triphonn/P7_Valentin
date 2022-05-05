@@ -171,11 +171,19 @@ exports.getOnePost = (req, res) => {
 
 // Showing all posts registered in DB
 exports.getAllPosts = (req, res) => {
-    const sqlRequest = `SELECT * FROM posts`;
+    const sqlRequest = `SELECT * FROM posts ORDER BY date DESC`;
     mysql.query(sqlRequest, (error, results) => {
         if (error || results == 0) {
             res.json({ error });
         } else {
+            for (let i = 0; i < results.length; i++) {
+                results[i].date = results[i].date
+                    .toISOString()
+                    .substring(0, 19)
+                    .split('T')
+                    .join(' ');
+            }
+            console.log(results);
             res.status(200).json(results);
         }
     });

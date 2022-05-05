@@ -61,7 +61,6 @@ export default new Vuex.Store({
         logUser: function (state, user) {
             instance.defaults.headers.common['Authorization'] = user.token;
             state.user = user;
-            console.log(user);
         },
         profileInfos: function (state, profileInfos) {
             state.profileInfos = profileInfos;
@@ -123,20 +122,21 @@ export default new Vuex.Store({
                     });
             });
         },
-        createProfile: ({ commit }, profileInfos) => {
+        createProfile: ({ commit, getters }, profileInfos) => {
             commit('setStatus', 'loading');
             return new Promise((resolve, reject) => {
                 commit;
                 instance
                     .post('/profile/create', profileInfos, {
-                        headers: { 'Content-Type': 'multipart/form-data' },
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            Authorization: 'Bearer ' + getters.getToken,
+                        },
                     })
                     .then(function (response) {
                         commit('setStatus', 'profileCreated');
-                        console.log(response);
                         commit('profileInfos', response.data.Profile);
                         commit('setUserInfos', response.data.Profile);
-                        console.log('Profil crée');
                         resolve(response);
                     })
                     .catch(function (error) {
@@ -152,12 +152,15 @@ export default new Vuex.Store({
                 return new Promise((resolve, reject) => {
                     const userId = getters.getUserId;
                     instance
-                        .get(`/auth/verifyprofile/${userId}`)
+                        .get(`/profile/verifyprofile/${userId}`, {
+                            headers: {
+                                Authorization: 'Bearer ' + getters.getToken,
+                            },
+                        })
                         .then(function (response) {
                             commit('setStatus', 'profileCreated');
                             commit('profileInfos', response.data[0]);
                             commit('setUserInfos', response.data[0]);
-                            console.log('Profil déjà crée');
                             resolve(response);
                         })
                         .catch(function (error) {
@@ -172,7 +175,6 @@ export default new Vuex.Store({
                 await instance
                     .get(`/profile/${username}`)
                     .then(async (response) => {
-                        console.log(response.data);
                         commit('profileInfos', response.data[0]);
                         commit('setStatus', '');
                     })
@@ -188,24 +190,20 @@ export default new Vuex.Store({
         },
         modifyProfile: async ({ commit, getters, dispatch }, ProfileInfos) => {
             const userId = getters.getUserId;
-            console.log(ProfileInfos);
 
             if (ProfileInfos.banner != null) {
-                console.log('1');
                 let bannerFormData = new FormData();
                 bannerFormData.append('image', ProfileInfos.banner);
                 bannerFormData.append('userId', userId);
                 dispatch('uploadBanner', bannerFormData);
             }
             if (ProfileInfos.avatar != null) {
-                console.log('2');
                 let avatarformData = new FormData();
                 avatarformData.append('image', ProfileInfos.avatar);
                 avatarformData.append('userId', userId);
                 dispatch('uploadAvatar', avatarformData);
             }
             if (ProfileInfos.name != '' || ProfileInfos.bio != '') {
-                console.log('3');
                 try {
                     let userInfos = {
                         userId: userId,
@@ -213,10 +211,14 @@ export default new Vuex.Store({
                         bio: ProfileInfos.bio,
                     };
                     await instance
-                        .put('/profile/modifyProfile', userInfos)
+                        .put('/profile/modifyProfile', userInfos, {
+                            headers: {
+                                Authorization: 'Bearer ' + getters.getToken,
+                            },
+                        })
                         .then(async (response) => {
                             commit('profileInfos', response.data[0]);
-                            commit('userInfos', response.data[0]);
+                            commit('setUserInfos', response.data[0]);
                             commit('setStatus', '');
                         })
                         .catch(function (error) {
@@ -230,11 +232,14 @@ export default new Vuex.Store({
                 commit('setStatus', 'error_modify');
             }
         },
-        uploadAvatar: async ({ commit }, avatarformData) => {
+        uploadAvatar: async ({ commit, getters }, avatarformData) => {
             try {
                 await instance
                     .put('/profile/uploadAvatar', avatarformData, {
-                        headers: { 'Content-Type': 'multipart/form-data' },
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            Authorization: 'Bearer ' + getters.getToken,
+                        },
                     })
                     .then(async (response) => {
                         commit('updateAvatar', response.data);
@@ -252,7 +257,10 @@ export default new Vuex.Store({
             try {
                 await instance
                     .put('/profile/uploadBanner', bannerFormData, {
-                        headers: { 'Content-Type': 'multipart/form-data' },
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            Authorization: 'Bearer ' + getters.getToken,
+                        },
                     })
                     .then(async (response) => {
                         commit('updateBanner', response.data);
@@ -279,9 +287,6 @@ export default new Vuex.Store({
             let draftFormData = new FormData();
             draftFormData.append('image', postData.postImage);
             draftFormData.append('content', JSON.stringify(postDraftData));
-
-            console.log(postData.postImage);
-            console.log(postDraftData);
 
             if (postData.postImage == null) {
                 try {
@@ -338,9 +343,6 @@ export default new Vuex.Store({
             let draftFormData = new FormData();
             draftFormData.append('image', postData.postImage);
             draftFormData.append('content', JSON.stringify(postDraftData));
-
-            console.log(postData.postImage);
-            console.log(postDraftData);
 
             if (postData.postImage == null) {
                 try {

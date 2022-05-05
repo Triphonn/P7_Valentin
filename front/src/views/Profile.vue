@@ -1,6 +1,6 @@
 <template>
     <v-app>
-        <nav-bar :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture"/>
+        <nav-bar :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @createpost="postOverlay" />
         <v-main v-if="mode == 'not_found'">
             <v-snackbar
                     v-model="snackbar"
@@ -51,7 +51,7 @@
                     <v-col>
                         <v-list-item>
                             <v-list-item-avatar size="100">
-                                <img
+                                <v-img
                                     class="avatar-22"
                                     :src="userInfos.profilePicture"
                                     alt="Photo de profil"
@@ -74,6 +74,87 @@
                     <v-btn v-if="userInfos.userId == user.userId" style="postition: absolute; top: 35px; right: 20px;" color="primary" @click="overlay = !overlay" class="button">      
                       <span>Editer le profil</span>
                     </v-btn>
+                    <v-overlay :z-index="zIndex" :value="overlayPost">
+                        <v-container ma-0 pa-0 fluid fill-height>
+                            <v-layout column align-center justify-center>
+                                <v-flex xs12 sm8 md4>
+                                    <v-card class="elevation-12">
+                                        <v-btn
+                                            depressed
+                                            fab
+                                            icon
+                                            color="primary"
+                                            @click="draftTab"
+                                            >
+                                                <v-icon dense color="secondary">
+                                                    mdi-close
+                                                </v-icon>
+                                        </v-btn>
+                                        <v-overlay :z-index="zIndex" :value="overlayClosingVerif">
+                                            <v-card
+                                                elevation="2"
+                                            >
+                                            <v-card-title>Enregistrer la publication ?</v-card-title>
+
+                                            <v-card-text>Vous pouvez enregistrer ceci pour l'envoyer plus tard depuis vos brouillons. </v-card-text>
+
+                                            <v-card-actions>
+                                                <v-btn
+                                                    text
+                                                    class="button"
+                                                    @click="saveDrafts"
+                                                >
+                                                Enregistrer
+                                                </v-btn>
+                                            </v-card-actions>
+                                            <v-card-actions>
+                                                <v-btn
+                                                    text
+                                                    class="button"
+                                                    @click="clearPost"
+                                                >
+                                                Supprimer
+                                                </v-btn>
+                                            </v-card-actions>
+                                            </v-card>
+                                        </v-overlay>
+                                        <v-card-text style="margin-top: -25px; width: 500px">
+                                        <v-form>
+                                            <v-textarea
+                                                class="form-row"
+                                                id="postTextArea"
+                                                name="postTextArea"
+                                                label="Quoi de neuf ?"
+                                                type="post"
+                                                v-model="postTextArea"
+                                                auto-grow
+                                                dense
+                                                counter="120"
+                                                :rules="[rules.length(120)]"
+                                            >
+                                            </v-textarea>
+                                            <img v-if="previewImage" class="img-file" width="100%" height="200px" :src="previewImage" />
+                                        </v-form>
+                                        </v-card-text>
+                                        <v-snackbar
+                                        v-model="snackbarPost"
+                                        :timeout="1500"
+                                        >
+                                        {{ postError }}
+                                        </v-snackbar>
+                                        <v-card-actions class="form-row">
+                                        <v-file-input hide-input prepend-icon="mdi-image-outline" @change="previewImageContent" accept="image/*" />       
+                                        <v-spacer></v-spacer>
+                                        <v-btn color="primary" @click="createSinglePost()" class="button" :disabled="!validatedFields" v-if="mode == 'createPost'">        
+                                            <span v-if="status == 'loading'">Publication en cours...</span>
+                                            <span v-else>Publier</span>
+                                        </v-btn>
+                                        </v-card-actions>
+                                    </v-card>
+                                </v-flex>
+                            </v-layout>
+                        </v-container>
+                    </v-overlay>
                     <v-overlay :z-index="zIndex" :value="overlay">
                       <v-card class="elevation-12" width="600px">
                             <v-toolbar dark color="primary">
@@ -170,18 +251,29 @@ export default {
             bannerHover: false,
             PPHover: false,
             overlay: false,
-            zIndex: 0,
+            zIndex: 1,
             mode: 'home',
+            previewMode: '',
             loading: false,
             getProfileError: '',
             snackbar: false,
+            imagePost: null,
+            previewImage: null,
+            postTextArea: '',
+            postError: '',
+            overlayClosingVerif: false,
+            overlayPost: false,
+            snackbarPost: false,
+            rules: {
+                length: len => v => (v || '').length <= len || `Vous avez atteint le maximum de charactères (${len})`,
+            },
 
             getUsernameAvatar: this.$store.state.userInfos,
 
             userInfos: this.$store.state.profileInfos,
             
-            defaultBanner: this.$store.state.profileInfos.banner || 'https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg',
-            profilePicture: this.$store.state.profileInfos.profilePicture || 'https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg',
+            defaultBanner: 'https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg',
+            profilePicture: 'https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg',
         };
     },
     props: {
@@ -189,7 +281,6 @@ export default {
     },
     mounted () {
         if (this.userInfos == null && this.mode != 'not_found') {
-            console.log('test 1');
             this.getProfile();
             this.mode = 'not_found'
             this.loading = true
@@ -199,14 +290,12 @@ export default {
             }, 2500);
         } else if (this.userInfos != null) {
             if (this.userInfos.username != this.$route.params.username){
-                console.log('test 2');
                 this.getProfile();
                 this.loading = true
                 setTimeout(() => {
                     this.$router.go()
                 }, 50);
             } else {
-                console.log('test 3');
                 this.loading = false
             }
         }
@@ -216,31 +305,103 @@ export default {
             return this.$store.getters.getProfileInfos;
         },
         userBanner: function () {
-            if (this.$store.state.profileInfos.banner != null && this.mode != 'modifying_banner') {
+            if (this.$store.state.profileInfos.banner != null && this.mode != 'modifying') {
                 return this.$store.state.profileInfos.banner;
             } else {
                 return this.defaultBanner;
             }
         },
         userAvatar: function() {
-            if (this.$store.state.profileInfos.banner != null && this.mode != 'modifying_avatar') {
+            if (this.$store.state.profileInfos.profilePicture != null && this.previewMode != 'avatar') {
                 return this.$store.state.profileInfos.profilePicture;
             } else {
-                return this.profilePicture;
+                return this.profilePicture
+            }
+        },
+        closeVerification() {
+            this.overlayClosingVerif = true;
+        },
+        validatedFields: function () {
+            if (this.mode == 'createPost'){
+               if (this.postTextArea != "" && this.postTextArea.length >= 5 && this.postTextArea.length <= 120) {
+                  return true;
+               } else {
+                  return false;
+               }
             }
         },
         ...mapGetters(['getProfileInfos']),
         ...mapState(['status', 'user']),
     },
     methods: {
+        createSinglePost(){
+            const self = this;
+
+            let today = new Date();
+            let dateToday = today.toISOString().substring(0, 19).split('T').join(' ');
+
+            this.$store.dispatch('createPost', {postText: this.postTextArea, postImage: this.imagePost, date: dateToday})
+            .then(function () {
+               if (self.status != 'error_save'){
+                  self.$router.go();
+               } else {
+                  self.snackbarPost = true;
+                  self.postError = 'Erreur de sauvegarde du brouillon';
+               }
+            })
+            .catch((error) => {
+              console.log(error);
+              this.snackbarPost = true;
+              this.postError = 'Erreur de sauvegarde du brouillon';
+            })
+        },
+        draftTab(){
+            if (!this.validatedFields) {
+               this.overlayPost = false;
+               this.clearPost();
+               
+            } else {
+               this.overlayClosingVerif = true
+            }
+        },
+        clearPost () {
+            this.postTextArea = '', this.overlayPost = false, this.overlayClosingVerif = false, this.imagePost = null, this.previewImage = null
+        },
+        saveDrafts() {
+            const self = this;
+            this.$store.dispatch('saveDrafts', {postText: this.postTextArea, postImage: this.imagePost})
+            .then(function () {
+               if (self.status != 'error_save'){
+                  self.$router.go();
+               } else {
+                  self.snackbarPost = true;
+                  self.postError = 'Erreur de sauvegarde du brouillon';
+               }
+            })
+            .catch((error) => {
+              console.log(error);
+              self.snackbarPost = true;
+              self.postError = 'Erreur de sauvegarde du brouillon';
+            })
+        },
+        postOverlay() {
+            this.mode = 'createPost'
+            this.overlayPost = true
+        },
+        previewImageContent(e) {
+            this.mode = 'createPost';
+            let urlCreator = window.URL || window.webkitURL;
+            this.imagePost = e;
+            this.previewImage = urlCreator.createObjectURL(this.imagePost);
+        },
         onBannerChange(e) {
-            this.mode = 'modifying_banner';
+            this.mode = 'modifying';
             let urlCreator = window.URL || window.webkitURL;
             this.banner = e;
             this.defaultBanner = urlCreator.createObjectURL(this.banner);
         },
         onPPChange(e) {
-            this.mode = 'modifying_avatar';
+            this.previewMode = 'avatar';
             let urlCreator = window.URL || window.webkitURL;
             this.avatar = e;
             this.profilePicture = urlCreator.createObjectURL(this.avatar);

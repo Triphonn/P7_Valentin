@@ -2,13 +2,13 @@
   <v-app>
     <div v-if="getUsernameAvatar != null">
       <nav-bar :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @createpost="postOverlay" />
-      <v-main>
+      <v-main v-if="posts.length >= 0">
          <posts v-for="post in posts" :key="post._id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" />
       </v-main>
     </div>
     <div v-else>
       <nav-bar @login="overlayLogin" />
-      <v-main>
+      <v-main v-if="posts.length >= 0">
          <posts v-for="post in posts" :key="post._id" :content="post.content" :file="post.file" :name="post.name" :username="post.username"/>
       </v-main>
     </div>
@@ -98,14 +98,16 @@
          <v-container ma-0 pa-0 fluid fill-height>
             <v-layout column align-center justify-center>
                <v-flex xs12 sm8 md4>
-                  <v-card class="elevation-12">
-                     <v-toolbar dark color="primary">
+                  <v-card class="elevation-12" rounded="lg">
+                     <v-toolbar dark color="primary" class="layout align-center justify-center">
                         <v-toolbar-title v-if="mode == 'signup'">Inscription</v-toolbar-title>
                         <v-toolbar-title v-else>Connexion</v-toolbar-title>
                      </v-toolbar>
-                     <span class="login_btn" v-if="mode == 'signup'">Vous avez déjà un compte ? <span class="card__action" @click="switchToLogin()">Se connecter</span></span>
-                     <span class="login_btn" v-else>Tu n'as pas encore de compte ? <span class="card__action" @click="switchToCreateAccount()">Créer un compte</span></span>
-                     <v-card-text>
+                     <div style="margin: 10px auto; margin-bottom: 0px;" class="layout align-center justify-center">
+                        <span class="login_btn" v-if="mode == 'signup'">Vous avez déjà un compte ? <span class="card__action" @click="switchToLogin()">Se connecter</span></span>
+                        <span class="login_btn" v-else>Tu n'as pas encore de compte ? <span class="card__action" @click="switchToCreateAccount()">Créer un compte</span></span>
+                     </div>
+                     <v-card-text style="padding-top: 0px">
                         <v-form>
                            <v-text-field
                               class="form-row"
@@ -287,7 +289,6 @@ export default {
             const response = await fetch('http://localhost:3000/post/getAllPosts')
             const data = await response.json();
             this.posts = data;
-            console.log(this.posts);
          },
          createSinglePost(){
             const self = this;
@@ -295,7 +296,6 @@ export default {
             let today = new Date();
             let dateToday = today.toISOString().substring(0, 19).split('T').join(' ');
 
-            console.log(dateToday);
             this.$store.dispatch('createPost', {postText: this.postTextArea, postImage: this.imagePost, date: dateToday})
             .then(function () {
                if (self.status != 'error_save'){
