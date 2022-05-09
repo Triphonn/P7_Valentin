@@ -2,20 +2,24 @@
   <v-app>
     <div v-if="getUsernameAvatar != null">
       <nav-bar :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @createpost="postOverlay" />
-      <v-main v-if="posts.length >= 0">
+      <v-main>
          <v-overlay :z-index="zIndex" :value="overlayPost">
             <create-post :mode="mode" @overlayClose="postOverlayHide" />
          </v-overlay>
-         <posts v-for="post in posts" :key="post._id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" />
+         <div v-if="posts.length >= 0">
+            <posts v-for="post in posts" :key="post._id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" />
+         </div>
       </v-main>
     </div>
     <div v-else>
       <nav-bar @login="overlayLogin" />
-      <v-main v-if="posts.length >= 0">
+      <v-main>
          <v-overlay :z-index="zIndex" :value="overlayLog">
-            <login :mode="mode" />
+            <login :mode="mode" @login="overlayLogin" />
          </v-overlay>
-         <posts v-for="post in posts" :key="post._id" :content="post.content" :file="post.file" :name="post.name" :username="post.username"/>
+         <div v-if="posts.length >= 0">
+            <posts v-for="post in posts" :key="post._id" :content="post.content" :file="post.file" :name="post.name" :username="post.username"/>
+         </div>
       </v-main>
     </div>
   </v-app>

@@ -4,11 +4,11 @@
             <v-flex xs12 sm8 md4>
                 <v-card class="elevation-12" rounded="lg">
                     <v-toolbar dark color="primary" class="layout align-center justify-center">
-                        <v-toolbar-title v-if="mode == 'signup' || loginmode == 'signup'" >Inscription</v-toolbar-title>
+                        <v-toolbar-title v-if="mode == 'signup'" >Inscription</v-toolbar-title>
                         <v-toolbar-title v-else>Connexion</v-toolbar-title>
                     </v-toolbar>
                     <div style="margin: 10px auto; margin-bottom: 0px;" class="layout align-center justify-center">
-                        <span class="login_btn" v-if="mode == 'signup' || loginmode == 'signup'">Vous avez déjà un compte ? <span class="card__action" @click="switchToLogin">Se connecter</span></span>
+                        <span class="login_btn" v-if="mode == 'signup'">Vous avez déjà un compte ? <span class="card__action" @click="switchToLogin">Se connecter</span></span>
                         <span class="login_btn" v-else>Tu n'as pas encore de compte ? <span class="card__action" @click="switchToCreateAccount">Créer un compte</span></span>
                     </div>
                     <v-card-text style="padding-top: 0px">
@@ -34,7 +34,7 @@
                               @blur="$v.password.$touch()"
                               v-model="password"
                            ></v-text-field>
-                           <v-alert dense type="info" v-if="passwordFeedback && loginmode == 'signup'" color='primary'>
+                           <v-alert dense type="info" v-if="passwordFeedback && mode == 'signup'" color='primary'>
                               {{ passwordFeedback }}
                            </v-alert>
                         </v-form>
@@ -47,7 +47,7 @@
                     </v-snackbar>
                     <v-card-actions class="form-row">
                         <v-spacer></v-spacer>
-                        <v-btn color="primary" @click="createAccount()" class="button" :disabled="disabled" v-if="loginmode == 'signup'">        
+                        <v-btn color="primary" @click="createAccount()" class="button" :disabled="disabled" v-if="mode == 'signup'">        
                            <span v-if="status == 'loading'">Création en cours...</span>
                            <span v-else>Créer mon compte</span>
                         </v-btn>
@@ -72,7 +72,6 @@ export default {
     name: 'Login',
     data () {
       return {
-          loginmode: 'signup',
           email: '',
           password: '',
           disabled: true,
@@ -86,11 +85,6 @@ export default {
         };
       },
     mounted () {
-        if (this.mode == 'signup'){
-            this.loginmode = 'signup'
-        } else {
-            this.loginmode = 'login'
-        }
         const userId = this.$store.state.user.userId;
         if (userId != -1) {
             this.overlayLog = false;
@@ -113,7 +107,7 @@ export default {
     computed: {
         emailErrors() {
             const errors = [];
-            if (this.loginmode == 'login') return errors;
+            if (this.mode == 'login') return errors;
             if (!this.$v.email.$dirty) return errors;
             !this.$v.email.required && errors.push('L\'email est requis');
             !this.$v.email.email && errors.push('L\'email n\'est pas valide');
@@ -124,7 +118,7 @@ export default {
 
         passwordErrors() {
             const errors = [];
-            if (this.loginmode == 'login') return errors;
+            if (this.mode == 'login') return errors;
             if (!this.$v.password.$dirty) return errors;
             !this.$v.password.required && errors.push('Le mot de passe est requis');
             !this.$v.password.minLength && errors.push('Le mot de passe doit contenir au moins 8 caractères');
@@ -159,22 +153,20 @@ export default {
          ...mapState(['status', 'profileInfos'])
       },
       methods: {
-        overlayLogin (event) {
-            if ( event == 1 ) {
-               this.loginmode = 'signup'
-               this.overlayLog = true
-            } else {
-               this.loginmode = 'login'
-               this.overlayLog = true
-            }
+        clearData(){
+            this.email = '', 
+            this.password = ''
+            this.emailError = '',
+            this.passwordError = '',
+            this.passwordFeedback = ''
         },
         switchToCreateAccount () {
-            this.email = '', this.password = ''
-            this.loginmode = 'signup';
+            this.clearData();
+            this.$emit('login', 1)
         },
         switchToLogin () {
-            this.email = '', this.password = ''
-            this.loginmode = 'login';
+            this.clearData();
+            this.$emit('login', 0)
         },
         verifyProfile () {
             const self = this;

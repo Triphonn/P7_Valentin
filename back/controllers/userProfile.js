@@ -136,7 +136,52 @@ exports.deleteProfile = async (req, res) => {
                             .status(401)
                             .json({ error: 'Mot de passe incorrect !' });
                     }
-                    const profile = await userProfile.findByPk(username);
+
+                    await userProfile.destroy({
+                        where: { username: username },
+                    });
+                    await user.destroy();
+
+                    await posts.destroy({
+                        where: { username: username },
+                    });
+
+                    await postdraft.destroy({
+                        where: { _id: userId },
+                    });
+                    res.status(200).json({
+                        message: "bien joué frero t'as bien supp",
+                    });
+                });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
+};
+
+exports.desactivateProfile = async (req, res) => {
+    try {
+        const { userId, username, password } = req.body;
+        const user = await users.findByPk(userId);
+        if (!user) {
+            res.status(404).json({ errror: 'Utilisateur non trouvé !' });
+        } else {
+            bcrypt
+                // Check password security
+                .compare(password, user.password)
+                .then(async (valid) => {
+                    // If password is wrong return error
+                    if (!valid) {
+                        return res
+                            .status(401)
+                            .json({ error: 'Mot de passe incorrect !' });
+                    }
+                    const profile = await userProfile.findOne({
+                        where: {
+                            username: username,
+                        },
+                    });
 
                     await deletedaccount.create({
                         userId: profile.userId,
@@ -151,12 +196,14 @@ exports.deleteProfile = async (req, res) => {
                     await profile.destroy();
                     await user.destroy();
 
-                    if (posts.findOne({ where: { username: username } })) {
-                        await posts.destroy();
-                    }
-                    if (postdraft.findOne({ where: { username: username } })) {
-                        await postdraft.destroy();
-                    }
+                    await posts.destroy({
+                        where: { username: username },
+                    });
+
+                    await postdraft.destroy({
+                        where: { _id: userId },
+                    });
+                    res.status(200);
                 });
         }
     } catch (error) {
@@ -172,6 +219,7 @@ exports.getOneProfile = async (req, res) => {
                 username: req.params.username,
             },
         });
+        console.log(profile);
         res.status(200).json(profile);
     } catch (error) {
         console.error(error);

@@ -215,7 +215,7 @@
                     </v-overlay>
                 </v-row>
             </v-card>
-            <div v-if="posts.length >= 0">
+            <div v-if="posts.length >= 0 && loading == false">
                 <posts v-for="post in posts" :key="post._id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" />
             </div>
         </v-main>
@@ -248,6 +248,7 @@ export default {
             zIndex: 1,
             mode: 'home',
             previewMode: '',
+            overlayLog: false,
 
             loading: false,
             getProfileError: '',
@@ -286,13 +287,10 @@ export default {
                 this.loading = false
                 this.$router.push('/')
             }, 2500);
-        } else if (this.userInfos != null) {
+        } else {
             if (this.userInfos.username != this.$route.params.username){
                 this.getProfile();
                 this.loading = true
-                setTimeout(() => {
-                    this.$router.go()
-                }, 50);
             } else {
                 this.loading = false
             }
@@ -369,8 +367,9 @@ export default {
             this.$store.dispatch('deleteAccount', {usernameConfirm: this.deleteConfirm, password: this.password, deleteDate: dateToday})
             .then(function () {
                 setTimeout(() => {
+                    console.log(self.status);
                     if (self.status != 'error_delete'){
-                        self.$router.go();
+                        self.$router.push('/');
                         self.$store.dispatch('logout')
                     } else {
                         self.deleteErrors = 'Mot de passe incorrect'
@@ -473,7 +472,7 @@ export default {
             this.getOneProfile(username)
             .then(function () {
                if (self.status != 'error_get'){
-                  self.$router.go();
+                    self.$router.go()
                } else {
                     self.snackbar = true;
                     self.getProfileError = 'Profil inconnu, retour à l\'accueil.';

@@ -176,8 +176,15 @@ export default new Vuex.Store({
                 await instance
                     .get(`/profile/${username}`)
                     .then(async (response) => {
-                        commit('profileInfos', response.data);
-                        commit('setStatus', '');
+                        console.log(response);
+                        if (response.data == null) {
+                            console.log('test data null');
+                            commit('profileInfos', response.data);
+                            commit('setStatus', 'error_get');
+                        } else {
+                            commit('profileInfos', response.data);
+                            commit('setStatus', '');
+                        }
                     })
                     .catch(function (error) {
                         commit('profileInfos', null);
@@ -404,15 +411,10 @@ export default new Vuex.Store({
                             Authorization: 'Bearer ' + getters.getToken,
                         },
                     })
-                    .then(async (response) => {
+                    .then(async () => {
                         setTimeout(() => {
-                            if (
-                                response.data.message ==
-                                'Vous avez bien supprimé votre compte.'
-                            ) {
-                                commit('setStatus', '');
-                            }
-                        }, 1500);
+                            commit('setStatus', '');
+                        }, 1750);
                     })
                     .catch(function (error) {
                         setTimeout(() => {
