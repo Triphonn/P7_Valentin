@@ -1,127 +1,75 @@
 const Post = require('../models/post');
-const postDraft = require('../models/postdraft');
 const fs = require('fs');
-const mysql = require('../db');
+const db = require('../db');
+const { posts, postdraft, userProfile } = db;
 
-exports.createPost = (req, res) => {
-    function between(min, max) {
-        return Math.floor(Math.random() * (max - min) + min);
-    }
+exports.createPost = async (req, res) => {
+    try {
+        function between(min, max) {
+            return Math.floor(Math.random() * (max - min) + min);
+        }
 
-    if (req.file != null) {
-        const { userId, postText, date } = JSON.parse(req.body.content);
-        const file = `${req.protocol}://${req.get('host')}/images/${
-            req.file.filename
-        }`;
+        let userId = '';
+        let postText = '';
+        let file = '';
 
-        mysql.query(
-            'SELECT * FROM userprofiles WHERE userId = ? ',
-            userId,
-            (error, results) => {
-                if (error) {
-                    res.json({ error });
-                } else {
-                    console.log(results);
-                    const _id = between(1000000000000000, 1999999999999999);
-                    console.log(_id);
-                    const Draft = new Post(
-                        results[0].username,
-                        results[0].name,
-                        _id,
-                        postText,
-                        file,
-                        date,
-                        0,
-                        0,
-                        '',
-                        ''
-                    );
-                    console.log(Draft);
-                    mysql.query('INSERT INTO posts SET ?', Draft, (error) => {
-                        if (error) {
-                            res.json({ error });
-                        } else {
-                            res.json({
-                                message: 'Votre publication a été sauvegardé',
-                            });
-                        }
-                    });
-                }
-            }
-        );
-    } else {
-        const { userId, postText, date } = req.body;
-        mysql.query(
-            'SELECT * FROM userprofiles WHERE userId = ? ',
-            userId,
-            (error, results) => {
-                if (error) {
-                    res.json({ error });
-                } else {
-                    console.log(results);
-                    const _id = between(1000000000000000, 1999999999999999);
-                    console.log('test 1 :' + _id);
-                    const noImageDraft = new Post(
-                        results[0].username,
-                        results[0].name,
-                        _id,
-                        postText,
-                        '',
-                        date,
-                        0,
-                        0,
-                        '',
-                        ''
-                    );
-                    console.log(noImageDraft);
-                    mysql.query(
-                        'INSERT INTO posts SET ?',
-                        noImageDraft,
-                        (error) => {
-                            if (error) {
-                                res.json({ error });
-                            } else {
-                                res.json({
-                                    message:
-                                        'Votre publication a été sauvegardé',
-                                });
-                            }
-                        }
-                    );
-                }
-            }
-        );
+        const _id = between(1000000000000000, 1999999999999999);
+
+        if (!req.file) {
+            userId = req.body.userId;
+            postText = req.body.postText;
+            imageContent = null;
+        } else {
+            userId = JSON.parse(req.body.content.userId);
+            postText = JSON.parse(req.body.content.postText);
+            file = `${req.protocol}://${req.get('host')}/images/${
+                req.file.filename
+            }`;
+        }
+
+        const profile = await userProfile.findByPk(userId);
+
+        await posts.create({
+            username: profile.username,
+            name: profile.name,
+            _id: _id,
+            content: postText,
+            file: file,
+        });
+        res.status(201).json({ message: 'Votre publication a été publié' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
     }
 };
 
-exports.saveDraft = (req, res) => {
-    console.log(req.body);
-    console.log(req.file);
-    if (req.file != null) {
-        const { userId, postText } = JSON.parse(req.body.content);
-        console.log(userId);
-        console.log(postText);
-        const imageContent = `${req.protocol}://${req.get('host')}/images/${
-            req.file.filename
-        }`;
-        const Draft = new postDraft(userId, postText, imageContent);
-        mysql.query('INSERT INTO postDrafts SET ?', Draft, (error) => {
-            if (error) {
-                res.json({ error });
-            } else {
-                res.json({ message: 'Votre brouillon a été sauvegardé' });
-            }
+exports.saveDraft = async (req, res) => {
+    try {
+        let userId = '';
+        let postText = '';
+        let imageContent = '';
+
+        if (!req.file) {
+            userId = req.body.userId;
+            postText = req.body.postText;
+            imageContent = null;
+        } else {
+            userId = JSON.parse(req.body.content.userId);
+            postText = JSON.parse(req.body.content.postText);
+            imageContent = `${req.protocol}://${req.get('host')}/images/${
+                req.file.filename
+            }`;
+        }
+
+        await postdraft.create({
+            _id: userId,
+            content: postText,
+            file: imageContent,
         });
-    } else {
-        const { userId, postText } = req.body;
-        const noImageDraft = new postDraft(userId, postText);
-        mysql.query('INSERT INTO postDrafts SET ?', noImageDraft, (error) => {
-            if (error) {
-                res.json({ error });
-            } else {
-                res.json({ message: 'Votre brouillon a été sauvegardé' });
-            }
-        });
+        res.status(201).json({ message: 'Votre brouillon a été sauvegardé' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
     }
 };
 
@@ -170,21 +118,33 @@ exports.getOnePost = (req, res) => {
 };
 
 // Showing all posts registered in DB
-exports.getAllPosts = (req, res) => {
-    const sqlRequest = `SELECT * FROM posts ORDER BY date DESC`;
-    mysql.query(sqlRequest, (error, results) => {
-        if (error || results == 0) {
-            res.json({ error });
-        } else {
-            for (let i = 0; i < results.length; i++) {
-                results[i].date = results[i].date
-                    .toISOString()
-                    .substring(0, 19)
-                    .split('T')
-                    .join(' ');
-            }
-            console.log(results);
-            res.status(200).json(results);
-        }
-    });
+exports.getAllPosts = async (req, res) => {
+    try {
+        const post = await posts.findAll();
+        res.status(201).json(post);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
+};
+
+exports.getPostsSingleUser = async (req, res) => {
+    try {
+        const post = await posts.findAll({
+            where: {
+                username: req.params.username,
+            },
+        });
+        // for (let i = 0; i < post.length; i++) {
+        //     post[i].createdAt = post[i].createdAt
+        //         .toISOString()
+        //         .substring(0, 19)
+        //         .split('T')
+        //         .join(' ');
+        // }
+        res.status(201).json(post);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
 };

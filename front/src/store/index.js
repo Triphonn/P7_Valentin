@@ -5,7 +5,7 @@ import createPersistedState from 'vuex-persistedstate';
 const axios = require('axios');
 
 const instance = axios.create({
-    baseURL: 'http://localhost:3000',
+    baseURL: 'http://localhost:3000/api',
 });
 
 let user = sessionStorage.getItem('vuex');
@@ -158,9 +158,10 @@ export default new Vuex.Store({
                             },
                         })
                         .then(function (response) {
+                            console.log(response);
                             commit('setStatus', 'profileCreated');
-                            commit('profileInfos', response.data[0]);
-                            commit('setUserInfos', response.data[0]);
+                            commit('profileInfos', response.data);
+                            commit('setUserInfos', response.data);
                             resolve(response);
                         })
                         .catch(function (error) {
@@ -175,7 +176,7 @@ export default new Vuex.Store({
                 await instance
                     .get(`/profile/${username}`)
                     .then(async (response) => {
-                        commit('profileInfos', response.data[0]);
+                        commit('profileInfos', response.data);
                         commit('setStatus', '');
                     })
                     .catch(function (error) {
@@ -217,8 +218,8 @@ export default new Vuex.Store({
                             },
                         })
                         .then(async (response) => {
-                            commit('profileInfos', response.data[0]);
-                            commit('setUserInfos', response.data[0]);
+                            commit('profileInfos', response.data);
+                            commit('setUserInfos', response.data);
                             commit('setStatus', '');
                         })
                         .catch(function (error) {
@@ -383,6 +384,45 @@ export default new Vuex.Store({
                     commit('setStatus', 'error_save');
                     throw 'Unable to save your draft ';
                 }
+            }
+        },
+        deleteAccount: async ({ commit, getters }, deleteConfirm) => {
+            commit('setStatus', 'loading');
+
+            const userId = getters.getUserId;
+
+            let deleteData = {
+                userId: userId,
+                username: deleteConfirm.usernameConfirm,
+                password: deleteConfirm.password,
+                date: deleteConfirm.deleteDate,
+            };
+            try {
+                await instance
+                    .post('/profile/delete', deleteData, {
+                        headers: {
+                            Authorization: 'Bearer ' + getters.getToken,
+                        },
+                    })
+                    .then(async (response) => {
+                        setTimeout(() => {
+                            if (
+                                response.data.message ==
+                                'Vous avez bien supprimé votre compte.'
+                            ) {
+                                commit('setStatus', '');
+                            }
+                        }, 1500);
+                    })
+                    .catch(function (error) {
+                        setTimeout(() => {
+                            commit('setStatus', 'error_delete');
+                        }, 1500);
+                        console.log(error);
+                    });
+            } catch (err) {
+                commit('setStatus', 'error_delete');
+                throw 'Unable to delete your account ';
             }
         },
         logout: ({ commit }) => {

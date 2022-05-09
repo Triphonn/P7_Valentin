@@ -1,212 +1,194 @@
-const userProfile = require('../models/userProfile');
-const mysql = require('../db');
+const bcrypt = require('bcrypt');
+const db = require('../db');
+const { users, posts, postdraft, userProfile, deletedaccount } = db;
 const fs = require('fs');
 
 // Creating user's profile
-exports.createProfile = (req, res) => {
-    const { userId, name, username, bio, banner, date } = JSON.parse(
-        req.body.profile
-    );
-    const profilePicture = `${req.protocol}://${req.get('host')}/images/${
-        req.file.filename
-    }`;
-    const Profile = new userProfile(
-        userId,
-        name,
-        username,
-        bio,
-        profilePicture,
-        banner,
-        date
-    );
-    mysql.query(
-        'SELECT * FROM userprofiles WHERE username = ? ',
-        username,
-        (error, results) => {
-            if (error) {
-                res.json({ error });
-            } else {
-                if (results != 0) {
-                    return res
-                        .status(404)
-                        .json({ errror: "Nom d'utilisateur déjà utilisé!" });
-                } else {
-                    mysql.query(
-                        'INSERT INTO userProfiles SET ?',
-                        Profile,
-                        (error) => {
-                            if (error) {
-                                res.json({ error });
-                            } else {
-                                res.json({ message: 'Profil crée', Profile });
-                            }
-                        }
-                    );
-                }
-            }
+exports.createProfile = async (req, res) => {
+    try {
+        const { userId, name, username, bio } = JSON.parse(req.body.profile);
+        const profilePicture = `${req.protocol}://${req.get('host')}/images/${
+            req.file.filename
+        }`;
+        const usernameCheck = await userProfile.findByPk(username);
+        if (usernameCheck) {
+            return res
+                .status(404)
+                .json({ errror: "Nom d'utilisateur déjà utilisé!" });
+        } else {
+            const Profile = await userProfile.create({
+                userId: userId,
+                name: name,
+                username: username,
+                bio: bio,
+                profilePicture: profilePicture,
+            });
+            res.status(201).json({
+                message: 'Votre profil a bien été crée',
+                Profile,
+            });
         }
-    );
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
 };
 
 // Modifying user's profile
-exports.modifyProfile = (req, res) => {
-    if (req.body.name == '') {
-        const sqlRequest = `UPDATE userProfiles SET bio = '${req.body.bio}' WHERE userId = ?`;
-        mysql.query(sqlRequest, req.body.userId, (error) => {
-            if (error) {
-                res.json({ error });
+exports.modifyProfile = async (req, res) => {
+    try {
+        const user = await userProfile.findByPk(req.body.userId);
+        const id = req.body.userId;
+        const data = req.body;
+
+        for (let key of Object.keys(data)) {
+            if (!data[key]) {
+                delete data[key];
+            } else {
+                await user.update(
+                    {
+                        [key]: data[key],
+                    },
+                    {
+                        where: {
+                            id: id,
+                        },
+                    }
+                );
             }
-        });
-    } else if (req.body.bio == '') {
-        const sqlRequest = `UPDATE userProfiles SET name = '${req.body.name}' WHERE userId = ?`;
-        mysql.query(sqlRequest, req.body.userId, (error) => {
-            if (error) {
-                res.json({ error });
-            }
-        });
-    } else {
-        const sqlRequest = `UPDATE userProfiles SET name = '${req.body.name}', bio = '${req.body.bio}' WHERE userId = ?`;
-        mysql.query(sqlRequest, req.body.userId, (error) => {
-            if (error) {
-                res.json({ error });
-            }
-        });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
     }
-    mysql.query(
-        `SELECT * FROM userProfiles WHERE userId = ?`,
-        req.body.userId,
-        (error, results) => {
-            if (error || results == 0) {
-                res.json({ error });
-            } else {
-                results[0].date = results[0].date
-                    .toISOString()
-                    .substring(0, 19)
-                    .split('T')
-                    .join(' ');
-                res.status(200).json(results);
-            }
-        }
-    );
 };
 
-exports.uploadAvatar = (req, res) => {
-    const userId = req.body.userId;
-    const profilePicture = `${req.protocol}://${req.get('host')}/images/${
-        req.file.filename
-    }`;
-    mysql.query(
-        `SELECT * FROM userProfiles WHERE userId = ?`,
-        userId,
-        (error, results) => {
-            if (error || results == 0) {
-                res.json({ error });
-            } else {
-                if (results[0].profilePicture != null) {
-                    const filename =
-                        results[0].profilePicture.split('/images/')[1];
-                    fs.unlink(`images/${filename}`, () => {
-                        const sqlRequest = `UPDATE userProfiles SET profilePicture = '${profilePicture}' WHERE userId = ?`;
-                        mysql.query(sqlRequest, userId, (error) => {
-                            if (error) {
-                                res.json({ error });
-                            } else {
-                                res.status(200).json(profilePicture);
-                            }
-                        });
-                    });
-                } else {
-                    const sqlRequest = `UPDATE userProfiles SET profilePicture = '${profilePicture}' WHERE userId = ?`;
-                    mysql.query(sqlRequest, userId, (error) => {
-                        if (error) {
-                            res.json({ error });
-                        } else {
-                            res.status(200).json(profilePicture);
-                        }
-                    });
-                }
-            }
+exports.uploadAvatar = async (req, res) => {
+    try {
+        const userId = req.body.userId;
+        const profilePicture = `${req.protocol}://${req.get('host')}/images/${
+            req.file.filename
+        }`;
+        const user = await userProfile.findByPk(userId);
+        if (user.profilePicture) {
+            const filename = user.profilePicture.split('/images/')[1];
+            fs.unlink(`images/${filename}`, async () => {
+                await user.update({
+                    profilePicture: profilePicture,
+                });
+                res.status(200).json(profilePicture);
+            });
+        } else {
+            await user.update({
+                profilePicture: profilePicture,
+            });
+            res.status(200).json(profilePicture);
         }
-    );
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
 };
 
-exports.uploadBanner = (req, res) => {
-    const userId = req.body.userId;
-    const banner = `${req.protocol}://${req.get('host')}/images/${
-        req.file.filename
-    }`;
-    mysql.query(
-        `SELECT * FROM userProfiles WHERE userId = ?`,
-        userId,
-        (error, results) => {
-            if (error || results == 0) {
-                res.json({ error });
-            } else {
-                if (results[0].banner != null) {
-                    const filename = results[0].banner.split('/images/')[1];
-                    fs.unlink(`images/${filename}`, () => {
-                        const sqlRequest = `UPDATE userProfiles SET banner = '${banner}' WHERE userId = ?`;
-                        mysql.query(sqlRequest, userId, (error) => {
-                            if (error) {
-                                res.json({ error });
-                            } else {
-                                res.status(200).json(banner);
-                            }
-                        });
-                    });
-                } else {
-                    const sqlRequest = `UPDATE userProfiles SET banner = '${banner}' WHERE userId = ?`;
-                    mysql.query(sqlRequest, userId, (error) => {
-                        if (error) {
-                            res.json({ error });
-                        } else {
-                            res.status(200).json(banner);
-                        }
-                    });
-                }
-            }
+exports.uploadBanner = async (req, res) => {
+    try {
+        const userId = req.body.userId;
+        const banner = `${req.protocol}://${req.get('host')}/images/${
+            req.file.filename
+        }`;
+        const user = await userProfile.findByPk(userId);
+        if (user.banner) {
+            const filename = user.banner.split('/images/')[1];
+            fs.unlink(`images/${filename}`, async () => {
+                await user.update({
+                    banner: banner,
+                });
+                res.status(200).json(banner);
+            });
+        } else {
+            await user.update({
+                banner: banner,
+            });
+            res.status(200).json(banner);
         }
-    );
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
 };
 
 // Deleting user's profile
-exports.deleteProfile = (req, res) => {
-    // let imageUrl = `${req.protocol}://${req.get('host')}/images/${
-    //     req.file.filename
-    // }`;
-    const sqlRequest = `DELETE FROM userProfiles WHERE userId = ?`;
-    mysql.query(sqlRequest, req.body.userId, (error) => {
-        if (error) {
-            res.json({ error });
+exports.deleteProfile = async (req, res) => {
+    try {
+        const { userId, username, password } = req.body;
+        const user = await users.findByPk(userId);
+        if (!user) {
+            res.status(404).json({ errror: 'Utilisateur non trouvé !' });
         } else {
-            res.json({ message: 'Profil supprimé' });
+            bcrypt
+                // Check password security
+                .compare(password, user.password)
+                .then(async (valid) => {
+                    // If password is wrong return error
+                    if (!valid) {
+                        return res
+                            .status(401)
+                            .json({ error: 'Mot de passe incorrect !' });
+                    }
+                    const profile = await userProfile.findByPk(username);
+
+                    await deletedaccount.create({
+                        userId: profile.userId,
+                        email: user.email,
+                        name: profile.name,
+                        username: profile.username,
+                        bio: profile.bio,
+                        profilePicture: profile.profilePicture,
+                        banner: profile.banner,
+                    });
+
+                    await profile.destroy();
+                    await user.destroy();
+
+                    if (posts.findOne({ where: { username: username } })) {
+                        await posts.destroy();
+                    }
+                    if (postdraft.findOne({ where: { username: username } })) {
+                        await postdraft.destroy();
+                    }
+                });
         }
-    });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
 };
 
-exports.getOneProfile = (req, res) => {
-    const sqlRequest = `SELECT * FROM userProfiles WHERE username = ?`;
-    mysql.query(sqlRequest, req.params.username, (error, results) => {
-        if (error || results == 0) {
-            res.status(404).json(error);
-        } else {
-            res.status(200).json(results);
-        }
-    });
+exports.getOneProfile = async (req, res) => {
+    try {
+        const profile = await userProfile.findOne({
+            where: {
+                username: req.params.username,
+            },
+        });
+        res.status(200).json(profile);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
 };
 
-exports.verifyProfile = (req, res) => {
-    const sqlRequest = `SELECT * FROM userprofiles WHERE userId = ?`;
-    mysql.query(sqlRequest, req.params.id, (error, results) => {
-        if (error || results == 0) {
-            res.status(404).json({ error });
+exports.verifyProfile = async (req, res) => {
+    try {
+        const profile = await userProfile.findByPk(req.params.id);
+        if (profile) {
+            res.status(200).json(profile);
         } else {
-            results[0].date = results[0].date
-                .toISOString()
-                .substring(0, 19)
-                .split('T')
-                .join(' ');
-            res.status(200).json(results);
+            res.status(404).json({ message: 'Profil non crée' });
         }
-    });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
 };

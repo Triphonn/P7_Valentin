@@ -11,5 +11,6 @@ router.post('/savedraft', auth, multer, post.saveDraft);
 router.post('/delete', auth, post.deletePost);
 router.get('/:username/status/:id', post.getOnePost);
 router.get('/getAllPosts', post.getAllPosts);
+router.get('/getAllPosts/:username', post.getPostsSingleUser);
 
 module.exports = router;

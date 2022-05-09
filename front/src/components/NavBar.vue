@@ -90,7 +90,6 @@ export default {
           logout: function() {
             this.$store.dispatch('logout')
             this.$router.push('/')
-            this.$router.go()
          },
          signup: function () {
            this.$emit('login', 1)

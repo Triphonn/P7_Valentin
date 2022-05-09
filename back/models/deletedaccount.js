@@ -1,9 +1,13 @@
 module.exports = (sequelize, DataTypes) => {
-    const userProfile = sequelize.define('userProfile', {
+    const deletedAccount = sequelize.define('deletedAccount', {
         userId: {
             allowNull: false,
-            type: DataTypes.INTEGER,
             primaryKey: true,
+            type: DataTypes.INTEGER,
+        },
+        email: {
+            allowNull: false,
+            type: DataTypes.STRING,
         },
         name: {
             allowNull: false,
@@ -27,5 +31,5 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
         },
     });
-    return userProfile;
+    return deletedAccount;
 };

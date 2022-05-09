@@ -2,9 +2,17 @@
     <v-app>
         <div v-if="getUsernameAvatar != null">
             <nav-bar :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @createpost="postOverlay" />
+            <v-main>
+                <v-overlay :z-index="zIndex" :value="overlayPost">
+                    <create-post :mode="mode" @overlayClose="postOverlayHide" />
+                </v-overlay>
+            </v-main>
         </div>
         <div v-else>
             <nav-bar @login="overlayLogin" />
+            <v-overlay :z-index="zIndex" :value="overlayLog">
+                <login :mode="mode" />
+            </v-overlay>
         </div>
         <v-main v-if="mode == 'not_found'">
             <v-snackbar
@@ -85,150 +93,6 @@
                     <v-btn v-if="userInfos.userId == user.userId" style="postition: absolute; top: 35px; right: 20px;" color="primary" @click="overlay = !overlay" class="button">      
                       <span>Editer le profil</span>
                     </v-btn>
-                    <v-overlay :z-index="zIndex" :value="overlayPost">
-                        <v-container ma-0 pa-0 fluid fill-height>
-                            <v-layout column align-center justify-center>
-                                <v-flex xs12 sm8 md4>
-                                    <v-card class="elevation-12">
-                                        <v-btn
-                                            depressed
-                                            fab
-                                            icon
-                                            color="primary"
-                                            @click="draftTab"
-                                            >
-                                                <v-icon dense color="secondary">
-                                                    mdi-close
-                                                </v-icon>
-                                        </v-btn>
-                                        <v-overlay :z-index="zIndex" :value="overlayClosingVerif">
-                                            <v-card
-                                                elevation="2"
-                                            >
-                                            <v-card-title>Enregistrer la publication ?</v-card-title>
-
-                                            <v-card-text>Vous pouvez enregistrer ceci pour l'envoyer plus tard depuis vos brouillons. </v-card-text>
-
-                                            <v-card-actions>
-                                                <v-btn
-                                                    text
-                                                    class="button"
-                                                    @click="saveDrafts"
-                                                >
-                                                Enregistrer
-                                                </v-btn>
-                                            </v-card-actions>
-                                            <v-card-actions>
-                                                <v-btn
-                                                    text
-                                                    class="button"
-                                                    @click="clearPost"
-                                                >
-                                                Supprimer
-                                                </v-btn>
-                                            </v-card-actions>
-                                            </v-card>
-                                        </v-overlay>
-                                        <v-card-text style="margin-top: -25px; width: 500px">
-                                        <v-form>
-                                            <v-textarea
-                                                class="form-row"
-                                                id="postTextArea"
-                                                name="postTextArea"
-                                                label="Quoi de neuf ?"
-                                                type="post"
-                                                v-model="postTextArea"
-                                                auto-grow
-                                                dense
-                                                counter="120"
-                                                :rules="[rules.length(120)]"
-                                            >
-                                            </v-textarea>
-                                            <img v-if="previewImage" class="img-file" width="100%" height="200px" :src="previewImage" />
-                                        </v-form>
-                                        </v-card-text>
-                                        <v-snackbar
-                                        v-model="snackbarPost"
-                                        :timeout="1500"
-                                        >
-                                        {{ postError }}
-                                        </v-snackbar>
-                                        <v-card-actions class="form-row">
-                                        <v-file-input hide-input prepend-icon="mdi-image-outline" @change="previewImageContent" accept="image/*" />       
-                                        <v-spacer></v-spacer>
-                                        <v-btn color="primary" @click="createSinglePost()" class="button" :disabled="!validatedFields" v-if="mode == 'createPost'">        
-                                            <span v-if="status == 'loading'">Publication en cours...</span>
-                                            <span v-else>Publier</span>
-                                        </v-btn>
-                                        </v-card-actions>
-                                    </v-card>
-                                </v-flex>
-                            </v-layout>
-                        </v-container>
-                    </v-overlay>
-                    <v-overlay :z-index="zIndex" :value="overlayLog">
-                        <v-container ma-0 pa-0 fluid fill-height>
-                            <v-layout column align-center justify-center>
-                            <v-flex xs12 sm8 md4>
-                                <v-card class="elevation-12" rounded="lg">
-                                    <v-toolbar dark color="primary" class="layout align-center justify-center">
-                                        <v-toolbar-title v-if="mode == 'signup'" >Inscription</v-toolbar-title>
-                                        <v-toolbar-title v-else>Connexion</v-toolbar-title>
-                                    </v-toolbar>
-                                    <div style="margin: 10px auto; margin-bottom: 0px;" class="layout align-center justify-center">
-                                        <span class="login_btn" v-if="mode == 'signup'">Vous avez déjà un compte ? <span class="card__action" @click="switchToLogin">Se connecter</span></span>
-                                        <span class="login_btn" v-else>Tu n'as pas encore de compte ? <span class="card__action" @click="switchToCreateAccount">Créer un compte</span></span>
-                                    </div>
-                                    <v-card-text style="padding-top: 0px; width: 500px;">
-                                        <v-form>
-                                        <v-text-field
-                                            class="form-row"
-                                            name="email"
-                                            label="Email"
-                                            type="text"
-                                            :error-messages="emailErrors"
-                                            @input="$v.email.$touch()"
-                                            @blur="$v.email.$touch()"
-                                            v-model="email"
-                                        ></v-text-field>
-                                        <v-text-field
-                                            class="form-row"
-                                            id="password"
-                                            name="password"
-                                            label="Password"
-                                            type="password"
-                                            :error-messages="passwordErrors"
-                                            @input="$v.password.$touch()"
-                                            @blur="$v.password.$touch()"
-                                            v-model="password"
-                                        ></v-text-field>
-                                        <v-alert dense type="info" v-if="passwordFeedback && mode == 'signup'" color='primary'>
-                                            {{ passwordFeedback }}
-                                        </v-alert>
-                                        </v-form>
-                                    </v-card-text>
-                                    <v-snackbar
-                                        v-model="snackbar"
-                                        :timeout="1500"
-                                    >
-                                        {{ loginError }}
-                                    </v-snackbar>
-                                    <v-card-actions class="form-row">
-                                        <v-spacer></v-spacer>
-                                        <v-btn color="primary" @click="createAccount()" class="button" :disabled="disabled" v-if="mode == 'signup'">        
-                                        <span v-if="status == 'loading'">Création en cours...</span>
-                                        <span v-else>Créer mon compte</span>
-                                        </v-btn>
-                                        <v-btn color="primary" @click="login()" class="button" :class="{'button--disabled' : !validatedFields}" v-else>        
-                                        <span v-if="status == 'loading'">Connexion en cours...</span>
-                                        <span v-else>Se connecter</span>
-                                        </v-btn>
-                                    </v-card-actions>
-                                </v-card>
-                            </v-flex>
-                            </v-layout>
-                        </v-container>
-                    </v-overlay>
                     <v-overlay :z-index="zIndex" :value="overlay">
                       <v-card class="elevation-12" width="600px">
                             <v-toolbar dark color="primary">
@@ -296,22 +160,72 @@
                                         v-model="bio"
                                         auto-grow
                                     ></v-textarea>
+                                    <v-btn color="primary" @click="overlayDelete = true, overlay = false, mode = 'deleteAccount'" class="button" style="color: red;">        
+                                        <span>Supprimer définitivement son compte</span>
+                                    </v-btn>
+                                </v-form>
+                            </v-card-text>
+                        </v-card>
+                    </v-overlay>
+                    <v-overlay :z-index="zIndex" :value="overlayDelete">
+                      <v-card class="elevation-12" width="600px">
+                            <v-toolbar dark color="primary">
+                                <v-app-bar-nav-icon>
+                                    <v-btn
+                                    depressed
+                                    fab
+                                    icon
+                                    color="primary"
+                                    @click="overlayDelete = false"
+                                    >
+                                        <v-icon dense color="secondary">
+                                        mdi-close
+                                        </v-icon>
+                                    </v-btn>
+                                </v-app-bar-nav-icon>
+                                <v-toolbar-title>Suppression du compte</v-toolbar-title>
+                            </v-toolbar>
+                            <v-card-text>
+                                <v-form>
+                                    <span>Cette action ne peut pas être annulée. Cela supprimera définitivement votre compte. <br> <span>Veuillez taper <b style="color: red">{{ this.userInfos.username }}</b> et confirmer votre <b style="color: red;">mot de passe</b> pour supprimer définitivement votre compte.</span></span>
+                                    <v-text-field
+                                        class="form-row"
+                                        id="deleteConfirm"
+                                        name="deleteConfirm"
+                                        label="Confirmation"
+                                        type="text"
+                                        v-model="deleteConfirm"
+                                    ></v-text-field>
+                                    <v-text-field
+                                        class="form-row"
+                                        id="password"
+                                        name="password"
+                                        label="Mot de passe"
+                                        type="password"
+                                        :error-messages="deleteErrors"
+                                        v-model="password"
+                                    ></v-text-field>
+                                    <v-btn color="primary" @click="deleteAccount" class="button" style="color: red;" :disabled="!validatedFields">        
+                                        <span v-if="status == 'loading'">Suppression en cours...</span>
+                                        <span v-else>Supprimer définitivement son compte</span>
+                                    </v-btn>
                                 </v-form>
                             </v-card-text>
                         </v-card>
                     </v-overlay>
                 </v-row>
             </v-card>
+            <div v-if="posts.length >= 0">
+                <posts v-for="post in posts" :key="post._id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" />
+            </div>
         </v-main>
     </v-app>
 </template>
 
 <script>
-import { validationMixin } from 'vuelidate'
-import { required, minLength, email } from 'vuelidate/lib/validators'
-import zxcvbn from 'zxcvbn'
-
 import NavBar from '../components/NavBar.vue';
+import Posts from '../components/Post.vue';
+import CreatePost from '../components/createPost.vue';
 import { mapActions, mapGetters, mapState } from 'vuex';
 
 export default {
@@ -319,19 +233,11 @@ export default {
 
     components: {
         NavBar,
+        Posts,
+        CreatePost,
     },
     data () {
-        return {
-            email: '',
-            password: '',
-            disabled: true,
-            emailError: '',
-            passwordError: '',
-            passwordFeedback: '',
-            loginError: '',
-            snackbar: false,
-            overlayLog: false,
-            
+        return {       
             name: "",
             bio: "",
             banner: null,
@@ -356,6 +262,12 @@ export default {
             rules: {
                 length: len => v => (v || '').length <= len || `Vous avez atteint le maximum de charactères (${len})`,
             },
+            posts: [],
+
+            password: '',
+            overlayDelete: false,
+            deleteErrors: '',
+            deleteConfirm: '',
 
             getUsernameAvatar: this.$store.state.userInfos,
 
@@ -365,14 +277,7 @@ export default {
             profilePicture: 'https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg',
         };
     },
-    props: {
-        source: String,
-    },
     mounted () {
-        const userId = this.$store.state.user.userId;
-        if (userId != -1) {
-            this.overlayLog = false;
-        }
         if (this.userInfos == null && this.mode != 'not_found') {
             this.getProfile();
             this.mode = 'not_found'
@@ -392,26 +297,19 @@ export default {
                 this.loading = false
             }
         }
+        this.getPostsSingleUser()
+        setInterval(() => {
+            this.getPostsSingleUser()
+        }, 1800000);
 
     },
-    mixins: [validationMixin],
-      validations: {
-         email: {
-            required,
-            email
-         },
-         password: {
-            required,
-            minLength: minLength(8)
-         }
-      },
     computed: {
         profileInfos() {
             return this.$store.getters.getProfileInfos;
         },
         dateProfile: function () {
-            const month = parseInt(this.userInfos.date.substring(6, 7));
-            const year = parseInt(this.userInfos.date.substring(0, 4));
+            const month = parseInt(this.userInfos.createdAt.substring(5, 7));
+            const year = parseInt(this.userInfos.createdAt.substring(0, 4));
             const arr = [{id: 1, val: 'janvier'}, {id: 2, val: 'février'}, {id: 3, val: 'mars'}, {id: 4, val: 'avril'}, {id: 5, val: 'mai'}, {id: 6, val: 'juin'}, {id: 7, val: 'juillet'}, {id: 8, val: 'août'}, {id: 9, val: 'septembre'}, {id: 10, val: 'octobre'}, {id: 11, val: 'novembre'}, {id: 12, val: 'décembre'}]
             const index = arr.find((el) => el.id === month)
             return `${index.val}`+ ` ${year}`;
@@ -433,60 +331,57 @@ export default {
         closeVerification() {
             this.overlayClosingVerif = true;
         },
-        emailErrors() {
-            const errors = [];
-            if (this.mode == 'login') return errors;
-            if (!this.$v.email.$dirty) return errors;
-            !this.$v.email.required && errors.push('L\'email est requis');
-            !this.$v.email.email && errors.push('L\'email n\'est pas valide');
-            this.emailError = errors.length != 0;
-            this.disabled = !this.emailError && !this.passwordError && this.validatedFields ? false : true;
-            return errors;
-        },
-
-        passwordErrors() {
-            const errors = [];
-            if (this.mode == 'login') return errors;
-            if (!this.$v.password.$dirty) return errors;
-            !this.$v.password.required && errors.push('Le mot de passe est requis');
-            !this.$v.password.minLength && errors.push('Le mot de passe doit contenir au moins 8 caractères');
-            const passwordSecure = zxcvbn(this.password);
-            if (passwordSecure.score < 2) {
-            errors.push(passwordSecure.feedback.warning);
-            this.passwordFeedback = passwordSecure.feedback.suggestions[0];
-            } else {
-            this.passwordFeedback = '';
-            }
-            this.passwordError = errors.length != 0;
-            this.disabled = !this.emailError && !this.passwordError && this.validatedFields ? false : true;
-            return errors;
-        },
-
         validatedFields: function () {
-            if (this.mode == 'signup') {
-            if (this.email != "" && this.password != "") {
-               return true;
-            } else {
-               return false;
-            }
-            } else if (this.mode == 'login'){
-               if (this.email != "" && this.password != "") {
-                  return true;
-               } else {
-                  return false;
-               }
-            } else if (this.mode == 'createPost'){
+            if (this.mode == 'createPost'){
                if (this.postTextArea != "" && this.postTextArea.length >= 5 && this.postTextArea.length <= 120) {
                   return true;
                } else {
                   return false;
                }
+            } else if (this.mode == 'deleteAccount'){
+                if (this.deleteConfirm == this.userInfos.username && this.password != "") {
+                    return true
+                } else {
+                    return false
+                }
             }
+
         },
         ...mapGetters(['getProfileInfos']),
         ...mapState(['status', 'user']),
     },
     methods: {
+        async getPostsSingleUser(){
+            const username = this.$route.params.username;
+            const response = await fetch(`http://localhost:3000/api/post/getAllPosts/${username}`)
+            const data = await response.json();
+            for (let i = 0; i < data.length; i++) {
+               data[i].createdAt = data[i].createdAt.substring(0, 19).split('T').join(' ');
+            }
+            this.posts = data;
+        },
+        deleteAccount(){
+            const self = this
+            
+            let today = new Date();
+            let dateToday = today.toISOString().substring(0, 19).split('T').join(' ');
+
+            this.$store.dispatch('deleteAccount', {usernameConfirm: this.deleteConfirm, password: this.password, deleteDate: dateToday})
+            .then(function () {
+                setTimeout(() => {
+                    if (self.status != 'error_delete'){
+                        self.$router.go();
+                        self.$store.dispatch('logout')
+                    } else {
+                        self.deleteErrors = 'Mot de passe incorrect'
+                    }
+                }, 1500);
+                
+            })
+            .catch((error) => {
+              console.log(error);
+            })
+        },
         createSinglePost(){
             const self = this;
 
@@ -541,6 +436,9 @@ export default {
             this.mode = 'createPost'
             this.overlayPost = true
         },
+        postOverlayHide(){
+            this.overlayPost = false
+         },
         previewImageContent(e) {
             this.mode = 'createPost';
             let urlCreator = window.URL || window.webkitURL;
@@ -563,9 +461,10 @@ export default {
             const self = this;
             this.$store.dispatch('modifyProfile', {banner: this.banner, avatar: this.avatar, name: this.name, bio: this.bio})
             .then(function () {
-               self.$router.go()
-            }, function (error) {
-            console.log(error);
+               self.overlay = false
+            })
+            .catch((error) => {
+              console.log(error);
             })
         },
         getProfile () {
@@ -592,58 +491,6 @@ export default {
                this.mode = 'login'
                this.overlayLog = true
             }
-        },
-        switchToCreateAccount () {
-            this.email = '', this.password = ''
-            this.mode = 'signup';
-        },
-        switchToLogin () {
-            this.email = '', this.password = ''
-            this.mode = 'login';
-        },
-        verifyProfile () {
-            const self = this;
-            const userId = self.$store.state.user.userId;
-            this.$store.dispatch('verifyProfile')
-            .then(function () {
-               if (self.$store.state.status == 'profileCreated' || self.$store.state.profileInfos != null) {
-                  self.$router.go();
-               }
-            })           
-            .catch((error) => {
-              console.log(error);
-              this.$router.push(`/createProfile/${userId}`);
-            })
-        },
-        login () {
-            const self = this;
-            this.$store.dispatch('login', {
-               email: this.email,
-               password: this.password,
-            })
-            .then(function () {
-              self.verifyProfile();
-            })
-            .catch((error) => {
-               console.log(error);
-               this.snackbar = true;
-               this.loginError = 'Adresse mail et/ou mot de passe invalide';
-            })
-            
-        },
-        createAccount () {
-            const self = this;
-            this.$store.dispatch('createAccount', {
-               email: this.email,
-               password: this.password,
-            }).then(function () {
-            self.login();
-            })
-            .catch((error) => {
-               console.log(error);
-               this.snackbar = true;
-               this.loginError = 'Adresse mail déjà utilisée';
-            })
         },
         ...mapActions(['getOneProfile'])
     },

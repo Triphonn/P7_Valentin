@@ -45,10 +45,6 @@
                                         @change="onFileChange"
                                         accept="image/*"
                                     ></v-file-input>
-                                    <!-- <input type="file"
-                                    id="file" name="file"
-                                    accept="image/*"
-                                    @change="onFileChange"> -->
                                     <img v-if="url" :src="url" class="max-width"/>
                                 </v-form>
                                 <div

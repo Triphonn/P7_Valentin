@@ -1,0 +1,235 @@
+<template>
+    <v-container ma-0 pa-0 fluid fill-height>
+        <v-layout column align-center justify-center>
+            <v-flex xs12 sm8 md4>
+                <v-card class="elevation-12" rounded="lg">
+                    <v-toolbar dark color="primary" class="layout align-center justify-center">
+                        <v-toolbar-title v-if="mode == 'signup' || loginmode == 'signup'" >Inscription</v-toolbar-title>
+                        <v-toolbar-title v-else>Connexion</v-toolbar-title>
+                    </v-toolbar>
+                    <div style="margin: 10px auto; margin-bottom: 0px;" class="layout align-center justify-center">
+                        <span class="login_btn" v-if="mode == 'signup' || loginmode == 'signup'">Vous avez déjà un compte ? <span class="card__action" @click="switchToLogin">Se connecter</span></span>
+                        <span class="login_btn" v-else>Tu n'as pas encore de compte ? <span class="card__action" @click="switchToCreateAccount">Créer un compte</span></span>
+                    </div>
+                    <v-card-text style="padding-top: 0px">
+                        <v-form>
+                           <v-text-field
+                              class="form-row"
+                              name="email"
+                              label="Email"
+                              type="text"
+                              :error-messages="emailErrors"
+                              @input="$v.email.$touch()"
+                              @blur="$v.email.$touch()"
+                              v-model="email"
+                           ></v-text-field>
+                           <v-text-field
+                              class="form-row"
+                              id="password"
+                              name="password"
+                              label="Password"
+                              type="password"
+                              :error-messages="passwordErrors"
+                              @input="$v.password.$touch()"
+                              @blur="$v.password.$touch()"
+                              v-model="password"
+                           ></v-text-field>
+                           <v-alert dense type="info" v-if="passwordFeedback && loginmode == 'signup'" color='primary'>
+                              {{ passwordFeedback }}
+                           </v-alert>
+                        </v-form>
+                    </v-card-text>
+                    <v-snackbar
+                        v-model="snackbar"
+                        :timeout="1500"
+                    >
+                        {{ loginError }}
+                    </v-snackbar>
+                    <v-card-actions class="form-row">
+                        <v-spacer></v-spacer>
+                        <v-btn color="primary" @click="createAccount()" class="button" :disabled="disabled" v-if="loginmode == 'signup'">        
+                           <span v-if="status == 'loading'">Création en cours...</span>
+                           <span v-else>Créer mon compte</span>
+                        </v-btn>
+                        <v-btn color="primary" @click="login()" class="button" :class="{'button--disabled' : !validatedFields}" v-else>        
+                           <span v-if="status == 'loading'">Connexion en cours...</span>
+                           <span v-else>Se connecter</span>
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-flex>
+        </v-layout>
+    </v-container>
+</template>
+
+<script>
+import { mapState } from 'vuex'
+import { validationMixin } from 'vuelidate'
+import { required, minLength, email } from 'vuelidate/lib/validators'
+import zxcvbn from 'zxcvbn'
+
+export default {
+    name: 'Login',
+    data () {
+      return {
+          loginmode: 'signup',
+          email: '',
+          password: '',
+          disabled: true,
+          emailError: '',
+          passwordError: '',
+          passwordFeedback: '',
+          loginError: '',
+          snackbar: false,
+          overlayLog: false,
+          zIndex: 1,
+        };
+      },
+    mounted () {
+        if (this.mode == 'signup'){
+            this.loginmode = 'signup'
+        } else {
+            this.loginmode = 'login'
+        }
+        const userId = this.$store.state.user.userId;
+        if (userId != -1) {
+            this.overlayLog = false;
+        }
+    },
+    mixins: [validationMixin],
+    validations: {
+        email: {
+            required,
+            email
+        },
+        password: {
+            required,
+            minLength: minLength(8)
+        }
+    },
+    props: {
+        mode: String
+    },
+    computed: {
+        emailErrors() {
+            const errors = [];
+            if (this.loginmode == 'login') return errors;
+            if (!this.$v.email.$dirty) return errors;
+            !this.$v.email.required && errors.push('L\'email est requis');
+            !this.$v.email.email && errors.push('L\'email n\'est pas valide');
+            this.emailError = errors.length != 0;
+            this.disabled = !this.emailError && !this.passwordError && this.validatedFields ? false : true;
+            return errors;
+        },
+
+        passwordErrors() {
+            const errors = [];
+            if (this.loginmode == 'login') return errors;
+            if (!this.$v.password.$dirty) return errors;
+            !this.$v.password.required && errors.push('Le mot de passe est requis');
+            !this.$v.password.minLength && errors.push('Le mot de passe doit contenir au moins 8 caractères');
+            const passwordSecure = zxcvbn(this.password);
+            if (passwordSecure.score < 2) {
+            errors.push(passwordSecure.feedback.warning);
+            this.passwordFeedback = passwordSecure.feedback.suggestions[0];
+            } else {
+            this.passwordFeedback = '';
+            }
+            this.passwordError = errors.length != 0;
+            this.disabled = !this.emailError && !this.passwordError && this.validatedFields ? false : true;
+            return errors;
+        },
+
+        validatedFields: function () {
+            if (this.mode == 'signup') {
+            if (this.email != "" && this.password != "") {
+               return true;
+            } else {
+               return false;
+            }
+            } else if (this.mode == 'login'){
+               if (this.email != "" && this.password != "") {
+                  return true;
+               } else {
+                  return false;
+               }
+            }
+        },
+         
+         ...mapState(['status', 'profileInfos'])
+      },
+      methods: {
+        overlayLogin (event) {
+            if ( event == 1 ) {
+               this.loginmode = 'signup'
+               this.overlayLog = true
+            } else {
+               this.loginmode = 'login'
+               this.overlayLog = true
+            }
+        },
+        switchToCreateAccount () {
+            this.email = '', this.password = ''
+            this.loginmode = 'signup';
+        },
+        switchToLogin () {
+            this.email = '', this.password = ''
+            this.loginmode = 'login';
+        },
+        verifyProfile () {
+            const self = this;
+            const userId = self.$store.state.user.userId;
+            this.$store.dispatch('verifyProfile')
+            .then(function () {
+               if (self.$store.state.status == 'profileCreated' || self.$store.state.userInfos != null) {
+                //   self.$router.go();
+               }
+            })           
+            .catch((error) => {
+              console.log(error);
+              this.$router.push(`/createProfile/${userId}`);
+            })
+        },
+        login () {
+            const self = this;
+            this.$store.dispatch('login', {
+               email: this.email,
+               password: this.password,
+            })
+            .then(function () {
+              self.verifyProfile();
+            })
+            .catch((error) => {
+               console.log(error);
+               this.snackbar = true;
+               this.loginError = 'Adresse mail et/ou mot de passe invalide';
+            })
+            
+        },
+        createAccount () {
+            const self = this;
+            this.$store.dispatch('createAccount', {
+               email: this.email,
+               password: this.password,
+            }).then(function () {
+            self.login();
+            })
+            .catch((error) => {
+               console.log(error);
+               this.snackbar = true;
+               this.loginError = 'Adresse mail déjà utilisée';
+            })
+        },
+      }
+  
+}
+</script>
+
+<style scoped>
+.overlay-content {
+  max-width: 960px;
+}
+.flex{
+  width: 500px;
+}
+</style>

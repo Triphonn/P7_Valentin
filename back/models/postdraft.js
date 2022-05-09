@@ -1,9 +1,18 @@
-class postDraft {
-    constructor(_id, content, file) {
-        this._id = _id;
-        this.content = content;
-        this.file = file;
-    }
-}
-
-module.exports = postDraft;
+module.exports = (sequelize, DataTypes) => {
+    const postDraft = sequelize.define('postDraft', {
+        _id: {
+            allowNull: false,
+            primaryKey: true,
+            type: DataTypes.INTEGER,
+        },
+        content: {
+            allowNull: false,
+            type: DataTypes.STRING,
+        },
+        file: {
+            allowNull: true,
+            type: DataTypes.STRING,
+        },
+    });
+    return postDraft;
+};

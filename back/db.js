@@ -1,23 +1,25 @@
-const express = require('express');
-const mysql = require('mysql');
-const app = express();
+const { Sequelize, DataTypes } = require('sequelize');
 
 require('dotenv').config();
 
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: process.env.DB_GROUPOMANIA_USERNAME,
-    password: process.env.DB_GROUPOMANIA_PASSWORD,
-    database: process.env.DB_GROUPOMANIA_NAME,
-});
-
-db.connect(function (err) {
-    if (err) {
-        console.error('error connecting: ' + err.stack);
-        return;
+// Option 3: Passing parameters separately (other dialects)
+const sequelize = new Sequelize(
+    process.env.MYSQL_ADDON_DB,
+    process.env.MYSQL_ADDON_USER,
+    process.env.MYSQL_ADDON_PASSWORD,
+    {
+        host: process.env.MYSQL_ADDON_HOST,
+        dialect: 'mysql',
     }
+);
 
-    console.log('connected as id ' + db.threadId);
-});
+const db = {};
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
+db.users = require('./models/signup')(sequelize, DataTypes);
+db.posts = require('./models/post')(sequelize, DataTypes);
+db.userProfile = require('./models/userProfile')(sequelize, DataTypes);
+db.postdraft = require('./models/postdraft')(sequelize, DataTypes);
+db.deletedaccount = require('./models/deletedaccount')(sequelize, DataTypes);
 
 module.exports = db;
