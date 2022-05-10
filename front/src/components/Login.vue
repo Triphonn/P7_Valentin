@@ -14,7 +14,7 @@
                     <v-card-text style="padding-top: 0px">
                         <v-form>
                            <v-text-field
-                              class="form-row"
+                              class="form-row mg-15"
                               name="email"
                               label="Email"
                               type="text"
@@ -24,7 +24,7 @@
                               v-model="email"
                            ></v-text-field>
                            <v-text-field
-                              class="form-row"
+                              class="form-row mg-15"
                               id="password"
                               name="password"
                               label="Password"
@@ -174,7 +174,7 @@ export default {
             this.$store.dispatch('verifyProfile')
             .then(function () {
                if (self.$store.state.status == 'profileCreated' || self.$store.state.userInfos != null) {
-                //   self.$router.go();
+                    self.$router.go();
                }
             })           
             .catch((error) => {
@@ -223,5 +223,9 @@ export default {
 }
 .flex{
   width: 500px;
+}
+.mg-15{
+    margin-right: 15px;
+    margin-left: 15px;
 }
 </style>

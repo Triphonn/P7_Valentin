@@ -1,17 +1,103 @@
 <template>
-    <v-item-group>
+  <v-container class="main-container bg-color width-100">
+    <v-card class="bg-color width-100">
+      <v-row class="no-wrap main-card main-post-hover tr-bg-color bg-color cursor width-100" @click="goToPost()">
+        <div class="bloc-post avatar-22 flex-column-start">
+          <v-list-item-avatar class="mr-1" size="50" @mouseover="PPHover = true" @mouseleave="PPHover = false">
+            <img
+              src="https://cdn.discordapp.com/attachments/843841677004374049/973269325408522250/ksM_DTxy_400x400.jpg"
+              alt="Photo de profil"
+            />
+                        <v-overlay class="transform-Y-bottom" absolute :z-index="zIndex" :value="PPHover" >
+              <v-card>
+                <v-card-title>test</v-card-title>
+              </v-card>
+            </v-overlay>
+          </v-list-item-avatar>
+        </div>
+        <div class="width-100">
+          <v-row class="no-wrap flex-between gap-5 width-100">
+            <div class="no-wrap flex-left gap-5 width-100">
+
+              <div class="flex-center text-hover-white cursor">
+                <v-card-title class="fs-15">{{ name }}</v-card-title>
+              </div>
+              <div class="flex-center cursor">
+                <v-card-subtitle @click="goToProfile()">@{{ username }}</v-card-subtitle>
+              </div>
+              <div class="flex-center">
+                <v-card-subtitle>·</v-card-subtitle>
+              </div>
+              <div class="flex-center">
+                <v-card-subtitle>2h</v-card-subtitle>
+              </div>
+            </div>
+            <div class="flex-center icon-basic tr-color">
+              <svg class="cursor" style="width:24px;height:24px" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" />
+              </svg>
+            </div>
+          </v-row>
+          <div class="mb-3 width-100">
+            <v-card-text class="text-content">{{ content }}</v-card-text>
+          </div>
+          <div class="mb-3 width-100">
+            <v-img
+              class="img-file"
+              src="https://cdn.discordapp.com/attachments/843841677004374049/973269325408522250/ksM_DTxy_400x400.jpg"
+           ></v-img>
+          </div>
+          <div class="row flex-between width-80 mb-2 width-100">
+            <div>
+              <div class="row icon-basic tr-color icon-bottom-bar">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M14.046 2.242l-4.148-.01h-.002c-4.374 0-7.8 3.427-7.8 7.802 0 4.098 3.186 7.206 7.465 7.37v3.828c0 .108.044.286.12.403.142.225.384.347.632.347.138 0 .277-.038.402-.118.264-.168 6.473-4.14 8.088-5.506 1.902-1.61 3.04-3.97 3.043-6.312v-.017c-.006-4.367-3.43-7.787-7.8-7.788zm3.787 12.972c-1.134.96-4.862 3.405-6.772 4.643V16.67c0-.414-.335-.75-.75-.75h-.396c-3.66 0-6.318-2.476-6.318-5.886 0-3.534 2.768-6.302 6.3-6.302l4.147.01h.002c3.532 0 6.3 2.766 6.302 6.296-.003 1.91-.942 3.844-2.514 5.176z"></path></g></svg>
+              </div>
+            </div>
+            <div>
+              <div class="row icon-basic tr-color icon-bottom-bar">
+                <svg style="width:24px;height:24px" viewBox="0 0 24 24"><path fill="currentColor" d="M15,20H9V12H4.16L12,4.16L19.84,12H15V20Z" /></svg>
+              </div>
+            </div>
+            <div>
+              <div class="row icon-basic tr-color icon-bottom-bar">
+                <svg style="width:24px;height:24px" viewBox="0 0 24 24"><path fill="currentColor" d="M9,4H15V12H19.84L12,19.84L4.16,12H9V4Z" /></svg>
+              </div>
+            </div>
+            <div>
+              <div class="row icon-basic tr-color icon-bottom-bar">
+                <svg viewBox="0 0 24 24" aria-hidden="true" ><g><path d="M17.53 7.47l-5-5c-.293-.293-.768-.293-1.06 0l-5 5c-.294.293-.294.768 0 1.06s.767.294 1.06 0l3.72-3.72V15c0 .414.336.75.75.75s.75-.336.75-.75V4.81l3.72 3.72c.146.147.338.22.53.22s.384-.072.53-.22c.293-.293.293-.767 0-1.06z"></path><path d="M19.708 21.944H4.292C3.028 21.944 2 20.916 2 19.652V14c0-.414.336-.75.75-.75s.75.336.75.75v5.652c0 .437.355.792.792.792h15.416c.437 0 .792-.355.792-.792V14c0-.414.336-.75.75-.75s.75.336.75.75v5.652c0 1.264-1.028 2.292-2.292 2.292z"></path></g></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </v-row>
+    </v-card>
+  </v-container>
+                <!-- <v-list-item-avatar size="100" @mouseover="PPHover = true" @mouseleave="PPHover = false">
+                 <img
+                    class="avatar-22"
+                    src="https://cdn.discordapp.com/attachments/843841677004374049/973269325408522250/ksM_DTxy_400x400.jpg"
+                    alt="Photo de profil"
+                  />
+                  <v-overlay absolute :z-index="zIndex" :value="PPHover" >
+                    <v-card>
+                      <v-card-title>test</v-card-title>
+                    </v-card>
+                  </v-overlay>
+                </v-list-item-avatar> -->
+    <!-- <v-item-group>
       <v-container>
         <v-col>
           <v-col
             cols="2"
-            md="4"
+            md="7"
             style="margin: 0 auto"
           >
             <v-item>
               <v-card
                 class="align-center"
                 dark
-                height="25vh"
+                height="40vh"
               >
               <v-card-title>{{ name }}</v-card-title>
               <v-card-subtitle style="cursor: pointer" @click="goToProfile()">@{{ username }}</v-card-subtitle>
@@ -22,7 +108,7 @@
           </v-col>
         </v-col>
       </v-container>
-    </v-item-group>
+    </v-item-group> -->
 </template>
 
 <script>
@@ -35,11 +121,12 @@ export default {
       return {
          mode: 'home',
          overlay: false,
-         zIndex: 0,
+         PPHover: false,
+         zIndex: 99999999999999,
          }
       },
       props: {
-        _id: Number,
+        id: Number,
         name: String,
         username: String,
         content: String,
@@ -52,6 +139,10 @@ export default {
       methods: {
           goToProfile: function () {
             this.$router.push(`/profile/${this.username}`);
+            this.$router.go()
+          },
+          goToPost: function() {
+            this.$router.push(`/${this.username}/status/${this.id}`);
             this.$router.go()
           },
           logout: function() {
@@ -71,3 +162,83 @@ export default {
       }
    }
 </script>
+
+<style scoped>
+.bloc-post{
+  -webkit-box-flex: 1;
+  flex-grow: 1;
+}
+.img-file{
+  background-size: cover;
+  border-radius: 15px;
+  object-fit: cover;
+}
+.icon-bottom-bar svg{
+  fill: currentcolor;
+  width: 1.25em;
+  height: 1.25em;
+  color: rgb(113, 118, 123);
+}
+.icon-bottom-bar:hover{
+  color: rgb(256,212,212) !important;
+}
+.icon-bottom-bar:hover svg{
+  background-color: rgba(256, 212, 212, 0.1);
+  border-radius: 20px;
+}
+.width-100{
+  width: 100%;
+}
+.width-80{
+  width: 80%;
+}
+.main-post-hover:hover{
+  transition-duration: 0.2s;
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+.icon-basic:hover{
+  color: rgb(256,212,212) !important;
+}
+.icon-basic:hover svg{
+  background-color: rgba(256, 212, 212, 0.1);
+  border-radius: 20px;
+}
+.mr-5{
+  margin-right: 5px;
+}
+.fs-15{
+  font-size: 15px;
+  font-weight: 700;
+}
+.main-container{
+  transition-duration: 0.2s;
+  width: 32vw;
+  border-radius: 0;
+}
+.main-card{
+  border-bottom: 1px solid rgb(47, 51, 54);
+  border-radius: 0 !important;
+  padding-right: 30px;
+  padding-left: 16px;
+  margin-bottom: -1px;
+}
+.gap-5{
+  gap: 5px;
+}
+.subtitle{
+  margin-top: 22px !important;
+}
+.no-wrap{
+  flex-wrap: nowrap;
+}
+.avatar-22{
+  padding: 0 10px 0 0;
+}
+.text-content{
+  width: 30vw;
+  color: inherit;
+  font: inherit;
+  white-space: inherit;
+  font-family: 'Chirp', sans-serif;
+}
+</style>

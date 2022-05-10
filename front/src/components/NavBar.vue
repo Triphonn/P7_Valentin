@@ -40,7 +40,7 @@
               </v-avatar>
           </v-btn>
           <v-btn @click.prevent="logout()" text>
-              Déconnexion
+              <span>Déconnexion</span>
           </v-btn>
       </v-col>
       <div v-else>
@@ -49,13 +49,13 @@
             text
             @click="signup"
           >
-          S'inscrire
+          <span>S'inscrire</span>
           </v-btn>
         <v-btn
           text
           @click="login"
         >
-        Se connecter
+        <span>Se connecter</span>
         </v-btn>
       </div>
     </v-app-bar>
@@ -89,7 +89,8 @@ export default {
           },
           logout: function() {
             this.$store.dispatch('logout')
-            this.$router.push('/')
+            // this.$router.push('/')
+            this.$router.go('/')
          },
          signup: function () {
            this.$emit('login', 1)

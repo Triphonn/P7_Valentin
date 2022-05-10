@@ -6,8 +6,8 @@
          <v-overlay :z-index="zIndex" :value="overlayPost">
             <create-post :mode="mode" @overlayClose="postOverlayHide" />
          </v-overlay>
-         <div v-if="posts.length >= 0">
-            <posts v-for="post in posts" :key="post._id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" />
+         <div class="flex-center mg-pa-gap-0" v-if="posts.length >= 0">
+            <posts v-for="post in posts" :key="post.id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" />
          </div>
       </v-main>
     </div>
@@ -17,8 +17,8 @@
          <v-overlay :z-index="zIndex" :value="overlayLog">
             <login :mode="mode" @login="overlayLogin" />
          </v-overlay>
-         <div v-if="posts.length >= 0">
-            <posts v-for="post in posts" :key="post._id" :content="post.content" :file="post.file" :name="post.name" :username="post.username"/>
+         <div class="flex-center flex-column border-basic" v-if="posts.length >= 0">
+            <posts class="mg-pa-gap-0" v-for="post in posts" :key="post.id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" :id="post._id" />
          </div>
       </v-main>
     </div>
@@ -114,5 +114,10 @@ export default {
 }
 .flex{
   width: 500px;
+}
+.mg-pa-gap-0{
+   margin: 0;
+   padding: 0;
+   gap: 0;
 }
 </style>

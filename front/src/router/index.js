@@ -4,6 +4,8 @@ import Home from '../views/Home.vue';
 import CreateProfile from '../views/createProfile.vue';
 import Profile from '../views/Profile.vue';
 import Login from '../components/Login.vue';
+import Posts from '../components/Post.vue';
+import SinglePost from '../views/SinglePost.vue';
 
 Vue.use(VueRouter);
 
@@ -12,6 +14,11 @@ const routes = [
         name: 'Home',
         path: '/home',
         component: Home,
+    },
+    {
+        name: 'Posts',
+        path: '/post',
+        component: Posts,
     },
     {
         name: 'Login',
@@ -27,6 +34,11 @@ const routes = [
         name: 'Profile',
         path: '/profile/:username',
         component: Profile,
+    },
+    {
+        name: 'SinglePost',
+        path: '/:username/status/:id',
+        component: SinglePost,
     },
     {
         name: 'NotFound',

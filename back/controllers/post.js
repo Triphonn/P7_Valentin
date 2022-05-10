@@ -106,21 +106,32 @@ exports.deletePost = (req, res) => {
         .catch((error) => res.status(500).json({ error }));
 };
 
-exports.getOnePost = (req, res) => {
-    const sqlRequest = `SELECT * FROM posts WHERE _id = ?`;
-    mysql.query(sqlRequest, req.params.id, (error, results) => {
-        if (error || results == 0) {
-            res.json({ error });
+exports.getOnePost = async (req, res) => {
+    try {
+        const post = await posts.findOne({
+            where: {
+                username: req.params.username,
+                _id: req.params.id,
+            },
+        });
+        if (!post || post == null) {
+            res.status(201).json(null);
         } else {
-            res.status(200).json(results);
+            res.status(201).json(post);
         }
-    });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
 };
 
 // Showing all posts registered in DB
 exports.getAllPosts = async (req, res) => {
     try {
-        const post = await posts.findAll();
+        const post = await posts.findAll({
+            limit: 15,
+            order: [['updatedAt', 'DESC']],
+        });
         res.status(201).json(post);
     } catch (error) {
         console.error(error);
@@ -134,6 +145,8 @@ exports.getPostsSingleUser = async (req, res) => {
             where: {
                 username: req.params.username,
             },
+            limit: 15,
+            order: [['updatedAt', 'DESC']],
         });
         // for (let i = 0; i < post.length; i++) {
         //     post[i].createdAt = post[i].createdAt
