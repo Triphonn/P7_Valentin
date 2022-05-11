@@ -228,7 +228,7 @@
 import NavBar from '../components/NavBar.vue';
 import Posts from '../components/Post.vue';
 import CreatePost from '../components/createPost.vue';
-import { mapActions, mapGetters, mapState } from 'vuex';
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex';
 
 export default {
     name: 'Profile',
@@ -252,7 +252,7 @@ export default {
             previewMode: '',
             overlayLog: false,
 
-            loading: false,
+            loading: true,
             getProfileError: '',
             snackbar: false,
             imagePost: null,
@@ -286,10 +286,7 @@ export default {
             this.getProfile();
             this.mode = 'not_found'
             this.loading = true
-            setTimeout(() => {
-                this.loading = false
-                this.$router.push('/')
-            }, 2500);
+            console.log('teet caca');
         } else {
             if (this.userInfos.username != this.$route.params.username){
                 this.getProfile();
@@ -298,6 +295,7 @@ export default {
                 this.loading = false
             }
         }
+        
         this.getPostsSingleUser()
         setInterval(() => {
             this.getPostsSingleUser()
@@ -474,11 +472,19 @@ export default {
             const username = this.$route.params.username;
             this.getOneProfile(username)
             .then(function () {
+                console.log(self.status);
                if (self.status != 'error_get'){
+                   console.log('test 1 ');
                     self.$router.go()
-               } else {
+               } else if (self.status == 'error_get'){
+                   console.log('test 2 ');
+                    self.mode = 'not_found';
                     self.snackbar = true;
                     self.getProfileError = 'Profil inconnu, retour à l\'accueil.';
+                    setTimeout(() => {
+                        self.loading = false
+                        self.$router.push('/')
+                    }, 2500);
                }
             })
             .catch((error) => {
@@ -494,7 +500,8 @@ export default {
                this.overlayLog = true
             }
         },
-        ...mapActions(['getOneProfile'])
+        ...mapActions(['getOneProfile']),
+        ...mapMutations(['setStatus'])
     },
 };
 </script>
@@ -514,6 +521,7 @@ export default {
 }
 .v-main{
    padding: 17px 0 0 0 !important;
+   width: 950px;
 }
 .container{
     padding: 0 !important;

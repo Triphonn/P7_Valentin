@@ -178,7 +178,6 @@ export default new Vuex.Store({
                     .then(async (response) => {
                         console.log(response);
                         if (response.data == null) {
-                            console.log('test data null');
                             commit('profileInfos', response.data);
                             commit('setStatus', 'error_get');
                         } else {
