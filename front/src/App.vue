@@ -1,17 +1,55 @@
 <template>
-  <router-view></router-view>
+  <router-view :style="{background: $vuetify.theme.themes[theme].background}"></router-view>
 </template>
 
 <script>
 
 export default {
   name: 'App',
-  components: {
+  computed:{
+    theme(){
+      return (this.$vuetify.theme.dark) ? 'dark' : 'light'
+    }
   }
 }
 </script>
 
 <style>
+.normal-cursor{
+  cursor: default;
+}
+.width-50p{
+  width: 50px;
+}
+.clear-pa-mg{
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.v-input__prepend-outer{
+  margin: 0 !important;
+}
+.text-field-post {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+.text-basic{
+  color: inherit;
+  font: inherit;
+  white-space: inherit;
+  font-family: 'Chirp', sans-serif;
+  display: inline;
+  font-size: 15px;
+}
+.width-100{
+  width: 100%;
+}
+.width-80{
+  width: 80%;
+}
+.border-bottom-gray{
+  border-bottom: 1px solid rgb(47, 51, 54);
+  border-radius: 0 !important;
+}
 .border-basic{
   border-left: 1px solid rgb(47, 51, 54);
   border-right: 1px solid rgb(47, 51, 54);
@@ -36,6 +74,9 @@ export default {
   color: rgb(113, 118, 123) !important;
   min-height: 20px;
 }
+.padding-basic{
+  padding: 7px;
+}
 .cursor{
   cursor: pointer;
 }
@@ -47,6 +88,17 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+}
+.flex-column-center{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.flex-row-evenly{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
 }
 .flex-center{
   display: flex;
@@ -64,7 +116,7 @@ export default {
   white-space: inherit;
   font-family: 'Chirp', sans-serif;
   display: inline;
-  padding: 0;
+  padding: 0 !important;
 }
 .v-card__subtitle{
   color: rgb(113, 118, 123) !important;
@@ -115,6 +167,8 @@ body {
 }
 
 img {
+  background-size: cover;
+  object-fit: cover;
   max-width: 100%;
   border-radius: 8px;
 }

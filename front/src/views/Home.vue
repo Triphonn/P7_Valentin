@@ -6,8 +6,9 @@
          <v-overlay :z-index="zIndex" :value="overlayPost">
             <create-post :mode="mode" @overlayClose="postOverlayHide" />
          </v-overlay>
-         <div class="flex-center mg-pa-gap-0" v-if="posts.length >= 0">
-            <posts v-for="post in posts" :key="post.id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" />
+         <div class="flex-center flex-column border-basic mg-pa-gap-0" v-if="posts.length >= 0">
+            <home-create-post :name="getUsernameAvatar.name" :username="getUsernameAvatar.username" :avatar="getUsernameAvatar.profilePicture" />
+            <posts class="mg-pa-gap-0" v-for="post in posts" :key="post.id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" :id="post._id" :comments="comments"/>
          </div>
       </v-main>
     </div>
@@ -18,7 +19,7 @@
             <login :mode="mode" @login="overlayLogin" />
          </v-overlay>
          <div class="flex-center flex-column border-basic" v-if="posts.length >= 0">
-            <posts class="mg-pa-gap-0" v-for="post in posts" :key="post.id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" :id="post._id" />
+            <posts class="mg-pa-gap-0" v-for="post in posts" :key="post.id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" :id="post._id" :comments="comments" />
          </div>
       </v-main>
     </div>
@@ -32,6 +33,7 @@ import NavBar from '../components/NavBar.vue';
 import Posts from '../components/Post.vue';
 import Login from '../components/Login.vue'
 import CreatePost from '../components/createPost.vue';
+import HomeCreatePost from '../components/HomeCreatePost.vue';
 
 export default {
     name: 'Home',
@@ -48,6 +50,7 @@ export default {
           previewImage: null,
           postTextArea: '',
           postError: '',
+          comments: [],
           overlayClosingVerif: false,
           rules: {
              length: len => v => (v || '').length <= len || `Vous avez atteint le maximum de charactères (${len})`,
@@ -59,6 +62,7 @@ export default {
          Posts,
          Login,
          CreatePost,
+         HomeCreatePost,
       },
       mounted () {
          this.getAllPosts()
@@ -119,5 +123,8 @@ export default {
    margin: 0;
    padding: 0;
    gap: 0;
+}
+.v-main{
+   padding: 35px 0 0 0 !important;
 }
 </style>

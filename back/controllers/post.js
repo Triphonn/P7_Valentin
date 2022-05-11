@@ -13,6 +13,8 @@ exports.createPost = async (req, res) => {
         let postText = '';
         let file = '';
 
+        console.log(JSON.parse(req.body.content));
+
         const _id = between(1000000000000000, 1999999999999999);
 
         if (!req.file) {
@@ -20,8 +22,9 @@ exports.createPost = async (req, res) => {
             postText = req.body.postText;
             imageContent = null;
         } else {
-            userId = JSON.parse(req.body.content.userId);
-            postText = JSON.parse(req.body.content.postText);
+            const body = JSON.parse(req.body.content);
+            userId = body.userId;
+            postText = body.postText;
             file = `${req.protocol}://${req.get('host')}/images/${
                 req.file.filename
             }`;

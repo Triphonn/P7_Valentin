@@ -53,6 +53,7 @@
                                  v-model="postTextArea"
                                  auto-grow
                                  dense
+                                 clearable
                                  counter="120"
                                  :rules="[rules.length(120)]"
                               >
@@ -118,25 +119,22 @@ export default {
         ...mapState(['status', 'profileInfos'])
     },
     methods: {
-        createSinglePost(){
+         createSinglePost(){
             const self = this;
 
-            let today = new Date();
-            let dateToday = today.toISOString().substring(0, 19).split('T').join(' ');
-
-            this.$store.dispatch('createPost', {postText: this.postTextArea, postImage: this.imagePost, date: dateToday})
+            this.$store.dispatch('createPost', {postText: this.postTextArea, postImage: this.imagePost})
             .then(function () {
                if (self.status != 'error_save'){
                   self.$router.go();
                } else {
                   self.snackbarPost = true;
-                  self.postError = 'Erreur de sauvegarde du brouillon';
+                  self.postError = 'Erreur de publication, veuillez réessayer.';
                }
             })
             .catch((error) => {
               console.log(error);
               this.snackbarPost = true;
-              this.postError = 'Erreur de sauvegarde du brouillon';
+              this.postError = 'Erreur de publication, veuillez réessayer.';
             })
         },
         draftTab(){
@@ -162,13 +160,13 @@ export default {
                   self.$router.go();
                } else {
                   self.snackbarPost = true;
-                  self.postError = 'Erreur de sauvegarde du brouillon';
+                  self.postError = 'Erreur de la sauvegarde du brouillon';
                }
             })
             .catch((error) => {
               console.log(error);
               self.snackbarPost = true;
-              self.postError = 'Erreur de sauvegarde du brouillon';
+              self.postError = 'Erreur de la sauvegarde du brouillon';
             })
         },
         previewImageContent(e) {

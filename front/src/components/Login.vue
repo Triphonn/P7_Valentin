@@ -14,6 +14,7 @@
                     <v-card-text style="padding-top: 0px">
                         <v-form>
                            <v-text-field
+                              color="third"
                               class="form-row mg-15"
                               name="email"
                               label="Email"
@@ -24,6 +25,7 @@
                               v-model="email"
                            ></v-text-field>
                            <v-text-field
+                              color="third"
                               class="form-row mg-15"
                               id="password"
                               name="password"

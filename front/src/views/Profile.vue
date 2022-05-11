@@ -60,7 +60,7 @@
                         :src="userInfos.banner"
                     ></v-img>
                 </v-row>
-                <v-row style="margin: 0; flex-wrap: nowrap">
+                <v-row class="bg-color border-basic border-bottom-gray" style="margin: 0; flex-wrap: nowrap">
                     <v-col>
                         <v-list-item>
                             <v-list-item-avatar size="100">
@@ -215,8 +215,10 @@
                     </v-overlay>
                 </v-row>
             </v-card>
-            <div v-if="posts.length >= 0 && loading == false">
-                <posts v-for="post in posts" :key="post._id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" />
+            <div class="flex-center flex-column" v-if="posts.length >= 0 && loading == false">
+                <div class="flex-center flex-column border-basic">
+                    <posts v-for="post in posts" :key="post._id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" :id="post._id" :comments="comments" />
+                </div>
             </div>
         </v-main>
     </v-app>
@@ -264,6 +266,7 @@ export default {
                 length: len => v => (v || '').length <= len || `Vous avez atteint le maximum de charactères (${len})`,
             },
             posts: [],
+            comments: [],
 
             password: '',
             overlayDelete: false,
@@ -508,5 +511,11 @@ export default {
   border: none;
   padding: 16px;
   transition: .4s background-color;
+}
+.v-main{
+   padding: 17px 0 0 0 !important;
+}
+.container{
+    padding: 0 !important;
 }
 </style>

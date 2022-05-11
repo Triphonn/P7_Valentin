@@ -1,26 +1,24 @@
 <template>
   <v-container class="main-container bg-color width-100">
-    <v-card class="bg-color width-100">
-      <v-row class="no-wrap main-card main-post-hover tr-bg-color bg-color cursor width-100" @click="goToPost()">
-        <div class="bloc-post avatar-22 flex-column-start">
-          <v-list-item-avatar class="mr-1" size="50" @mouseover="PPHover = true" @mouseleave="PPHover = false">
-            <img
-              src="https://cdn.discordapp.com/attachments/843841677004374049/973269325408522250/ksM_DTxy_400x400.jpg"
-              alt="Photo de profil"
-            />
-                        <v-overlay class="transform-Y-bottom" absolute :z-index="zIndex" :value="PPHover" >
-              <v-card>
-                <v-card-title>test</v-card-title>
-              </v-card>
-            </v-overlay>
+    <v-card class="main-post-hover bg-color width-100 flex-column border-bottom-gray">
+      <v-row class="no-wrap main-card tr-bg-color cursor width-100">
+        <div class="avatar-22 flex-column-start">
+          <v-list-item-avatar class="mr-1 size-icon" size="50" @mouseover="PPHover = true" @mouseleave="PPHover = false" @click="goToProfile()">
+              <img
+                  src="https://cdn.discordapp.com/attachments/843841677004374049/973269325408522250/ksM_DTxy_400x400.jpg"
+                  alt="Photo de profil"
+              />
+              <v-overlay absolute :z-index="zIndex" :value="PPHover" >
+              </v-overlay>
           </v-list-item-avatar>
+          <div v-if="comments.length >= 1" class="gray-bar"></div>
         </div>
         <div class="width-100">
           <v-row class="no-wrap flex-between gap-5 width-100">
             <div class="no-wrap flex-left gap-5 width-100">
 
               <div class="flex-center text-hover-white cursor">
-                <v-card-title class="fs-15">{{ name }}</v-card-title>
+                <v-card-title class="fs-15" @click="goToProfile()">{{ name }}</v-card-title>
               </div>
               <div class="flex-center cursor">
                 <v-card-subtitle @click="goToProfile()">@{{ username }}</v-card-subtitle>
@@ -43,9 +41,32 @@
           </div>
           <div class="mb-3 width-100">
             <v-img
+              v-if="file"
               class="img-file"
-              src="https://cdn.discordapp.com/attachments/843841677004374049/973269325408522250/ksM_DTxy_400x400.jpg"
+              :src="file"
+              @click="previewImage = true"
            ></v-img>
+            <v-overlay :z-index="zIndex" :value="previewImage">
+              <v-img
+                class="big-img-file normal-cursor"
+                width="40vw"
+                :src="file"
+              >
+              <v-btn
+                depressed
+                fab
+                icon
+                color="primary"
+                right
+                @click="previewImage = false"
+                style="float: right;"
+                >
+                <v-icon dense color="primary">
+                  mdi-close
+                </v-icon>
+              </v-btn>
+              </v-img>
+            </v-overlay>
           </div>
           <div class="row flex-between width-80 mb-2 width-100">
             <div>
@@ -55,12 +76,12 @@
             </div>
             <div>
               <div class="row icon-basic tr-color icon-bottom-bar">
-                <svg style="width:24px;height:24px" viewBox="0 0 24 24"><path fill="currentColor" d="M15,20H9V12H4.16L12,4.16L19.84,12H15V20Z" /></svg>
+                <svg style="width:24px;height:24px" viewBox="0 0 24 24"><path fill="currentColor" d="M22,11L12,21L2,11H8V3H16V11H22M12,18L17,13H14V5H10V13H7L12,18Z" /></svg>
               </div>
             </div>
             <div>
               <div class="row icon-basic tr-color icon-bottom-bar">
-                <svg style="width:24px;height:24px" viewBox="0 0 24 24"><path fill="currentColor" d="M9,4H15V12H19.84L12,19.84L4.16,12H9V4Z" /></svg>
+                <svg style="width:24px;height:24px" viewBox="0 0 24 24"><path fill="currentColor" d="M16,13V21H8V13H2L12,3L22,13H16M7,11H10V19H14V11H17L12,6L7,11Z" /></svg>
               </div>
             </div>
             <div>
@@ -71,44 +92,21 @@
           </div>
         </div>
       </v-row>
+      <v-row v-if="comments.length >= 1" class="cursor comment-looker main-post-hover no-wrap main-card tr-bg-color cursor width-100">
+        <div class="bloc-post avatar-22 flex-column-start width-64 ml-small">
+          <v-list-item-avatar class="mr-1 " size="35" @click="goToProfile()">
+            <img
+              src="https://cdn.discordapp.com/attachments/843841677004374049/973269325408522250/ksM_DTxy_400x400.jpg"
+              alt="Photo de profil"
+            />
+          </v-list-item-avatar>
+        </div>
+        <div class="flex-center text-basic">
+          <span>Afficher la discussion</span>
+        </div>
+      </v-row>
     </v-card>
   </v-container>
-                <!-- <v-list-item-avatar size="100" @mouseover="PPHover = true" @mouseleave="PPHover = false">
-                 <img
-                    class="avatar-22"
-                    src="https://cdn.discordapp.com/attachments/843841677004374049/973269325408522250/ksM_DTxy_400x400.jpg"
-                    alt="Photo de profil"
-                  />
-                  <v-overlay absolute :z-index="zIndex" :value="PPHover" >
-                    <v-card>
-                      <v-card-title>test</v-card-title>
-                    </v-card>
-                  </v-overlay>
-                </v-list-item-avatar> -->
-    <!-- <v-item-group>
-      <v-container>
-        <v-col>
-          <v-col
-            cols="2"
-            md="7"
-            style="margin: 0 auto"
-          >
-            <v-item>
-              <v-card
-                class="align-center"
-                dark
-                height="40vh"
-              >
-              <v-card-title>{{ name }}</v-card-title>
-              <v-card-subtitle style="cursor: pointer" @click="goToProfile()">@{{ username }}</v-card-subtitle>
-              <v-card-text>{{ content }}</v-card-text>
-              <v-img v-if="file" :src="file" style="height: 15vh"></v-img>
-              </v-card>
-            </v-item>
-          </v-col>
-        </v-col>
-      </v-container>
-    </v-item-group> -->
 </template>
 
 <script>
@@ -122,6 +120,7 @@ export default {
          mode: 'home',
          overlay: false,
          PPHover: false,
+         previewImage: false,
          zIndex: 99999999999999,
          }
       },
@@ -129,6 +128,7 @@ export default {
         id: Number,
         name: String,
         username: String,
+        comments: Array,
         content: String,
         file: String,
       },
@@ -164,11 +164,41 @@ export default {
 </script>
 
 <style scoped>
-.bloc-post{
-  -webkit-box-flex: 1;
-  flex-grow: 1;
+.size-icon{
+  height: 50px;
+  min-width: 45px !important;
+  width: 45px !important;
+}
+.ml-small{
+  margin-left: 2px;
+}
+.mg-auto{
+  margin: 0 auto;
+}
+.width-64{
+  width: 64px;
+}
+.comment-looker{
+  display: flex;
+  align-items: left;
+  justify-content: flex-start;
+}
+.gray-bar{
+  width: 2px;
+  background-color: rgb(51, 54, 57);
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 4px;
+  height: 100%;
 }
 .img-file{
+  max-width: 500px;
+  background-size: cover;
+  border-radius: 15px;
+  object-fit: cover;
+}
+.big-img-file{
+  max-width: 1500px;
   background-size: cover;
   border-radius: 15px;
   object-fit: cover;
@@ -185,12 +215,6 @@ export default {
 .icon-bottom-bar:hover svg{
   background-color: rgba(256, 212, 212, 0.1);
   border-radius: 20px;
-}
-.width-100{
-  width: 100%;
-}
-.width-80{
-  width: 80%;
 }
 .main-post-hover:hover{
   transition-duration: 0.2s;
@@ -216,9 +240,7 @@ export default {
   border-radius: 0;
 }
 .main-card{
-  border-bottom: 1px solid rgb(47, 51, 54);
-  border-radius: 0 !important;
-  padding-right: 30px;
+  padding-right: 20px;
   padding-left: 16px;
   margin-bottom: -1px;
 }
