@@ -6,10 +6,12 @@ const auth = require('../middleware/auth');
 const multer = require('../middleware/multer-config');
 
 router.post('/create', auth, multer, post.createPost);
+router.post('/:id/comment', auth, multer, post.commentOnePost);
 router.post('/savedraft', auth, multer, post.saveDraft);
 // router.post('/modify', auth, post.modifyPost);
 router.post('/delete', auth, post.deletePost);
-router.get('/:username/post/:id', post.getOnePost);
+router.get('/:username/:id', post.getOnePost);
+router.get('/getcomments/:id/coms', post.getOnePostCommments);
 router.get('/getAllPosts', post.getAllPosts);
 router.get('/getAllPosts/:username', post.getPostsSingleUser);
 

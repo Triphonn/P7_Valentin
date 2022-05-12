@@ -344,7 +344,6 @@ export default new Vuex.Store({
             let postDraftData = {
                 userId: userId,
                 postText: postData.postText,
-                date: postData.date,
             };
 
             let draftFormData = new FormData();
@@ -389,6 +388,65 @@ export default new Vuex.Store({
                 } catch (err) {
                     commit('setStatus', 'error_save');
                     throw 'Unable to save your draft ';
+                }
+            }
+        },
+        postOneComment: async ({ commit, getters }, comment) => {
+            commit('setStatus', 'loading.comment');
+
+            const userId = getters.getUserId;
+
+            let commentData = {
+                userId: userId,
+                content: comment.content,
+            };
+
+            let commentFormData = new FormData();
+            commentFormData.append('image', comment.image);
+            commentFormData.append('content', JSON.stringify(commentData));
+
+            if (comment.image == null) {
+                try {
+                    await instance
+                        .post(`/post/${comment.postId}/comment`, commentData, {
+                            headers: {
+                                Authorization: 'Bearer ' + getters.getToken,
+                            },
+                        })
+                        .then(async () => {
+                            commit('setStatus', '');
+                        })
+                        .catch(function (error) {
+                            commit('setStatus', 'error_save');
+                            console.log(error);
+                        });
+                } catch (err) {
+                    commit('setStatus', 'error_save');
+                    throw 'Unable to save your comment';
+                }
+            } else {
+                try {
+                    await instance
+                        .post(
+                            `/post/${comment.postId}/comment`,
+                            commentFormData,
+                            {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data',
+                                    Authorization: 'Bearer ' + getters.getToken,
+                                },
+                            }
+                        )
+                        .then(async () => {
+                            commit('setStatus', '');
+                        })
+                        .catch(function (error) {
+                            commit('setStatus', 'error_save');
+                            console.log(error);
+                        });
+                } catch (err) {
+                    commit('setStatus', 'error_save');
+                    throw 'Unable to save your comment';
                 }
             }
         },

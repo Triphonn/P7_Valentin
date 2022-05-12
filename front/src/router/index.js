@@ -37,7 +37,7 @@ const routes = [
     },
     {
         name: 'SinglePost',
-        path: '/:username/status/:id',
+        path: '/:username/:id',
         component: SinglePost,
     },
     {

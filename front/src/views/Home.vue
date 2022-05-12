@@ -8,7 +8,7 @@
          </v-overlay>
          <div class="flex-center flex-column border-basic mg-pa-gap-0" v-if="posts.length >= 0">
             <home-create-post :name="getUsernameAvatar.name" :username="getUsernameAvatar.username" :avatar="getUsernameAvatar.profilePicture" />
-            <posts class="mg-pa-gap-0" v-for="post in posts" :key="post.id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" :id="post._id" :comments="comments"/>
+            <posts class="mg-pa-gap-0" v-for="post in posts" :key="post.id" :avatar="post.avatar" :content="post.content" :file="post.file" :name="post.name" :username="post.username" :id="post.id" :comments="comments" :commentavatar="getUsernameAvatar.profilePicture"/>
          </div>
       </v-main>
     </div>
@@ -19,7 +19,7 @@
             <login :mode="mode" @login="overlayLogin" />
          </v-overlay>
          <div class="flex-center flex-column border-basic" v-if="posts.length >= 0">
-            <posts class="mg-pa-gap-0" v-for="post in posts" :key="post.id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" :id="post._id" :comments="comments" />
+            <posts class="mg-pa-gap-0" v-for="post in posts" :key="post.id" :avatar="post.avatar" :content="post.content" :file="post.file" :name="post.name" :username="post.username" :id="post.id" :comments="comments" />
          </div>
       </v-main>
     </div>
@@ -27,8 +27,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-
 import NavBar from '../components/NavBar.vue';
 import Posts from '../components/Post.vue';
 import Login from '../components/Login.vue'
@@ -41,20 +39,11 @@ export default {
       return {
           getUsernameAvatar: this.$store.state.userInfos,
           mode: 'signup',
-          snackbarPost: false,
           overlayPost: false,
           overlayLog: false,
           zIndex: 1,
           posts: [],
-          imagePost: null,
-          previewImage: null,
-          postTextArea: '',
-          postError: '',
           comments: [],
-          overlayClosingVerif: false,
-          rules: {
-             length: len => v => (v || '').length <= len || `Vous avez atteint le maximum de charactères (${len})`,
-          }
         };
       },
       components: {
@@ -69,13 +58,6 @@ export default {
          setInterval(() => {
             this.getAllPosts()
          }, 1800000);
-      },
-      computed: {
-         closeVerification() {
-            this.overlayClosingVerif = true;
-         },
-         
-         ...mapState(['status', 'profileInfos'])
       },
       methods: {
          async getAllPosts(){
@@ -92,12 +74,6 @@ export default {
          },
          postOverlayHide(){
             this.overlayPost = false
-         },
-         previewImageContent(e) {
-            this.mode = 'createPost';
-            let urlCreator = window.URL || window.webkitURL;
-            this.imagePost = e;
-            this.previewImage = urlCreator.createObjectURL(this.imagePost);
          },
          overlayLogin (event) {
             if ( event == 1 ) {

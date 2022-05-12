@@ -46,6 +46,9 @@ export default {
 .width-80{
   width: 80%;
 }
+.width-850{
+  width: 850px !important;
+}
 .border-bottom-gray{
   border-bottom: 1px solid rgb(47, 51, 54);
   border-radius: 0 !important;
@@ -104,6 +107,10 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.flex-row-top{
+  display: flex;
+  align-items: top;
 }
 .flex-left{
   display: flex;

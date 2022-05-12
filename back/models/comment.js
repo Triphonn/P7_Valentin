@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const post = sequelize.define('post', {
+    const comment = sequelize.define('comment', {
         username: {
             allowNull: false,
             type: DataTypes.STRING,
@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             type: DataTypes.STRING,
         },
+        postId: {
+            allowNull: false,
+            type: DataTypes.INTEGER,
+        },
         content: {
             allowNull: false,
             type: DataTypes.STRING,
@@ -20,26 +24,15 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             type: DataTypes.STRING,
         },
-        upvotes: {
+        likes: {
             allowNull: true,
             type: DataTypes.INTEGER,
             defaultValue: 0,
         },
-        downvotes: {
-            allowNull: false,
-            type: DataTypes.INTEGER,
-            defaultValue: 0,
-        },
-        usersUpvoted: {
-            allowNull: false,
+        userLiked: {
+            allowNull: true,
             type: DataTypes.STRING,
-            defaultValue: '',
-        },
-        usersDownvoted: {
-            allowNull: false,
-            type: DataTypes.STRING,
-            defaultValue: '',
         },
     });
-    return post;
+    return comment;
 };
