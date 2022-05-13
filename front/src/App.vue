@@ -46,12 +46,15 @@ export default {
 .width-80{
   width: 80%;
 }
+.width-90{
+  max-width: 85%;
+}
 .width-850{
   width: 850px !important;
 }
 .border-bottom-gray{
   border-bottom: 1px solid rgb(47, 51, 54);
-  border-radius: 0 !important;
+  border-radius: 15px !important;
 }
 .border-basic{
   border-left: 1px solid rgb(47, 51, 54);
@@ -71,7 +74,10 @@ export default {
   transition-property: background-color;
 }
 .bg-color{
-  background-color: rgba(0, 0, 0, 1) !important;
+  background-color: var(--v-fourth-base) !important;
+}
+.border-radius-25{
+  border-radius: 15px;
 }
 .icon-basic{
   color: rgb(113, 118, 123) !important;
@@ -141,6 +147,31 @@ export default {
   text-decoration: none;
   color: rgb(230, 230, 230);
 }
+.mw-100{
+  max-width: 100%;
+}
+
+@media screen and (max-width: 960px) {
+  .container {
+    width: 100% !important;
+  }
+  .v-main{
+    padding: 35px 0 50px 0 !important;
+  }
+}
+
+@media (min-width: 960px) and (max-width: 1263px) {
+  .container {
+    width: 80% !important;
+  }
+}
+
+@media screen and (min-width: 1264px) {
+  .container {
+    width: 65% !important;
+  }
+}
+
 
 @font-face {
     font-family: 'Chirp';
@@ -165,12 +196,12 @@ export default {
 }
 
 body {
-  background-color: rgba(0, 0, 0, 1);
+  background-color: var(--v-background-base);
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 32px;
+  padding: 20px;
 }
 
 img {

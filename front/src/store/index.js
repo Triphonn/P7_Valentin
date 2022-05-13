@@ -42,6 +42,7 @@ export default new Vuex.Store({
         user: user,
         profileInfos: null,
         userInfos: null,
+        isMobile: false,
     },
     getters: {
         getProfileInfos(state) {
@@ -57,6 +58,9 @@ export default new Vuex.Store({
     mutations: {
         setStatus: function (state, status) {
             state.status = status;
+        },
+        setMobileMode: function (state, isMobile) {
+            state.isMobile = isMobile;
         },
         logUser: function (state, user) {
             instance.defaults.headers.common['Authorization'] = user.token;

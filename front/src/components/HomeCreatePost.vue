@@ -182,7 +182,7 @@ export default {
 }
 .border-bottom-gray{
   border-bottom: 1px solid rgb(47, 51, 54);
-  border-radius: 0 !important;
+  border-radius: 15px !important;
 }
 .gray-bar{
   width: 2px;
@@ -239,11 +239,10 @@ export default {
 }
 .main-container{
   transition-duration: 0.2s;
-  width: 32vw;
-  border-radius: 0;
+  border-radius: 15px;
 }
 .container{
-    padding: 0;
+  padding: 0;
 }
 .main-card{
   padding-right: 16px;

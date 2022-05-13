@@ -1,7 +1,7 @@
 <template>
   <v-container class="main-container bg-color width-100">
     <v-card class="main-post-hover bg-color width-100 flex-column border-bottom-gray">
-      <v-row class="no-wrap main-card tr-bg-color cursor width-100" @click="goToPost">
+      <v-row class="no-wrap main-card tr-bg-color cursor width-100" @click.stop="overlayCom">
         <div class="avatar-22 flex-column-start">
           <v-list-item-avatar class="mr-1" size="50" @mouseover="PPHover = true" @mouseleave="PPHover = false" @click.stop="goToProfile()">
               <img
@@ -13,7 +13,7 @@
           </v-list-item-avatar>
           <!-- <div v-if="comments.length >= 1" class="gray-bar"></div> -->
         </div>
-        <div class="width-100">
+        <div class="width-90">
           <v-row class="no-wrap flex-between gap-5 width-100">
             <div class="no-wrap flex-left gap-5 width-100">
 
@@ -42,7 +42,7 @@
           <div class="mb-3 width-100">
             <v-img
               v-if="file"
-              class="img-file"
+              class="img-file clear-pa-mg"
               :src="file"
               @click.stop="imageHD = true"
            ></v-img>
@@ -187,36 +187,39 @@ export default {
         ...mapState(['status', 'user', 'profileInfos'])
       },
       methods: {
-          goToProfile: function () {
-            this.$router.push(`/profile/${this.username}`);
-            this.$router.go()
-          },
-          goToPost: function() {
-            this.$router.push(`/${this.username}/${this.id}`);
-            this.$router.go()
-          },
-          logout: function() {
-            this.$store.dispatch('logout')
-            this.$router.push('/')
-            this.$router.go()
-         },
-         signup: function () {
-           this.$emit('login', 1)
-         },
-         login: function () {
-           this.$emit('login', 0)
-         },
-         createpost: function () {
-           this.$emit('createpost')
-         },
-         overlayComment(){
-           if (this.user.isLoggedIn){
-              this.overlayPostComment = this.overlayPostComment ? false : true
-           } else {
-             this.snackbar = true
-             this.commentError = 'Vous devez être connecté pour commenter des publications.'
-           }
-         },
+        goToProfile: function () {
+          this.$router.push(`/profile/${this.username}`);
+          this.$router.go()
+        },
+        goToPost: function() {
+          this.$router.push(`/${this.username}/${this.id}`);
+          this.$router.go()
+        },
+        logout: function() {
+          this.$store.dispatch('logout')
+          this.$router.push('/')
+          this.$router.go()
+        },
+        signup: function () {
+          this.$emit('login', 1)
+        },
+        login: function () {
+          this.$emit('login', 0)
+        },
+        overlayCom: function (){
+          this.$emit('overlayCom', this.id)
+        },
+        createpost: function () {
+          this.$emit('createpost')
+        },
+        overlayComment(){
+          if (this.user.isLoggedIn){
+            this.overlayPostComment = this.overlayPostComment ? false : true
+          } else {
+            this.snackbar = true
+            this.commentError = 'Vous devez être connecté pour commenter des publications.'
+          }
+        },
         clearPost () {
             this.commentTextArea = '', this.imageComment = null, this.previewImage = null
         },
@@ -250,14 +253,14 @@ export default {
 }
 .gray-bar{
   width: 2px;
-  background-color: rgb(51, 54, 57);
+  background-color: var(--v-background-base);
   margin-left: auto;
   margin-right: auto;
   margin-top: 4px;
   height: 100%;
 }
 .img-file{
-  max-width: 500px;
+  max-width: 100%;
   background-size: cover;
   border-radius: 15px;
   object-fit: cover;
@@ -278,18 +281,14 @@ export default {
   color: rgb(256,212,212) !important;
 }
 .icon-bottom-bar:hover svg{
-  background-color: rgba(256, 212, 212, 0.1);
+  background-color: var(--v-fourth-base);
   border-radius: 20px;
 }
-.main-post-hover:hover{
-  transition-duration: 0.2s;
-  background-color: rgba(255, 255, 255, 0.03) !important;
-}
 .icon-basic:hover{
-  color: rgb(256,212,212) !important;
+  color: var(--v-third-base) !important;
 }
 .icon-basic:hover svg{
-  background-color: rgba(256, 212, 212, 0.1);
+  background-color: var(--v-primary-base);
   border-radius: 20px;
 }
 .mr-5{
@@ -301,8 +300,7 @@ export default {
 }
 .main-container{
   transition-duration: 0.2s;
-  width: 32vw;
-  border-radius: 0;
+  border-radius: 15px;
 }
 .main-card{
   padding-right: 20px;
