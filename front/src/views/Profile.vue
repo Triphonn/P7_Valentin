@@ -33,7 +33,7 @@
             </v-col>
         </v-main>
 
-        <v-main v-else>
+        <v-main v-else class="test">
             <v-col
                 cols="12"
                 md="4"
@@ -45,7 +45,7 @@
                 type="image, table-heading, list-item-two-line"
                 ></v-skeleton-loader>
             </v-col>
-            <v-card v-else class="mx-auto" max-width="950" tile>
+            <v-card v-else class="mx-auto test" max-width="950" tile>
                 <v-row style="margin: 0;">
                     <v-img
                         v-if="!userInfos || userInfos.banner == null "
@@ -94,7 +94,7 @@
                       <span>Editer le profil</span>
                     </v-btn>
                     <v-overlay :z-index="zIndex" :value="overlay">
-                      <v-card class="elevation-12" width="600px">
+                      <v-card class="elevation-12 border-radius-15" width="600px">
                             <v-toolbar dark color="primary">
                                 <v-app-bar-nav-icon>
                                     <v-btn
@@ -124,9 +124,9 @@
                                 <v-form>
                                     <div>
                                         <v-card @mouseover="bannerHover = true" @mouseleave="bannerHover = false">
-                                            <img class="img-file" width="100%" height="200px" :src="userBanner" />
+                                            <img class="img-file clear-pa-mg" width="100%" height="200px" :src="userBanner" />
 
-                                            <v-overlay absolute :z-index="zIndex" :value="bannerHover" >
+                                            <v-overlay class="clear-pa-mg" absolute :z-index="zIndex" :value="bannerHover" >
                                                 <v-file-input hide-input prepend-icon="mdi-camera-outline" @change="onBannerChange" accept="image/*">
                                                 </v-file-input>
                                             </v-overlay>
@@ -144,7 +144,7 @@
                                         </v-overlay>
                                     </v-list-item-avatar>
                                     <v-text-field
-                                        class="form-row"
+                                        class="form-row mg-15"
                                         name="name"
                                         label="Prénom/Nom"
                                         type="text"
@@ -152,7 +152,7 @@
                                         v-model="name"
                                     ></v-text-field>
                                     <v-textarea
-                                        class="form-row"
+                                        class="form-row mg-15"
                                         id="bio"
                                         name="bio"
                                         label="Bio"
@@ -160,9 +160,11 @@
                                         v-model="bio"
                                         auto-grow
                                     ></v-textarea>
-                                    <v-btn color="primary" @click="overlayDelete = true, overlay = false, mode = 'deleteAccount'" class="button" style="color: red;">        
-                                        <span>Supprimer définitivement son compte</span>
-                                    </v-btn>
+                                    <div class="padding-bottom mg-auto flex-center">
+                                        <v-btn color="primary" @click="overlayDelete = true, overlay = false, mode = 'deleteAccount'" class="button" style="color: red;">        
+                                            <span>Supprimer définitivement son compte</span>
+                                        </v-btn>
+                                    </div>
                                 </v-form>
                             </v-card-text>
                         </v-card>
@@ -187,9 +189,11 @@
                             </v-toolbar>
                             <v-card-text>
                                 <v-form>
-                                    <span>Cette action ne peut pas être annulée. Cela supprimera définitivement votre compte. <br> <span>Veuillez taper <b style="color: red">{{ this.userInfos.username }}</b> et confirmer votre <b style="color: red;">mot de passe</b> pour supprimer définitivement votre compte.</span></span>
+                                    <div class="px-4 pt-2">
+                                        <span>Cette action ne peut pas être annulée. Cela supprimera définitivement votre compte. <br> <span>Veuillez taper <b style="color: red">{{ this.userInfos.username }}</b> et confirmer votre <b style="color: red;">mot de passe</b> pour supprimer définitivement votre compte.</span></span>
+                                    </div>
                                     <v-text-field
-                                        class="form-row"
+                                        class="form-row mg-15"
                                         id="deleteConfirm"
                                         name="deleteConfirm"
                                         label="Confirmation"
@@ -197,7 +201,7 @@
                                         v-model="deleteConfirm"
                                     ></v-text-field>
                                     <v-text-field
-                                        class="form-row"
+                                        class="form-row mg-15"
                                         id="password"
                                         name="password"
                                         label="Mot de passe"
@@ -205,10 +209,12 @@
                                         :error-messages="deleteErrors"
                                         v-model="password"
                                     ></v-text-field>
-                                    <v-btn color="primary" @click="deleteAccount" class="button" style="color: red;" :disabled="!validatedFields">        
-                                        <span v-if="status == 'loading'">Suppression en cours...</span>
-                                        <span v-else>Supprimer définitivement son compte</span>
-                                    </v-btn>
+                                    <div class="padding-bottom mg-auto flex-center">
+                                        <v-btn color="primary" @click="deleteAccount" class="button" style="color: red;" :disabled="!validatedFields">        
+                                            <span v-if="status == 'loading'">Suppression en cours...</span>
+                                            <span v-else>Supprimer définitivement son compte</span>
+                                        </v-btn>
+                                    </div>
                                 </v-form>
                             </v-card-text>
                         </v-card>
@@ -507,6 +513,9 @@ export default {
 </script>
 
 <style scoped>
+.v-application .primary--text{
+  color: var(--v-third-base) !important;
+}
 .row{
     width: 950px;
 }
@@ -525,5 +534,9 @@ export default {
 }
 .container{
     padding: 0 !important;
+}
+.mg-15{
+    margin-right: 15px;
+    margin-left: 15px;
 }
 </style>

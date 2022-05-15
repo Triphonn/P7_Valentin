@@ -21,22 +21,48 @@
                <create-post :mode="mode" @overlayClose="postOverlayHide" />
             </v-overlay>
             <div class="flex-center flex-column mg-pa-gap-0" v-if="posts.length >= 0">
-               <home-create-post :name="getUsernameAvatar.name" :username="getUsernameAvatar.username" :avatar="getUsernameAvatar.profilePicture" />
-               <posts class="mg-pa-gap-0 border-radius-25" v-for="post in posts" :key="post.id" :avatar="post.avatar" :content="post.content" :file="post.file" :name="post.name" :username="post.username" :id="post.id" :comments="comments" :commentavatar="getUsernameAvatar.profilePicture" @overlayCom="commentsOverlay" />
-               <v-overlay :z-index="zIndex" :value="overlayComments" v-if="overlayComments">
-                  <posts class="mg-pa-gap-0 width-850" :key="singlePost.id" :avatar="singlePost.avatar" :content="singlePost.content" :file="singlePost.file" :name="singlePost.name" :username="singlePost.username"  :id="singlePost.id" :comments="comments" :commentavatar="getUsernameAvatar.profilePicture" />
-               </v-overlay>
+               <div class="resp-div-post flex-center flex-column mg-pa-gap-0">
+                  <home-create-post :name="getUsernameAvatar.name" :username="getUsernameAvatar.username" :avatar="getUsernameAvatar.profilePicture" />
+               </div>
+               <div class="resp-div-post flex-center flex-column mg-pa-gap-0">
+                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :avatar="post.avatar" :content="post.content" :file="post.file" :name="post.name" :username="post.username" :id="post.id" :comments="comments" :commentavatar="getUsernameAvatar.profilePicture" @overlayCom="commentsOverlay" />
+               </div>
+               <div class="width-50">
+                  <v-overlay :z-index="zIndex" :value="overlayComments" v-if="overlayComments">
+                     <posts class="mg-pa-gap-0 width-850" :key="singlePost.id" :avatar="singlePost.avatar" :content="singlePost.content" :file="singlePost.file" :name="singlePost.name" :username="singlePost.username"  :id="singlePost.id" :comments="comments" :commentavatar="getUsernameAvatar.profilePicture" />
+                  </v-overlay>
+               </div>
             </div>
          </v-main>
       </div>
       <div v-else>
-         <nav-bar @login="overlayLogin" />
+         <div v-if="isMobile" class="flex-center">
+            <a href="/">
+            <v-img
+               alt="Groupomania Logo"
+               class="shrink mr-2"
+               contain
+               src="../assets/icon-left-font-monochrome-white.png"
+               transition="scale-transition"
+               width="200"
+            />
+            </a>
+         </div>
+         <nav-bar-mobile v-if="isMobile" />
+         <nav-bar v-else @login="overlayLogin" />
          <v-main>
             <v-overlay :z-index="zIndex" :value="overlayLog">
                <login :mode="mode" @login="overlayLogin" />
             </v-overlay>
-            <div class="flex-center flex-column border-basic" v-if="posts.length >= 0">
-               <posts class="mg-pa-gap-0" v-for="post in posts" :key="post.id" :avatar="post.avatar" :content="post.content" :file="post.file" :name="post.name" :username="post.username" :id="post.id" :comments="comments" />
+            <div class="flex-center flex-column mg-pa-gap-0" v-if="posts.length >= 0">
+               <div class="resp-div-post flex-center flex-column mg-pa-gap-0">
+                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :avatar="post.avatar" :content="post.content" :file="post.file" :name="post.name" :username="post.username" :id="post.id" :comments="comments" @overlayCom="commentsOverlay" />
+               </div>
+               <div class="width-50">
+                  <v-overlay :z-index="zIndex" :value="overlayComments" v-if="overlayComments">
+                     <posts class="mg-pa-gap-0 width-850" :key="singlePost.id" :avatar="singlePost.avatar" :content="singlePost.content" :file="singlePost.file" :name="singlePost.name" :username="singlePost.username"  :id="singlePost.id" :comments="comments" />
+                  </v-overlay>
+               </div>
             </div>
          </v-main>
       </div>
@@ -147,9 +173,6 @@ export default {
 <style scoped>
 .overlay-content {
   max-width: 960px;
-}
-.flex{
-  width: 500px;
 }
 .mg-pa-gap-0{
    margin: 0;

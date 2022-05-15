@@ -45,11 +45,12 @@
                         <v-card-text style="margin-top: -25px;">
                            <v-form>
                               <v-textarea
-                                 class="form-row"
+                                 class="form-row mg-15"
                                  id="postTextArea"
                                  name="postTextArea"
                                  label="Quoi de neuf ?"
                                  type="post"
+                                 color="third"
                                  v-model="postTextArea"
                                  auto-grow
                                  dense
@@ -184,5 +185,9 @@ export default {
 }
 .flex{
   width: 500px;
+}
+.mg-15{
+    margin-right: 15px;
+    margin-left: 15px;
 }
 </style>

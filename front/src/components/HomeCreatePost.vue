@@ -30,10 +30,26 @@
                             counter="120"
                             clearable
                             color="third"
+                            @click:clear="postTextArea = ''"
                             :rules="[rules.length(120)]"
                         >
                         </v-textarea>
-                        <img v-if="previewImage" class="img-file" width="100px" height="100px" :src="previewImage" />
+                        <v-img v-if="previewImage" class="img-file" width="100px" height="100px" :src="previewImage" >
+                          <v-btn
+                            depressed
+                            fab
+                            icon
+                            color="secondary"
+                            right
+                            @click.stop="clearPost"
+                            @blur="search = ''"
+                            style="float: right;"
+                            >
+                            <v-icon dense color="primary">
+                              mdi-close
+                            </v-icon>
+                          </v-btn>
+                        </v-img>
                     </v-form>
                 </v-card-text>
                 <v-snackbar
@@ -49,7 +65,7 @@
             <div class="row flex-between px-16 width-100 mb-2">
                 <div>
                     <div class="width-50 row icon-basic tr-color icon-bottom-bar cursor flex-center padding-basic">
-                        <v-file-input class="text-field-post" hide-input @blur="search = ''" prepend-icon="mdi-image-plus" @change="previewImageContent" accept="image/*" />
+                        <v-file-input class="text-field-post" clearable="true" hide-input @blur="search = ''" prepend-icon="mdi-image-plus" @change="previewImageContent" accept="image/*" />
                     </div>
                 </div>
                 <v-card-actions class="form-row clear-pa-mg">
@@ -175,6 +191,9 @@ export default {
 .width-64{
   width: 64px;
 }
+.width-24{
+  width: 24px !important;
+}
 .comment-looker{
   display: flex;
   align-items: left;
@@ -225,10 +244,6 @@ export default {
 }
 .icon-basic:hover{
   color: rgb(256,212,212) !important;
-}
-.icon-basic:hover{
-  background-color: rgba(256, 212, 212, 0.1);
-  border-radius: 20px;
 }
 .mr-5{
   margin-right: 5px;

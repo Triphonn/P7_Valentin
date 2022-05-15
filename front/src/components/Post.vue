@@ -13,21 +13,21 @@
           </v-list-item-avatar>
           <!-- <div v-if="comments.length >= 1" class="gray-bar"></div> -->
         </div>
-        <div class="width-90">
+        <div class="width-100 flex-column-start">
           <v-row class="no-wrap flex-between gap-5 width-100">
             <div class="no-wrap flex-left gap-5 width-100">
 
-              <div class="flex-center text-hover-white cursor">
-                <v-card-title class="fs-15" @click.stop="goToProfile()">{{ name }}</v-card-title>
+              <div class="flex-center text-hover-white cursor div-resp">
+                <v-card-title class="fs-15 text-resp" @click.stop="goToProfile()">{{ name }}</v-card-title>
               </div>
-              <div class="flex-center cursor">
-                <v-card-subtitle @click.stop="goToProfile()">@{{ username }}</v-card-subtitle>
+              <div class="flex-center cursor div-resp">
+                <v-card-subtitle class="text-resp" @click.stop="goToProfile()">@{{ username }}</v-card-subtitle>
               </div>
-              <div class="flex-center">
+              <div class="flex-center div-resp">
                 <v-card-subtitle>·</v-card-subtitle>
               </div>
-              <div class="flex-center">
-                <v-card-subtitle>2h</v-card-subtitle>
+              <div class="flex-center div-resp">
+                <v-card-subtitle class="text-resp">2h</v-card-subtitle>
               </div>
             </div>
             <div class="flex-center icon-basic tr-color">
@@ -36,20 +36,23 @@
               </svg>
             </div>
           </v-row>
-          <div class="mb-3 width-100">
-            <v-card-text class="text-content">{{ content }}</v-card-text>
+          <div class="mb-3 width-100 div-resp resp-content">
+            <v-card-text class="text-content text-resp">{{ content }}</v-card-text>
           </div>
-          <div class="mb-3 width-100">
-            <v-img
-              v-if="file"
-              class="img-file clear-pa-mg"
-              :src="file"
-              @click.stop="imageHD = true"
-           ></v-img>
+          <div class="mb-3 width-50">
+            <div class="img-width">
+              <v-img
+                v-if="file"
+                class="img-file"
+                :src="file"
+                @click.stop="imageHD = true"
+              >
+              </v-img>
+            </div>
             <v-overlay @click.stop="imageHD = false" :z-index="zIndex" :value="imageHD">
               <v-img
                 class="big-img-file normal-cursor"
-                width="40vw"
+                width="80%"
                 :src="file"
               >
               <v-btn
@@ -76,12 +79,12 @@
             </div>
             <div>
               <div class="row icon-basic tr-color icon-bottom-bar">
-                <svg style="width:24px;height:24px" viewBox="0 0 24 24"><path fill="currentColor" d="M22,11L12,21L2,11H8V3H16V11H22M12,18L17,13H14V5H10V13H7L12,18Z" /></svg>
+                <svg viewBox="0 0 24 24" aria-hidden="true" class="r-4qtqp9 r-yyyyoo r-1xvli5t r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-1hdv0qi"><g><path d="M12 21.638h-.014C9.403 21.59 1.95 14.856 1.95 8.478c0-3.064 2.525-5.754 5.403-5.754 2.29 0 3.83 1.58 4.646 2.73.814-1.148 2.354-2.73 4.645-2.73 2.88 0 5.404 2.69 5.404 5.755 0 6.376-7.454 13.11-10.037 13.157H12zM7.354 4.225c-2.08 0-3.903 1.988-3.903 4.255 0 5.74 7.034 11.596 8.55 11.658 1.518-.062 8.55-5.917 8.55-11.658 0-2.267-1.823-4.255-3.903-4.255-2.528 0-3.94 2.936-3.952 2.965-.23.562-1.156.562-1.387 0-.014-.03-1.425-2.965-3.954-2.965z"></path></g></svg>
               </div>
             </div>
             <div>
               <div class="row icon-basic tr-color icon-bottom-bar">
-                <svg style="width:24px;height:24px" viewBox="0 0 24 24"><path fill="currentColor" d="M16,13V21H8V13H2L12,3L22,13H16M7,11H10V19H14V11H17L12,6L7,11Z" /></svg>
+                <svg viewBox="0 0 24 24" aria-hidden="true" class="r-4qtqp9 r-yyyyoo r-1xvli5t r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-1hdv0qi"><g><path d="M17.53 7.47l-5-5c-.293-.293-.768-.293-1.06 0l-5 5c-.294.293-.294.768 0 1.06s.767.294 1.06 0l3.72-3.72V15c0 .414.336.75.75.75s.75-.336.75-.75V4.81l3.72 3.72c.146.147.338.22.53.22s.384-.072.53-.22c.293-.293.293-.767 0-1.06z"></path><path d="M19.708 21.944H4.292C3.028 21.944 2 20.916 2 19.652V14c0-.414.336-.75.75-.75s.75.336.75.75v5.652c0 .437.355.792.792.792h15.416c.437 0 .792-.355.792-.792V14c0-.414.336-.75.75-.75s.75.336.75.75v5.652c0 1.264-1.028 2.292-2.292 2.292z"></path></g></svg>
               </div>
             </div>
           </div>
@@ -261,9 +264,13 @@ export default {
 }
 .img-file{
   max-width: 100%;
+  max-height: 250px;
   background-size: cover;
   border-radius: 15px;
   object-fit: cover;
+}
+.img-width{
+  width: 100%;
 }
 .big-img-file{
   max-width: 1500px;

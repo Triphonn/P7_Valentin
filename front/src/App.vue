@@ -21,9 +21,13 @@ export default {
 .width-50p{
   width: 50px;
 }
+.width-50{
+  width: 50% !important;
+}
 .clear-pa-mg{
   padding: 0 !important;
   margin: 0 !important;
+  border-radius: 0 !important;
 }
 .v-input__prepend-outer{
   margin: 0 !important;
@@ -41,7 +45,7 @@ export default {
   font-size: 15px;
 }
 .width-100{
-  width: 100%;
+  width: 100% !important;
 }
 .width-80{
   width: 80%;
@@ -76,15 +80,22 @@ export default {
 .bg-color{
   background-color: var(--v-fourth-base) !important;
 }
-.border-radius-25{
-  border-radius: 15px;
+.border-radius-15{
+  border-radius: 15px !important;
 }
 .icon-basic{
   color: rgb(113, 118, 123) !important;
   min-height: 20px;
 }
 .padding-basic{
-  padding: 7px;
+  padding: 7px !important;
+}
+.padding-bottom{
+  padding-bottom: 20px !important;
+}
+.mg-auto{
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 .cursor{
   cursor: pointer;
@@ -150,25 +161,48 @@ export default {
 .mw-100{
   max-width: 100%;
 }
+.input:focus { 
+    outline: none !important;
+    border-color: #719ECE;
+    box-shadow: 0 0 10px #719ECE;
+}
+.text-resp{
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+}
+
+.div-resp{
+  overflow: hidden !important;
+}
 
 @media screen and (max-width: 960px) {
-  .container {
+  .resp-div-post {
     width: 100% !important;
   }
   .v-main{
     padding: 35px 0 50px 0 !important;
   }
+  .img-file{
+    width: 350px;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .img-file{
+    width: 150px;
+  }
 }
 
 @media (min-width: 960px) and (max-width: 1263px) {
-  .container {
+  .resp-div-post {
     width: 80% !important;
   }
 }
 
 @media screen and (min-width: 1264px) {
-  .container {
-    width: 65% !important;
+  .resp-div-post {
+    width: 50% !important;
   }
 }
 
@@ -193,13 +227,21 @@ export default {
 
 #app {
   max-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.test{
+  max-width: 100%;
+  width: 100% !important;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
 }
 
 body {
   background-color: var(--v-background-base);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   min-height: 100vh;
   padding: 20px;
 }
