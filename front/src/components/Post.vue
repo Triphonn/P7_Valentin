@@ -27,7 +27,7 @@
                 <v-card-subtitle>·</v-card-subtitle>
               </div>
               <div class="flex-center div-resp">
-                <v-card-subtitle class="text-resp">2h</v-card-subtitle>
+                <v-card-subtitle class="text-resp">{{ date }}</v-card-subtitle>
               </div>
             </div>
             <div v-if="user.isLoggedIn" class="flex-center text-center icon-basic tr-color">
@@ -245,6 +245,7 @@ export default {
         comments: Array,
         content: String,
         file: String,
+        date: String,
       },
       computed: {
         validatedFields: function () {
@@ -334,6 +335,7 @@ export default {
         },
         editOnePost(){
           this.editPost({postId: this.id, content: this.postEdit, image: this.imageEdit})
+          this.$router.go()
         },
         ...mapActions(['postOneComment', 'deletePost', 'editPost']),
       }
