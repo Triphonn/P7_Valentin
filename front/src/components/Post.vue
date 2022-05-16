@@ -30,46 +30,110 @@
                 <v-card-subtitle class="text-resp">2h</v-card-subtitle>
               </div>
             </div>
-            <div class="flex-center icon-basic tr-color">
-              <svg class="cursor" style="width:24px;height:24px" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" />
-              </svg>
+            <div v-if="user.isLoggedIn" class="flex-center text-center icon-basic tr-color">
+                <v-menu offset-y v-if="checkPost" :disabled="!checkPost" rounded left>
+                  <template v-slot:activator="{ on, attrs }">
+                    <svg v-bind="attrs" v-on="on" class="cursor" style="width:24px;height:24px" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" />
+                    </svg>
+                  </template>
+                  <v-list class="clear-pa-mg">
+                    <v-list-item class="cursor list-item-basic" @click="editPostOverlay">
+                      <v-list-item-title>Éditer le post</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item class="cursor list-item-basic" @click="deleteOnePost">
+                      <v-list-item-title>Supprimer le post</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
             </div>
           </v-row>
-          <div class="mb-3 width-100 div-resp resp-content">
-            <v-card-text class="text-content text-resp">{{ content }}</v-card-text>
-          </div>
-          <div class="mb-3 width-50">
-            <div class="img-width">
-              <v-img
-                v-if="file"
-                class="img-file"
-                :src="file"
-                @click.stop="imageHD = true"
-              >
-              </v-img>
+          <div v-if="!editPostMode">
+            <div class="mb-3 width-100 div-resp resp-content">
+              <v-card-text class="text-content text-resp">{{ content }}</v-card-text>
             </div>
-            <v-overlay @click.stop="imageHD = false" :z-index="zIndex" :value="imageHD">
-              <v-img
-                class="big-img-file normal-cursor"
-                width="80%"
-                :src="file"
-              >
-              <v-btn
-                depressed
-                fab
-                icon
-                color="primary"
-                right
-                @click.stop="imageHD = false"
-                style="float: right;"
+            <div class="mb-3 width-50">
+              <div class="img-width">
+                <v-img
+                  v-if="file"
+                  class="img-file"
+                  :src="file"
+                  @click.stop="imageHD = true"
                 >
-                <v-icon dense color="primary">
-                  mdi-close
-                </v-icon>
-              </v-btn>
-              </v-img>
-            </v-overlay>
+                </v-img>
+              </div>
+              <v-overlay @click.stop="imageHD = false" :z-index="zIndex" :value="imageHD">
+                <v-img
+                  class="big-img-file normal-cursor"
+                  width="80%"
+                  :src="file"
+                >
+                  <v-btn
+                    depressed
+                    fab
+                    icon
+                    color="primary"
+                    right
+                    @click.stop="imageHD = false"
+                    style="float: right;"
+                    >
+                    <v-icon dense color="primary">
+                      mdi-close
+                    </v-icon>
+                  </v-btn>
+                </v-img>
+              </v-overlay>
+            </div>
+          </div>
+          <div v-else>
+            <v-card-text>
+              <v-form>
+                  <v-textarea
+                      class="form-row clear-pa-mg"
+                      type="post"
+                      v-model="postEdit"
+                      auto-grow
+                      dense
+                      counter="120"
+                      clearable
+                      color="third"
+                      @click:clear="postEdit = ''"
+                      @click.stop=""
+                  >
+                  </v-textarea>
+                  <v-img v-if="previewImageEdit" class="img-file" width="100px" height="100px" :src="previewImageEdit" >
+                    <v-btn
+                      depressed
+                      fab
+                      icon
+                      right
+                      @click.stop="imageEdit = 'deleted', previewImageEdit = null"
+                      @blur="search = ''"
+                      style="float: right;"
+                      >
+                      <v-icon dense size="15" color="secondary">
+                        mdi-close
+                      </v-icon>
+                    </v-btn>
+                  </v-img>
+              </v-form>
+            </v-card-text>
+            <div class="width-100 mt-3">
+              <div class="row flex-between px-16 width-100 mb-2">
+                  <div @click.stop="">
+                      <div class="width-50 row icon-basic tr-color icon-bottom-bar cursor flex-center padding-basic">
+                          <v-file-input class="text-field-post" hide-input @blur="search = ''" prepend-icon="mdi-image-plus" @change="previewEditImage" accept="image/*" />
+                      </div>
+                  </div>
+                  <v-card-actions class="form-row clear-pa-mg">
+                      <v-spacer></v-spacer>
+                      <v-btn color="third" @click.stop="editOnePost" class="button button-radius" :disabled="!validatedFields">        
+                          <span v-if="status == 'loading'">Modification en cours...</span>
+                          <span v-else>Modifier</span>
+                      </v-btn>
+                  </v-card-actions>
+              </div>
+            </div>
           </div>
           <div class="row flex-between width-80 mb-2 width-100">
             <div>
@@ -165,7 +229,11 @@ export default {
          overlayPostComment: false,
          commentTextArea: "",
          commentError: null,
-         snackbar: false
+         snackbar: false,
+         editPostMode: false,
+         postEdit: this.content,
+         imageEdit: null,
+         previewImageEdit: null
          }
       },
       props: {
@@ -180,14 +248,29 @@ export default {
       },
       computed: {
         validatedFields: function () {
+          if (this.overlayPostComment){
             if (this.commentTextArea != "" ) {
                return true;
             } else {
                return false;
             }
+          } else if (this.editPostMode) {
+            if (this.postEdit != this.content || this.previewImageEdit != this.file){
+              return true
+            } else {
+              return false
+            }
+          }
+        },
+        checkPost: function(){
+          if (this.username == this.$store.state.userInfos.username && this.user.isLoggedIn){
+            return true
+          } else {
+            return false
+          }
         },
         ...mapGetters(['getProfileInfos']),
-        ...mapState(['status', 'user', 'profileInfos'])
+        ...mapState(['status', 'user', 'userInfos'])
       },
       methods: {
         goToProfile: function () {
@@ -231,15 +314,37 @@ export default {
             this.imageComment = e;
             this.previewImage = urlCreator.createObjectURL(this.imageComment);
         },
+        previewEditImage(e){
+          let urlCreator = window.URL || window.webkitURL;
+          this.imageEdit = e;
+          this.previewImageEdit = urlCreator.createObjectURL(this.imageEdit);
+        },
         postComment: function(){
           this.postOneComment({postId: this.id, content: this.commentTextArea, image: this.imageComment})
         },
-         ...mapActions(['postOneComment']),
+        deleteOnePost: function(){
+          this.deletePost({postId: this.id})
+          this.$router.go()
+        },
+        editPostOverlay(){
+          this.editPostMode = true;
+          if (this.file){
+            this.previewImageEdit = this.file
+          }
+        },
+        editOnePost(){
+          this.editPost({postId: this.id, content: this.postEdit, image: this.imageEdit})
+        },
+        ...mapActions(['postOneComment', 'deletePost', 'editPost']),
       }
    }
 </script>
 
 <style scoped>
+.v-overlay__content{
+  display: flex !important;
+  width: 50% !important;
+}
 .ml-small{
   margin-left: 2px;
 }
@@ -263,7 +368,7 @@ export default {
   height: 100%;
 }
 .img-file{
-  max-width: 100%;
+  max-width: 406px;
   max-height: 250px;
   background-size: cover;
   border-radius: 15px;
@@ -297,6 +402,12 @@ export default {
 .icon-basic:hover svg{
   background-color: var(--v-primary-base);
   border-radius: 20px;
+}
+.list-item-basic:hover{
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+.list-item-basic{
+  background-color: var(--v-primary-base) !important;
 }
 .mr-5{
   margin-right: 5px;

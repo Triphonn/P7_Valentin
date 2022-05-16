@@ -150,7 +150,7 @@ exports.deleteProfile = async (req, res) => {
                         where: { _id: userId },
                     });
                     res.status(200).json({
-                        message: "bien joué frero t'as bien supp",
+                        message: 'Compte supprimé',
                     });
                 });
         }

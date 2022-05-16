@@ -109,37 +109,103 @@ exports.saveDraft = async (req, res) => {
     }
 };
 
-// exports.modifyPost = (req, res) => {
-//     // If user updates ImageFile, it updates in DB too
-//     const postObject = req.file
-//         ? {
-//               ...JSON.parse(req.body.post),
-//               imageUrl: `${req.protocol}://${req.get('host')}/images/${
-//                   req.file.filename
-//               }`,
-//           }
-//         : { ...req.body };
-//     // Updating sauceData in DB
-//     Post.updateOne(
-//         { _id: req.params.id },
-//         { ...sauceObject, _id: req.params.id }
-//     )
-//         .then(() => res.status(200).json({ message: 'Sauce modifiée !' }))
-//         .catch((error) => res.status(400).json({ error }));
-// };
+exports.modifyPost = async (req, res) => {
+    try {
+        let postId = '';
+        let content = '';
+        let file = '';
 
-exports.deletePost = (req, res) => {
-    // Deleting sauceData in DB
-    const sqlRequest = `DELETE FROM posts WHERE _id = ?`;
-    mysql
-        .query(sqlRequest, req.params.id, (error) => {
-            if (error) {
-                res.json({ error });
+        if (!req.file) {
+            content = req.body.content;
+            postId = req.body.postId;
+        } else {
+            const body = JSON.parse(req.body.content);
+            postId = body.postId;
+            content = body.content;
+            file = `${req.protocol}://${req.get('host')}/images/${
+                req.file.filename
+            }`;
+        }
+
+        const post = await posts.findOne({
+            where: { id: postId },
+        });
+        if (post.file) {
+            if (req.file) {
+                const filename = post.file.split('/images/')[1];
+                fs.unlink(`images/${filename}`, async () => {
+                    await post.update({
+                        content: content,
+                        file: file,
+                    });
+                });
             } else {
-                res.json({ message: 'Post supprimé' });
+                await post.update({
+                    content: content,
+                });
             }
-        })
-        .catch((error) => res.status(500).json({ error }));
+        } else {
+            if (req.file) {
+                const filename = post.file.split('/images/')[1];
+                fs.unlink(`images/${filename}`, async () => {
+                    await post.update({
+                        content: content,
+                        file: file,
+                    });
+                });
+            } else {
+                await post.update({
+                    content: content,
+                });
+            }
+        }
+
+        res.status(201);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
+};
+
+exports.deletePostImage = async (req, res) => {
+    try {
+        console.log(req.body);
+        const post = await posts.findOne({
+            where: { id: req.body.postId },
+        });
+        const filename = post.file.split('/images/')[1];
+        fs.unlink(`images/${filename}`, async () => {
+            await post.update({
+                file: '',
+            });
+        });
+
+        res.status(200);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
+};
+
+exports.deletePost = async (req, res) => {
+    try {
+        const post = await posts.findOne({
+            where: { id: req.body.postId },
+        });
+        if (post.file) {
+            const filename = post.file.split('/images/')[1];
+            fs.unlink(`images/${filename}`, async () => {
+                await post.destroy();
+            });
+        } else {
+            await post.destroy();
+        }
+
+        res.status(201);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
 };
 
 exports.getOnePost = async (req, res) => {

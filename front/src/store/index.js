@@ -454,6 +454,102 @@ export default new Vuex.Store({
                 }
             }
         },
+        editPost: async ({ commit, getters, dispatch }, editContent) => {
+            console.log(editContent);
+            if (editContent.image == 'deleted') {
+                dispatch('deletePostImage', { postId: editContent.postId });
+            }
+            let editData = {
+                postId: editContent.postId,
+                content: editContent.content,
+            };
+
+            let editFormData = new FormData();
+            editFormData.append('image', editContent.image);
+            editFormData.append('content', JSON.stringify(editData));
+            if (editContent.image == null || editContent.image == 'deleted') {
+                try {
+                    await instance
+                        .post(`/post/modify`, editData, {
+                            headers: {
+                                Authorization: 'Bearer ' + getters.getToken,
+                            },
+                        })
+                        .then(async () => {
+                            commit('setStatus', '');
+                        })
+                        .catch(function (error) {
+                            commit('setStatus', 'error_delete');
+                            console.log(error);
+                        });
+                } catch (err) {
+                    commit('setStatus', 'error_delete');
+                    throw 'Unable to delete your post';
+                }
+            } else {
+                try {
+                    await instance
+                        .post(`/post/modify`, editFormData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                                Authorization: 'Bearer ' + getters.getToken,
+                            },
+                        })
+                        .then(async () => {
+                            commit('setStatus', '');
+                        })
+                        .catch(function (error) {
+                            commit('setStatus', 'error_delete');
+                            console.log(error);
+                        });
+                } catch (err) {
+                    commit('setStatus', 'error_delete');
+                    throw 'Unable to delete your post';
+                }
+            }
+        },
+        deletePostImage: async ({ commit, getters }, postId) => {
+            try {
+                console.log(postId);
+                await instance
+                    .post(`/post/deletePostImage`, postId, {
+                        headers: {
+                            Authorization: 'Bearer ' + getters.getToken,
+                        },
+                    })
+                    .then(async () => {
+                        commit('setStatus', '');
+                    })
+                    .catch(function (error) {
+                        commit('setStatus', 'error_delete');
+                        console.log(error);
+                    });
+            } catch (err) {
+                commit('setStatus', 'error_delete');
+                throw 'Unable to delete your image';
+            }
+        },
+        deletePost: async ({ commit, getters }, postId) => {
+            try {
+                console.log(postId);
+                await instance
+                    .post(`/post/delete`, postId, {
+                        headers: {
+                            Authorization: 'Bearer ' + getters.getToken,
+                        },
+                    })
+                    .then(async () => {
+                        commit('setStatus', '');
+                    })
+                    .catch(function (error) {
+                        commit('setStatus', 'error_delete');
+                        console.log(error);
+                    });
+            } catch (err) {
+                commit('setStatus', 'error_delete');
+                throw 'Unable to delete your post';
+            }
+        },
         deleteAccount: async ({ commit, getters }, deleteConfirm) => {
             commit('setStatus', 'loading');
 

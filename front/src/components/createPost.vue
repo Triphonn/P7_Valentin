@@ -55,6 +55,7 @@
                                  auto-grow
                                  dense
                                  clearable
+                                 @click:clear="postTextArea = ''"
                                  counter="120"
                                  :rules="[rules.length(120)]"
                               >
@@ -69,9 +70,9 @@
                            {{ postError }}
                         </v-snackbar>
                         <v-card-actions class="form-row">
-                           <v-file-input hide-input prepend-icon="mdi-image-outline" @change="previewImageContent" accept="image/*" />       
+                           <v-file-input hide-input prepend-icon="mdi-image-plus" @change="previewImageContent" accept="image/*" />       
                            <v-spacer></v-spacer>
-                           <v-btn color="primary" @click="createSinglePost()" class="button" :disabled="!validatedFields">        
+                           <v-btn color="third" @click="createSinglePost()" class="button" :disabled="!validatedFields">        
                               <span v-if="status == 'loading'">Publication en cours...</span>
                               <span v-else>Publier</span>
                            </v-btn>

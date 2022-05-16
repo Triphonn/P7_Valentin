@@ -144,6 +144,7 @@
                                         </v-overlay>
                                     </v-list-item-avatar>
                                     <v-text-field
+                                        color="third"
                                         class="form-row mg-15"
                                         name="name"
                                         label="Prénom/Nom"
@@ -152,6 +153,7 @@
                                         v-model="name"
                                     ></v-text-field>
                                     <v-textarea
+                                        color="third"
                                         class="form-row mg-15"
                                         id="bio"
                                         name="bio"
@@ -193,6 +195,7 @@
                                         <span>Cette action ne peut pas être annulée. Cela supprimera définitivement votre compte. <br> <span>Veuillez taper <b style="color: red">{{ this.userInfos.username }}</b> et confirmer votre <b style="color: red;">mot de passe</b> pour supprimer définitivement votre compte.</span></span>
                                     </div>
                                     <v-text-field
+                                        color="third"
                                         class="form-row mg-15"
                                         id="deleteConfirm"
                                         name="deleteConfirm"
@@ -201,6 +204,7 @@
                                         v-model="deleteConfirm"
                                     ></v-text-field>
                                     <v-text-field
+                                        color="third"
                                         class="form-row mg-15"
                                         id="password"
                                         name="password"
@@ -292,7 +296,6 @@ export default {
             this.getProfile();
             this.mode = 'not_found'
             this.loading = true
-            console.log('teet caca');
         } else {
             if (this.userInfos.username != this.$route.params.username){
                 this.getProfile();

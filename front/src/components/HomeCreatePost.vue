@@ -10,6 +10,7 @@
                     <img
                         :src="avatar"
                         alt="Photo de profil"
+                        class="border-radius"
                     />
                     <v-overlay absolute :z-index="zIndex" :value="PPHover" >
                     </v-overlay>
@@ -39,13 +40,12 @@
                             depressed
                             fab
                             icon
-                            color="secondary"
                             right
-                            @click.stop="clearPost"
+                            @click.stop="imagePost = null, previewImage = null"
                             @blur="search = ''"
                             style="float: right;"
                             >
-                            <v-icon dense color="primary">
+                            <v-icon dense size="15" color="secondary">
                               mdi-close
                             </v-icon>
                           </v-btn>
@@ -65,7 +65,7 @@
             <div class="row flex-between px-16 width-100 mb-2">
                 <div>
                     <div class="width-50 row icon-basic tr-color icon-bottom-bar cursor flex-center padding-basic">
-                        <v-file-input class="text-field-post" clearable="true" hide-input @blur="search = ''" prepend-icon="mdi-image-plus" @change="previewImageContent" accept="image/*" />
+                        <v-file-input class="text-field-post" hide-input @blur="search = ''" prepend-icon="mdi-image-plus" @change="previewImageContent" accept="image/*" />
                     </div>
                 </div>
                 <v-card-actions class="form-row clear-pa-mg">
@@ -182,6 +182,9 @@ export default {
 </script>
 
 <style scoped>
+.border-radius{
+  border-radius: 25px;
+}
 .ml-small{
   margin-left: 2px;
 }
