@@ -118,28 +118,31 @@
                       @click.stop=""
                   >
                   </v-textarea>
-                  <v-img v-if="previewImageEdit" class="img-file" width="100px" height="100px" :src="previewImageEdit" >
-                    <v-btn
-                      depressed
-                      fab
-                      icon
-                      right
-                      @click.stop="imageEdit = 'deleted', previewImageEdit = null"
-                      @blur="search = ''"
-                      style="float: right;"
-                      >
-                      <v-icon dense size="15" color="secondary">
+                  <div v-if="previewImageEdit" class="flex-row-top width-150-150">
+                    <v-img v-if="previewImageEdit" class="img-file" width="150px" height="150px" :src="previewImageEdit" >
+                    </v-img>
+                    <div class="width-50 icon-basic tr-color cursor padding-basic">
+                      <v-icon v-if="previewImageEdit" @click.stop="previewPost = 'deleted', previewImageEdit = null" dense size="24" color="secondary">
                         mdi-close
                       </v-icon>
-                    </v-btn>
-                  </v-img>
+                    </div>
+                  </div>
+                  <div v-if="previewVideoEdit" class="flex-row-top">
+                    <video v-if="previewVideoEdit" ref="videoRef" :src="previewVideoEdit" class="img-file" id="video-container" width="300px" height="200px" controls>
+                    </video>
+                    <div class="width-50 icon-basic tr-color cursor padding-basic">
+                      <v-icon v-if="previewVideoEdit" @click.stop="previewPost = null, previewVideoEdit = null" dense size="24" color="secondary">
+                        mdi-close
+                      </v-icon>
+                    </div>
+                  </div>
               </v-form>
             </v-card-text>
             <div class="width-100 mt-3">
               <div class="row flex-between px-16 width-100 mb-2">
                   <div @click.stop="">
                       <div class="width-50 row icon-basic tr-color icon-bottom-bar cursor flex-center padding-basic">
-                          <v-file-input class="text-field-post" hide-input @blur="search = ''" prepend-icon="mdi-image-plus" @change="previewEditImage" accept="image/*" />
+                          <v-file-input class="text-field-post" hide-input @blur="search = ''" prepend-icon="mdi-image-plus" @change="previewEditImage" accept="image/*, video/*" />
                       </div>
                   </div>
                   <v-card-actions class="form-row clear-pa-mg">
@@ -250,7 +253,9 @@ export default {
          editPostMode: false,
          postEdit: this.content,
          imageEdit: null,
-         previewImageEdit: null
+         previewImageEdit: null,
+         previewPost: null,
+         previewVideoEdit: null
          }
       },
       props: {
@@ -274,7 +279,7 @@ export default {
                return false;
             }
           } else if (this.editPostMode) {
-            if (this.postEdit != this.content || this.previewImageEdit != this.image){
+            if (this.postEdit != this.content || this.previewImageEdit != this.image || this.previewVideoEdit != this.video){
               return true
             } else {
               return false
@@ -333,10 +338,16 @@ export default {
             this.imageComment = e;
             this.previewImage = urlCreator.createObjectURL(this.imageComment);
         },
-        previewEditImage(e){
-          let urlCreator = window.URL || window.webkitURL;
-          this.imageEdit = e;
-          this.previewImageEdit = urlCreator.createObjectURL(this.imageEdit);
+        previewEditImage(e) {
+            let urlCreator = window.URL || window.webkitURL;
+            this.previewPost = e;
+            if(e.type.startsWith("video")){
+              this.previewVideoEdit = urlCreator.createObjectURL(this.previewPost);
+              this.previewImageEdit = null
+            } else {
+              this.previewImageEdit = urlCreator.createObjectURL(this.previewPost);
+              this.previewVideoEdit = null
+            }
         },
         postComment: function(){
           this.postOneComment({postId: this.id, content: this.commentTextArea, image: this.imageComment})
@@ -349,10 +360,12 @@ export default {
           this.editPostMode = true;
           if (this.image){
             this.previewImageEdit = this.image
+          } else {
+            this.previewVideoEdit = this.video
           }
         },
         editOnePost(){
-          this.editPost({postId: this.id, content: this.postEdit, image: this.imageEdit})
+          this.editPost({postId: this.id, content: this.postEdit, image: this.previewPost})
           this.$router.go()
         },
         ...mapActions(['postOneComment', 'deletePost', 'editPost']),

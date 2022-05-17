@@ -19,12 +19,10 @@ exports.createPost = async (req, res) => {
             userId = body.userId;
             postText = body.postText;
             if (req.file.mimetype.startsWith('video')) {
-                console.log('test');
                 video = `${req.protocol}://${req.get('host')}/videos/${
                     req.file.filename
                 }`;
             } else {
-                console.log('test2');
                 image = `${req.protocol}://${req.get('host')}/images/${
                     req.file.filename
                 }`;
@@ -118,9 +116,11 @@ exports.saveDraft = async (req, res) => {
 
 exports.modifyPost = async (req, res) => {
     try {
+        console.log(req.file);
         let postId = '';
         let content = '';
-        let file = '';
+        let image = '';
+        let video = '';
 
         if (!req.file) {
             content = req.body.content;
@@ -129,22 +129,49 @@ exports.modifyPost = async (req, res) => {
             const body = JSON.parse(req.body.content);
             postId = body.postId;
             content = body.content;
-            file = `${req.protocol}://${req.get('host')}/images/${
-                req.file.filename
-            }`;
+            if (req.file.mimetype.startsWith('video')) {
+                video = `${req.protocol}://${req.get('host')}/videos/${
+                    req.file.filename
+                }`;
+            } else {
+                image = `${req.protocol}://${req.get('host')}/images/${
+                    req.file.filename
+                }`;
+            }
         }
 
         const post = await posts.findOne({
             where: { id: postId },
         });
-        if (post.file) {
+        if (post.video || post.image) {
             if (req.file) {
-                const filename = post.file.split('/images/')[1];
-                fs.unlink(`images/${filename}`, async () => {
-                    await post.update({
-                        content: content,
-                        file: file,
-                    });
+                console.log('test 1');
+                let filename = '';
+                let file = '';
+                if (post.video) {
+                    console.log('test 2');
+                    filename = post.video.split('/videos/')[1];
+                    file = 'videos';
+                } else {
+                    file = 'images';
+                    filename = post.image.split('/images/')[1];
+                }
+                fs.unlink(`${file}/${filename}`, async () => {
+                    if (video) {
+                        console.log('test 3');
+                        await post.update({
+                            content: content,
+                            video: video,
+                            image: '',
+                        });
+                    } else {
+                        console.log('test 4');
+                        await post.update({
+                            content: content,
+                            image: image,
+                            video: '',
+                        });
+                    }
                 });
             } else {
                 await post.update({
@@ -153,13 +180,17 @@ exports.modifyPost = async (req, res) => {
             }
         } else {
             if (req.file) {
-                const filename = post.file.split('/images/')[1];
-                fs.unlink(`images/${filename}`, async () => {
+                if (video) {
                     await post.update({
                         content: content,
-                        file: file,
+                        video: video,
                     });
-                });
+                } else {
+                    await post.update({
+                        content: content,
+                        image: image,
+                    });
+                }
             } else {
                 await post.update({
                     content: content,

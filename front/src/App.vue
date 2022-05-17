@@ -87,6 +87,10 @@ export default {
   color: rgb(113, 118, 123) !important;
   min-height: 20px;
 }
+.width-150-150{
+  width: 150px;
+  height: 150px;
+}
 .padding-basic{
   padding: 7px !important;
 }
@@ -99,6 +103,9 @@ export default {
 }
 .cursor{
   cursor: pointer;
+}
+video {
+  object-fit: fill;
 }
 .flex-between{
   display: flex;
