@@ -21,7 +21,7 @@
         <v-spacer></v-spacer>
           <v-btn
             text
-            @click="createpost"
+            @click.stop="createpost"
           >
           <v-icon>mdi-plus-box</v-icon>
           </v-btn>

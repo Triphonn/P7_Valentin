@@ -20,7 +20,6 @@ db.users = require('./models/signup')(sequelize, DataTypes);
 db.posts = require('./models/post')(sequelize, DataTypes);
 db.comments = require('./models/comment')(sequelize, DataTypes);
 db.userProfile = require('./models/userProfile')(sequelize, DataTypes);
-db.postdraft = require('./models/postdraft')(sequelize, DataTypes);
 db.deletedaccount = require('./models/deletedaccount')(sequelize, DataTypes);
 
 module.exports = db;

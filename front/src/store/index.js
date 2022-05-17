@@ -285,61 +285,6 @@ export default new Vuex.Store({
                 throw 'Unable to modify your profile 3 ';
             }
         },
-        saveDrafts: async ({ commit, getters }, postData) => {
-            commit('setStatus', 'loading.saving');
-
-            const userId = getters.getUserId;
-
-            let postDraftData = {
-                userId: userId,
-                postText: postData.postText,
-            };
-
-            let draftFormData = new FormData();
-            draftFormData.append('image', postData.postImage);
-            draftFormData.append('content', JSON.stringify(postDraftData));
-
-            if (postData.postImage == null) {
-                try {
-                    await instance
-                        .post('/post/savedraft', postDraftData, {
-                            headers: {
-                                Authorization: 'Bearer ' + getters.getToken,
-                            },
-                        })
-                        .then(async () => {
-                            commit('setStatus', '');
-                        })
-                        .catch(function (error) {
-                            commit('setStatus', 'error_save');
-                            console.log(error);
-                        });
-                } catch (err) {
-                    commit('setStatus', 'error_save');
-                    throw 'Unable to save your draft ';
-                }
-            } else {
-                try {
-                    await instance
-                        .post('/post/savedraft', draftFormData, {
-                            headers: {
-                                'Content-Type': 'multipart/form-data',
-                                Authorization: 'Bearer ' + getters.getToken,
-                            },
-                        })
-                        .then(async () => {
-                            commit('setStatus', '');
-                        })
-                        .catch(function (error) {
-                            commit('setStatus', 'error_save');
-                            console.log(error);
-                        });
-                } catch (err) {
-                    commit('setStatus', 'error_save');
-                    throw 'Unable to save your draft ';
-                }
-            }
-        },
         createPost: async ({ commit, getters }, postData) => {
             commit('setStatus', 'loading.saving');
 
@@ -371,7 +316,7 @@ export default new Vuex.Store({
                         });
                 } catch (err) {
                     commit('setStatus', 'error_save');
-                    throw 'Unable to save your draft ';
+                    throw 'Unable to save your post ';
                 }
             } else {
                 try {
@@ -391,7 +336,7 @@ export default new Vuex.Store({
                         });
                 } catch (err) {
                     commit('setStatus', 'error_save');
-                    throw 'Unable to save your draft ';
+                    throw 'Unable to save your post ';
                 }
             }
         },

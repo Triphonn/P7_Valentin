@@ -28,43 +28,31 @@
                             v-model="postTextArea"
                             auto-grow
                             dense
-                            counter="120"
+                            counter="200"
                             clearable
                             color="third"
                             @click:clear="postTextArea = ''"
-                            :rules="[rules.length(120)]"
+                            :rules="[rules.length(200)]"
                         >
                         </v-textarea>
-                        <v-img v-if="previewImage" class="img-file" width="100px" height="100px" :src="previewImage" >
-                          <v-btn
-                            depressed
-                            fab
-                            icon
-                            right
-                            @click.stop="previewPost = null, previewImage = null"
-                            @blur="search = ''"
-                            style="float: right;"
-                            >
-                            <v-icon dense size="15" color="secondary">
+                        <div v-if="previewImage" class="flex-row-top width-150-150">
+                          <v-img v-if="previewImage" class="img-file" width="150px" height="150px" :src="previewImage" >
+                          </v-img>
+                          <div class="width-50 icon-basic tr-color cursor padding-basic">
+                            <v-icon v-if="previewImage" @click.stop="previewPost = 'deleted', previewImage = null" dense size="24" color="secondary">
                               mdi-close
                             </v-icon>
-                          </v-btn>
-                        </v-img>
-                        <video v-if="previewVideo" ref="videoRef" :src="previewVideo" class="img-file" id="video-container" width="300px" height="200px" controls>
-                          <v-btn
-                            depressed
-                            fab
-                            icon
-                            right
-                            @click.stop="previewPost = null, previewImage = null"
-                            @blur="search = ''"
-                            style="float: right; z-index: 9999;"
-                            >
-                            <v-icon dense size="15" color="secondary">
+                          </div>
+                        </div>
+                        <div v-if="previewVideo" class="flex-row-top">
+                          <video v-if="previewVideo" ref="videoRef" :src="previewVideo" class="img-file" id="video-container" width="300px" height="200px" controls>
+                          </video>
+                          <div class="width-50 icon-basic tr-color cursor padding-basic">
+                            <v-icon v-if="previewVideo" @click.stop="previewPost = null, previewVideo = null" dense size="24" color="secondary">
                               mdi-close
                             </v-icon>
-                          </v-btn>
-                        </video>
+                          </div>
+                        </div>
                     </v-form>
                 </v-card-text>
                 <v-snackbar
@@ -119,7 +107,6 @@ export default {
         },
         overlay: false,
         PPHover: false,
-        previewImage: false,
         zIndex: 99999999999999,
         }
     },
@@ -129,12 +116,8 @@ export default {
         avatar: String,
     },
     computed: {
-        closeVerification() {
-            this.overlayClosingVerif = true;
-        },
-
         validatedFields: function () {
-            if (this.postTextArea != "" && this.postTextArea.length >= 5 && this.postTextArea.length <= 120) {
+            if (this.postTextArea != "" && this.postTextArea.length >= 5 && this.postTextArea.length <= 200) {
                 return true;
             } else {
                 return false;
@@ -194,8 +177,10 @@ export default {
             console.log(e);
             if(e.type.startsWith("video")){
               this.previewVideo = urlCreator.createObjectURL(this.previewPost);
+              this.previewImage = null
             } else {
               this.previewImage = urlCreator.createObjectURL(this.previewPost);
+              this.previewVideo = null
             }
         },
       }

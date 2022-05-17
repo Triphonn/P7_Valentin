@@ -1,11 +1,9 @@
 const fs = require('fs');
 const db = require('../db');
-const { posts, postdraft, userProfile, comments } = db;
+const { posts, userProfile, comments } = db;
 
 exports.createPost = async (req, res) => {
     try {
-        console.log(req.file);
-
         let userId = '';
         let postText = '';
         let image = '';
@@ -84,39 +82,8 @@ exports.commentOnePost = async (req, res) => {
     }
 };
 
-exports.saveDraft = async (req, res) => {
-    try {
-        let userId = '';
-        let postText = '';
-        let imageContent = '';
-
-        if (!req.file) {
-            userId = req.body.userId;
-            postText = req.body.postText;
-            imageContent = null;
-        } else {
-            userId = JSON.parse(req.body.content.userId);
-            postText = JSON.parse(req.body.content.postText);
-            imageContent = `${req.protocol}://${req.get('host')}/images/${
-                req.file.filename
-            }`;
-        }
-
-        await postdraft.create({
-            _id: userId,
-            content: postText,
-            file: imageContent,
-        });
-        res.status(201).json({ message: 'Votre brouillon a été sauvegardé' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error });
-    }
-};
-
 exports.modifyPost = async (req, res) => {
     try {
-        console.log(req.file);
         let postId = '';
         let content = '';
         let image = '';
@@ -145,11 +112,9 @@ exports.modifyPost = async (req, res) => {
         });
         if (post.video || post.image) {
             if (req.file) {
-                console.log('test 1');
                 let filename = '';
                 let file = '';
                 if (post.video) {
-                    console.log('test 2');
                     filename = post.video.split('/videos/')[1];
                     file = 'videos';
                 } else {
@@ -158,14 +123,12 @@ exports.modifyPost = async (req, res) => {
                 }
                 fs.unlink(`${file}/${filename}`, async () => {
                     if (video) {
-                        console.log('test 3');
                         await post.update({
                             content: content,
                             video: video,
                             image: '',
                         });
                     } else {
-                        console.log('test 4');
                         await post.update({
                             content: content,
                             image: image,
