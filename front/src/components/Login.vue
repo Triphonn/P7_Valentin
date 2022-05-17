@@ -49,12 +49,12 @@
                     </v-snackbar>
                     <v-card-actions class="form-row">
                         <v-spacer></v-spacer>
-                        <v-btn color="primary" @click="createAccount()" class="button" :disabled="disabled" v-if="mode == 'signup'">        
-                           <span v-if="status == 'loading'">Création en cours...</span>
+                        <v-btn color="third" @click="createAccount()" class="button button-radius" :disabled="disabled" v-if="mode == 'signup'">        
+                           <span v-if="status == 'loading' || status == 'profilCreated'">Création en cours...</span>
                            <span v-else>Créer mon compte</span>
                         </v-btn>
-                        <v-btn color="primary" @click="login()" class="button" :class="{'button--disabled' : !validatedFields}" v-else>        
-                           <span v-if="status == 'loading'">Connexion en cours...</span>
+                        <v-btn color="third" @click="login()" class="button button-radius" :class="{'button--disabled' : !validatedFields}" v-else>        
+                           <span v-if="status == 'loading' || status == 'profilCreated'">Connexion en cours...</span>
                            <span v-else>Se connecter</span>
                         </v-btn>
                     </v-card-actions>
@@ -191,7 +191,7 @@ export default {
                password: this.password,
             })
             .then(function () {
-              self.verifyProfile();
+                self.verifyProfile();
             })
             .catch((error) => {
                console.log(error);
@@ -229,5 +229,8 @@ export default {
 .mg-15{
     margin-right: 15px;
     margin-left: 15px;
+}
+.button-radius{
+    border-radius: 20px;
 }
 </style>

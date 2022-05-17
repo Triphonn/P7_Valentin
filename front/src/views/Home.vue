@@ -1,5 +1,11 @@
 <template>
   <v-app>
+      <v-snackbar
+         v-model="snackbar"
+         :timeout="1000000000"
+      >
+         {{ accountError }}
+      </v-snackbar>
       <div v-if="getUsernameAvatar != null">
          <div v-if="isMobile" class="flex-center">
             <a href="/">
@@ -93,6 +99,8 @@ export default {
           comments: [],
           loadSinglePostError: '',
           singlePost: null,
+          snackbar: false,
+          accountError: null
         };
       },
       components: {
@@ -104,6 +112,10 @@ export default {
          NavBarMobile
       },
       mounted () {
+         if (this.getUsernameAvatar == null && this.$store.state.user.isLoggedIn){
+            this.snackbar = true;
+            this.accountError = 'ERREUR : Vous n\'avez pas encore fini votre inscription, veuillez vous reconnecter pour finaliser votre inscription !';
+         }
          this.getAllPosts()
          this.checkIsMobile()
          // this.getAllComments();

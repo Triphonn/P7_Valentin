@@ -150,30 +150,25 @@ export default new Vuex.Store({
             });
         },
         verifyProfile: ({ commit, getters }) => {
-            if (!sessionStorage.getItem('vuex')) {
-                console.log('non connecté');
-            } else {
-                return new Promise((resolve, reject) => {
-                    const userId = getters.getUserId;
-                    instance
-                        .get(`/profile/verifyprofile/${userId}`, {
-                            headers: {
-                                Authorization: 'Bearer ' + getters.getToken,
-                            },
-                        })
-                        .then(function (response) {
-                            console.log(response);
-                            commit('setStatus', 'profileCreated');
-                            commit('profileInfos', response.data);
-                            commit('setUserInfos', response.data);
-                            resolve(response);
-                        })
-                        .catch(function (error) {
-                            commit('setStatus', 'create');
-                            reject(error);
-                        });
-                });
-            }
+            return new Promise((resolve, reject) => {
+                const userId = getters.getUserId;
+                instance
+                    .get(`/profile/verifyprofile/${userId}`, {
+                        headers: {
+                            Authorization: 'Bearer ' + getters.getToken,
+                        },
+                    })
+                    .then(function (response) {
+                        commit('setStatus', 'profileCreated');
+                        commit('profileInfos', response.data);
+                        commit('setUserInfos', response.data);
+                        resolve(response);
+                    })
+                    .catch(function (error) {
+                        commit('setStatus', 'create');
+                        reject(error);
+                    });
+            });
         },
         getOneProfile: async ({ commit }, username) => {
             try {

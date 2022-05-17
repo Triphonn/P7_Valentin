@@ -47,6 +47,13 @@ export default {
 .width-100{
   width: 100% !important;
 }
+.card__action{
+  color:#2196F3;
+  text-decoration: underline;
+}
+.card__action:hover {
+  cursor:pointer;
+}
 .width-80{
   width: 80%;
 }

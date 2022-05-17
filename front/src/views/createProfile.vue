@@ -13,22 +13,25 @@
                             <v-card-text>
                                 <v-form>
                                     <v-text-field
-                                        class="form-row"
+                                        class="form-row mg-15"
                                         name="name"
+                                        color="third"
                                         label="Prénom/Nom"
                                         type="text"
                                         v-model="name"
                                     ></v-text-field>
                                     <v-text-field
-                                        class="form-row"
+                                        class="form-row mg-15"
                                         id="username"
+                                        color="third"
                                         name="username"
                                         label="Nom d'utilisateur"
                                         type="username"
                                         v-model="username"
                                     ></v-text-field>
                                     <v-textarea
-                                        class="form-row"
+                                        class="form-row mg-15"
+                                        color="third"
                                         id="bio"
                                         name="bio"
                                         label="Bio"
@@ -36,26 +39,17 @@
                                         v-model="bio"
                                         auto-grow
                                     ></v-textarea>
-                                    <v-file-input
-                                        v-model="file"
-                                        label="Photo de Profil"
-                                        name="file"
-                                        filled
-                                        prepend-icon="mdi-camera"
-                                        @change="onFileChange"
-                                        accept="image/*"
-                                    ></v-file-input>
-                                    <img v-if="url" :src="url" class="max-width"/>
+                                    <v-file-input class="text-field-post mg-15" hide-input @blur="search = ''" prepend-icon="mdi-image-plus" @change="onFileChange" accept="image/*" />
+                                    <div v-if="url" class="flex-row-top width-150-150">
+                                        <v-img v-if="url" class="img-file" width="150px" height="150px" :src="url" >
+                                        </v-img>
+                                        <div class="width-50 icon-basic tr-color cursor padding-basic">
+                                            <v-icon v-if="url" @click.stop="file = '', url = null" dense size="24" color="secondary">
+                                            mdi-close
+                                            </v-icon>
+                                        </div>
+                                    </div>
                                 </v-form>
-                                <div
-                                    class="form-row"
-                                    v-if="
-                                        mode == 'create' &&
-                                        status == 'create'
-                                    "
-                                >
-                                    Profil non crée
-                                </div>
                                 <v-snackbar
                                     v-model="snackbar"
                                     :timeout="1500"
@@ -66,12 +60,10 @@
                             <v-card-actions class="form-row">
                                 <v-spacer></v-spacer>
                                 <v-btn
-                                    color="primary"
+                                    color="third"
                                     @click="createProfile()"
-                                    class="button"
-                                    :class="{
-                                        'button--disabled': !validatedFields,
-                                    }"
+                                    class="button button-radius"
+                                    :disabled="!validatedFields"
                                 >
                                     <span v-if="status == 'loading'"
                                         >Création en cours...</span
@@ -99,7 +91,7 @@ export default {
             name: '',
             username: '',
             bio: '',
-            file: {},
+            file: '',
             url: null,
             profileError: '',
             snackbar: false,
@@ -153,8 +145,6 @@ export default {
         },
         createProfile () {
             const self = this;
-            let today = new Date();
-            let dateToday = today.toISOString().substring(0, 19).split('T').join(' ');
             
             const profileInfos = {
                 userId: this.$store.state.user.userId,
@@ -162,7 +152,6 @@ export default {
                 username: this.username,
                 bio: this.bio,
                 banner: null,
-                date: dateToday,
             }
             let formData = new FormData();
             formData.append("image", this.file);
@@ -187,16 +176,30 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 
 .max-width{
     max-width: 400px;
+}
+.img-file{
+  margin-top: 15px;
+  background-size: cover;
+  border-radius: 15px;
+  object-fit: cover;
+}
+.button-radius{
+    border-radius: 20px;
 }
 .form-row {
     display: flex;
     margin: 16px 0px;
     gap: 16px;
     flex-wrap: wrap;
+}
+
+.mg-15{
+    margin-right: 15px;
+    margin-left: 15px;
 }
 
 .form-row__input {
