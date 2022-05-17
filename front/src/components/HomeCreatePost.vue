@@ -41,7 +41,7 @@
                             fab
                             icon
                             right
-                            @click.stop="imagePost = null, previewImage = null"
+                            @click.stop="previewPost = null, previewImage = null"
                             @blur="search = ''"
                             style="float: right;"
                             >
@@ -50,6 +50,21 @@
                             </v-icon>
                           </v-btn>
                         </v-img>
+                        <video v-if="previewVideo" ref="videoRef" :src="previewVideo" class="img-file" id="video-container" width="300px" height="200px" controls>
+                          <v-btn
+                            depressed
+                            fab
+                            icon
+                            right
+                            @click.stop="previewPost = null, previewImage = null"
+                            @blur="search = ''"
+                            style="float: right; z-index: 9999;"
+                            >
+                            <v-icon dense size="15" color="secondary">
+                              mdi-close
+                            </v-icon>
+                          </v-btn>
+                        </video>
                     </v-form>
                 </v-card-text>
                 <v-snackbar
@@ -65,7 +80,7 @@
             <div class="row flex-between px-16 width-100 mb-2">
                 <div>
                     <div class="width-50 row icon-basic tr-color icon-bottom-bar cursor flex-center padding-basic">
-                        <v-file-input class="text-field-post" hide-input @blur="search = ''" prepend-icon="mdi-image-plus" @change="previewImageContent" accept="image/*" />
+                        <v-file-input class="text-field-post" hide-input @blur="search = ''" prepend-icon="mdi-image-plus" @change="previewImageContent" accept="image/*, video/*" />
                     </div>
                 </div>
                 <v-card-actions class="form-row clear-pa-mg">
@@ -93,8 +108,9 @@ export default {
         snackbarPost: false,
         zIndex: 1,
         posts: [],
-        imagePost: null,
+        previewPost: null,
         previewImage: null,
+        previewVideo: null,
         postTextArea: '',
         postError: '',
         overlayClosingVerif: false,
@@ -154,7 +170,7 @@ export default {
         createSinglePost(){
             const self = this;
 
-            this.$store.dispatch('createPost', {postText: this.postTextArea, postImage: this.imagePost})
+            this.$store.dispatch('createPost', {postText: this.postTextArea, postImage: this.previewPost})
             .then(function () {
                if (self.status != 'error_save'){
                   self.$router.go();
@@ -170,12 +186,17 @@ export default {
             })
         },
         clearPost () {
-            this.postTextArea = '', this.imagePost = null, this.previewImage = null
+            this.postTextArea = '', this.previewPost = null, this.previewImage = null
         },
         previewImageContent(e) {
             let urlCreator = window.URL || window.webkitURL;
-            this.imagePost = e;
-            this.previewImage = urlCreator.createObjectURL(this.imagePost);
+            this.previewPost = e;
+            console.log(e);
+            if(e.type.startsWith("video")){
+              this.previewVideo = urlCreator.createObjectURL(this.previewPost);
+            } else {
+              this.previewImage = urlCreator.createObjectURL(this.previewPost);
+            }
         },
       }
    }

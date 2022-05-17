@@ -83,11 +83,11 @@ export default {
         ...mapState(['status', 'user', 'profileInfos'])
       },
       methods: {
-          goToProfile: function () {
+        goToProfile: function () {
             this.$router.push(`/profile/${this.username}`);
             this.$router.go()
-          },
-          logout: function() {
+        },
+        logout: function() {
             this.$store.dispatch('logout')
             // this.$router.push('/')
             this.$router.go('/')

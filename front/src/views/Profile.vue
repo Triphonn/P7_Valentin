@@ -90,7 +90,7 @@
                             </v-list-item-content>
                         </v-list-item>
                     </v-col>
-                    <v-btn v-if="userInfos.userId == user.userId" style="postition: absolute; top: 35px; right: 20px;" color="primary" @click="overlay = !overlay" class="button">      
+                    <v-btn v-if="userInfos.userId == user.userId" style="postition: absolute; top: 35px; right: 20px;" color="primary" @click="overlay = !overlay, editModeTrue" class="button">      
                       <span>Editer le profil</span>
                     </v-btn>
                     <v-overlay :z-index="zIndex" :value="overlay">
@@ -225,10 +225,15 @@
                     </v-overlay>
                 </v-row>
             </v-card>
-            <div class="flex-center flex-column" v-if="posts.length >= 0 && loading == false">
-                <div class="flex-center flex-column border-basic">
-                    <posts v-for="post in posts" :key="post._id" :content="post.content" :file="post.file" :name="post.name" :username="post.username" :id="post._id" :comments="comments" />
-                </div>
+            <div class="flex-center flex-column mg-pa-gap-0 pt-5" v-if="posts.length >= 0">
+               <div v-if="mode != 'loading'" class="resp-div-post flex-center flex-column mg-pa-gap-0">
+                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :date="post.updatedAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="comments" :commentavatar="getUsernameAvatar.profilePicture" @overlayCom="commentsOverlay" />
+               </div>
+               <div class="width-50">
+                  <v-overlay :z-index="zIndex" :value="overlayComments" v-if="overlayComments">
+                     <posts class="mg-pa-gap-0 width-850" :key="singlePost.id" :avatar="singlePost.avatar" :date="singlePost.updatedAt" :content="singlePost.content" :image="post.image" :video="post.video" :name="singlePost.name" :username="singlePost.username"  :id="singlePost.id" :comments="comments" :commentavatar="getUsernameAvatar.profilePicture" />
+                  </v-overlay>
+               </div>
             </div>
         </v-main>
     </v-app>
@@ -282,6 +287,7 @@ export default {
             overlayDelete: false,
             deleteErrors: '',
             deleteConfirm: '',
+            overlayComments: false,
 
             getUsernameAvatar: this.$store.state.userInfos,
 
@@ -322,7 +328,7 @@ export default {
             const index = arr.find((el) => el.id === month)
             return `${index.val}`+ ` ${year}`;
         },
-        userBanner: function () {
+        userBanner () {
             if (this.$store.state.profileInfos.banner != null && this.mode != 'modifying') {
                 return this.$store.state.profileInfos.banner;
             } else {
@@ -335,6 +341,10 @@ export default {
             } else {
                 return this.profilePicture
             }
+        },
+        editModeTrue(){
+            this.name = this.userInfos.name
+            this.bio = this.userInfos.bio
         },
         closeVerification() {
             this.overlayClosingVerif = true;
@@ -360,13 +370,36 @@ export default {
     },
     methods: {
         async getPostsSingleUser(){
+            this.mode = 'loading'
             const username = this.$route.params.username;
-            const response = await fetch(`http://localhost:3000/api/post/getAllPosts/${username}`)
+            const response = await fetch(`http://localhost:3000/api/post/getAllPosts`)
             const data = await response.json();
             for (let i = 0; i < data.length; i++) {
-               data[i].createdAt = data[i].createdAt.substring(0, 19).split('T').join(' ');
+               // data[i].createdAt = data[i].createdAt.substring(0, 19).split('T').join(' ');
+               const date1 = new Date();
+               const date2 = new Date(data[i].updatedAt);
+
+               const diffTime = Math.abs(date2 - date1);
+               const diffSeconds = Math.ceil(diffTime / (1000));
+               const diffMins = Math.ceil(diffTime / (1000 * 60));
+               const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+               const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+               
+               if (diffSeconds <= 60 ){
+                  data[i].updatedAt = (diffSeconds - 1) + "sec"
+               } else if (diffSeconds >= 60 && diffMins <= 60){
+                  data[i].updatedAt = (diffMins - 1) + "min"
+               } else if (diffMins >= 60 && diffHours <= 24) {
+                  data[i].updatedAt = (diffHours - 1) + "h"
+               } else {
+                  data[i].updatedAt = (diffDays - 1) + 'j'
+               }
             }
-            this.posts = data;
+            const dataFilter = data.filter(el => el.username == username)
+            this.posts = dataFilter;
+            setInterval(() => {
+                this.mode = ''
+            }, 250);
         },
         deleteAccount(){
             const self = this
@@ -377,7 +410,6 @@ export default {
             this.$store.dispatch('deleteAccount', {usernameConfirm: this.deleteConfirm, password: this.password, deleteDate: dateToday})
             .then(function () {
                 setTimeout(() => {
-                    console.log(self.status);
                     if (self.status != 'error_delete'){
                         self.$router.push('/');
                         self.$store.dispatch('logout')
@@ -481,12 +513,9 @@ export default {
             const username = this.$route.params.username;
             this.getOneProfile(username)
             .then(function () {
-                console.log(self.status);
                if (self.status != 'error_get'){
-                   console.log('test 1 ');
                     self.$router.go()
                } else if (self.status == 'error_get'){
-                   console.log('test 2 ');
                     self.mode = 'not_found';
                     self.snackbar = true;
                     self.getProfileError = 'Profil inconnu, retour à l\'accueil.';
@@ -499,6 +528,10 @@ export default {
             .catch((error) => {
               console.log(error);
             })
+        },
+        commentsOverlay(event){
+            this.overlayComments = true
+            this.singlePost = this.posts.find(element => element.id == event);
         },
         overlayLogin (event) {
             if ( event == 1 ) {
@@ -541,5 +574,13 @@ export default {
 .mg-15{
     margin-right: 15px;
     margin-left: 15px;
+}
+.overlay-content {
+  max-width: 960px;
+}
+.mg-pa-gap-0{
+   margin: 0;
+   padding: 0;
+   gap: 15px;
 }
 </style>

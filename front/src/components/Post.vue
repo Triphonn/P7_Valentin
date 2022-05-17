@@ -55,18 +55,20 @@
             <div class="mb-3 width-50">
               <div class="img-width">
                 <v-img
-                  v-if="file"
+                  v-if="image"
                   class="img-file"
-                  :src="file"
+                  :src="image"
                   @click.stop="imageHD = true"
                 >
                 </v-img>
+                <video v-if="video" ref="videoRef" :src="video" class="img-file" id="video-container" width="500px" autoplay controls onloadstart="this.volume=0" @click.stop="imageHD = true">
+                </video>
               </div>
               <v-overlay @click.stop="imageHD = false" :z-index="zIndex" :value="imageHD">
                 <v-img
                   class="big-img-file normal-cursor"
                   width="80%"
-                  :src="file"
+                  :src="image"
                 >
                   <v-btn
                     depressed
@@ -82,6 +84,21 @@
                     </v-icon>
                   </v-btn>
                 </v-img>
+                <video v-if="video" ref="videoRef" :src="video" class="big-img-file normal-cursor" id="video-container" width="80%" onloadstart="this.volume=0.4" autoplay controls>
+                  <v-btn
+                    depressed
+                    fab
+                    icon
+                    color="primary"
+                    right
+                    @click.stop="imageHD = false"
+                    style="float: right;"
+                    >
+                    <v-icon dense color="primary">
+                      mdi-close
+                    </v-icon>
+                  </v-btn>
+                </video>
               </v-overlay>
             </div>
           </div>
@@ -244,7 +261,8 @@ export default {
         commentavatar: String,
         comments: Array,
         content: String,
-        file: String,
+        image: String,
+        video: String,
         date: String,
       },
       computed: {
@@ -256,7 +274,7 @@ export default {
                return false;
             }
           } else if (this.editPostMode) {
-            if (this.postEdit != this.content || this.previewImageEdit != this.file){
+            if (this.postEdit != this.content || this.previewImageEdit != this.image){
               return true
             } else {
               return false
@@ -329,8 +347,8 @@ export default {
         },
         editPostOverlay(){
           this.editPostMode = true;
-          if (this.file){
-            this.previewImageEdit = this.file
+          if (this.image){
+            this.previewImageEdit = this.image
           }
         },
         editOnePost(){
@@ -371,7 +389,7 @@ export default {
 }
 .img-file{
   max-width: 406px;
-  max-height: 250px;
+  max-height: 400px;
   background-size: cover;
   border-radius: 15px;
   object-fit: cover;
@@ -381,6 +399,7 @@ export default {
 }
 .big-img-file{
   max-width: 1500px;
+  max-height: 1000px;
   background-size: cover;
   border-radius: 15px;
   object-fit: cover;

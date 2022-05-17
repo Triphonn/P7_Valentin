@@ -4,7 +4,7 @@
     horizontal
     class="fixed-bar mg-pa-gap-0"
   >
-    <v-btn>
+    <v-btn @click.stop="goToHome">
         <div class="flex-column-center reverse">
             <span>Accueil</span>
 
@@ -20,11 +20,22 @@
         </div>
     </v-btn>
 
-    <v-btn>
+    <v-btn v-if=" user.isLoggedIn == true " @click="goToProfile()">
         <div class="flex-column-center reverse">
-            <span>Profil</span>
+          <span>Profil</span>
+            <v-avatar class="pp-2" size="24" right>
+              <img
+                  :src="profilePicture"
+                  alt="Photo de profil"
+              >
+            </v-avatar>
+        </div>
+    </v-btn>
+    <v-btn v-else>
+        <div class="flex-column-center reverse">
+            <span>S'inscrire</span>
 
-            <v-icon class="clear-pa-mg">mdi-account</v-icon>
+            <v-icon class="clear-pa-mg">mdi-login-variant</v-icon>
         </div>
     </v-btn>
   </v-bottom-navigation>
@@ -53,24 +64,27 @@ export default {
         ...mapState(['status', 'user', 'profileInfos'])
       },
       methods: {
-          goToProfile: function () {
-            this.$router.push(`/profile/${this.username}`);
-            this.$router.go()
-          },
-          logout: function() {
-            this.$store.dispatch('logout')
-            // this.$router.push('/')
-            this.$router.go('/')
-         },
-         signup: function () {
-           this.$emit('login', 1)
-         },
-         login: function () {
-           this.$emit('login', 0)
-         },
-         createpost: function () {
-           this.$emit('createpost')
-         }
+        goToHome: function () {
+          this.$router.go('/')
+        },
+        goToProfile: function () {
+          this.$router.push(`/profile/${this.username}`);
+          this.$router.go()
+        },
+        logout: function() {
+          this.$store.dispatch('logout')
+          // this.$router.push('/')
+          this.$router.go('/')
+        },
+        signup: function () {
+          this.$emit('login', 1)
+        },
+        login: function () {
+          this.$emit('login', 0)
+        },
+        createpost: function () {
+          this.$emit('createpost')
+        }
       }
    }
 </script>

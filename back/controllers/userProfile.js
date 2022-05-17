@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const db = require('../db');
-const { users, posts, postdraft, userProfile, deletedaccount } = db;
+const { users, posts, postdraft, userProfile, deletedaccount, comments } = db;
 const fs = require('fs');
 
 // Creating user's profile
@@ -55,6 +55,26 @@ exports.modifyProfile = async (req, res) => {
                         },
                     }
                 );
+                await posts.update(
+                    {
+                        [key]: data[key],
+                    },
+                    {
+                        where: {
+                            username: user.username,
+                        },
+                    }
+                );
+                await comments.update(
+                    {
+                        [key]: data[key],
+                    },
+                    {
+                        where: {
+                            username: user.username,
+                        },
+                    }
+                );
             }
         }
         res.status(200).json(user);
@@ -77,6 +97,22 @@ exports.uploadAvatar = async (req, res) => {
                 await user.update({
                     profilePicture: profilePicture,
                 });
+                await posts.update(
+                    { avatar: profilePicture },
+                    {
+                        where: {
+                            username: user.username,
+                        },
+                    }
+                );
+                await comments.update(
+                    { avatar: profilePicture },
+                    {
+                        where: {
+                            username: user.username,
+                        },
+                    }
+                );
                 res.status(200).json(profilePicture);
             });
         } else {
@@ -219,7 +255,6 @@ exports.getOneProfile = async (req, res) => {
                 username: req.params.username,
             },
         });
-        console.log(profile);
         res.status(200).json(profile);
     } catch (error) {
         console.error(error);

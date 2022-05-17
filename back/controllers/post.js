@@ -1,17 +1,15 @@
-const { log } = require('console');
 const fs = require('fs');
 const db = require('../db');
 const { posts, postdraft, userProfile, comments } = db;
 
 exports.createPost = async (req, res) => {
     try {
-        function between(min, max) {
-            return Math.floor(Math.random() * (max - min) + min);
-        }
+        console.log(req.file);
 
         let userId = '';
         let postText = '';
-        let file = '';
+        let image = '';
+        let video = '';
 
         if (!req.file) {
             userId = req.body.userId;
@@ -20,9 +18,17 @@ exports.createPost = async (req, res) => {
             const body = JSON.parse(req.body.content);
             userId = body.userId;
             postText = body.postText;
-            file = `${req.protocol}://${req.get('host')}/images/${
-                req.file.filename
-            }`;
+            if (req.file.mimetype.startsWith('video')) {
+                console.log('test');
+                video = `${req.protocol}://${req.get('host')}/videos/${
+                    req.file.filename
+                }`;
+            } else {
+                console.log('test2');
+                image = `${req.protocol}://${req.get('host')}/images/${
+                    req.file.filename
+                }`;
+            }
         }
 
         const profile = await userProfile.findByPk(userId);
@@ -32,7 +38,8 @@ exports.createPost = async (req, res) => {
             name: profile.name,
             avatar: profile.profilePicture,
             content: postText,
-            file: file,
+            image: image,
+            video: video,
         });
         res.status(201).json({ message: 'Votre publication a été publié' });
     } catch (error) {
@@ -169,15 +176,28 @@ exports.modifyPost = async (req, res) => {
 
 exports.deletePostImage = async (req, res) => {
     try {
-        console.log(req.body);
         const post = await posts.findOne({
             where: { id: req.body.postId },
         });
-        const filename = post.file.split('/images/')[1];
-        fs.unlink(`images/${filename}`, async () => {
-            await post.update({
-                file: '',
-            });
+        let filename = '';
+        let file = '';
+        if (post.video) {
+            filename = post.video.split('/videos/')[1];
+            file = 'videos';
+        } else {
+            file = 'images';
+            filename = post.image.split('/images/')[1];
+        }
+        fs.unlink(`${file}/${filename}`, async () => {
+            if (post.video) {
+                await post.update({
+                    video: '',
+                });
+            } else {
+                await post.update({
+                    image: '',
+                });
+            }
         });
 
         res.status(200);
@@ -192,9 +212,17 @@ exports.deletePost = async (req, res) => {
         const post = await posts.findOne({
             where: { id: req.body.postId },
         });
-        if (post.file) {
-            const filename = post.file.split('/images/')[1];
-            fs.unlink(`images/${filename}`, async () => {
+        if (post.video || post.image) {
+            let filename = '';
+            let file = '';
+            if (post.video) {
+                filename = post.video.split('/videos/')[1];
+                file = 'videos';
+            } else {
+                filename = post.image.split('/images/')[1];
+                file = 'images';
+            }
+            fs.unlink(`${file}/${filename}`, async () => {
                 await post.destroy();
             });
         } else {
@@ -229,13 +257,11 @@ exports.getOnePost = async (req, res) => {
 
 exports.getOnePostCommments = async (req, res) => {
     try {
-        console.log(req.params.id);
         const comment = await comments.findAll({
             where: {
                 postId: req.params.id,
             },
         });
-        console.log(comment);
         if (!comment || comment == null) {
             res.status(201).json(null);
         } else {
