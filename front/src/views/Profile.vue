@@ -130,8 +130,11 @@
                                 >
                             </span>
                         </v-list-item>
+                        <v-btn v-if="userInfos.userId == user.userId" color="primary" @click="overlay = !overlay, editModeTrue" class="button d-md-none">      
+                            <span>Editer le profil</span>
+                        </v-btn>
                     </v-col>
-                    <v-btn v-if="userInfos.userId == user.userId" style="postition: absolute; top: 35px; right: 20px;" color="primary" @click="overlay = !overlay, editModeTrue" class="button">      
+                    <v-btn v-if="userInfos.userId == user.userId" style="postition: absolute; top: 35px; right: 20px;" color="primary" @click="overlay = !overlay, editModeTrue" class="button d-none d-md-block">      
                       <span>Editer le profil</span>
                     </v-btn>
                     <v-overlay :z-index="zIndex" :value="overlay">

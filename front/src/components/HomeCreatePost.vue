@@ -120,7 +120,7 @@ export default {
     },
     computed: {
         validatedFields: function () {
-            if (this.postTextArea != "" && this.postTextArea.length >= 5 && this.postTextArea.length <= 200) {
+            if (this.postTextArea != "" && this.postTextArea.length >= 5 && this.postTextArea.length <= 200 && !this.postTextArea.match(/^\s*$/)) {
                 return true;
             } else {
                 return false;

@@ -329,7 +329,6 @@ export default {
           const data = await response.json();
           const array = data.filter(e => e.username == username)
           this.userLiked = array;
-          console.log(array);
         },
         loaded(){
           this.testmode = true

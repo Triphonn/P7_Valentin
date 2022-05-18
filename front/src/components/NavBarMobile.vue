@@ -65,7 +65,7 @@ export default {
       },
       methods: {
         goToHome: function () {
-          this.$router.go('/')
+          this.$router.push('/')
         },
         goToProfile: function () {
           this.$router.push(`/profile/${this.username}`);
