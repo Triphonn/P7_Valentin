@@ -394,6 +394,26 @@ export default new Vuex.Store({
                 }
             }
         },
+        postOneLike: async ({ commit, getters }, likeData) => {
+            try {
+                await instance
+                    .post(`/post/like/${likeData.postId}`, likeData, {
+                        headers: {
+                            Authorization: 'Bearer ' + getters.getToken,
+                        },
+                    })
+                    .then(async () => {
+                        commit('setStatus', '');
+                    })
+                    .catch(function (error) {
+                        commit('setStatus', 'error_like');
+                        console.log(error);
+                    });
+            } catch (err) {
+                commit('setStatus', 'error_like');
+                throw 'Unable to like the post';
+            }
+        },
         editPost: async ({ commit, getters, dispatch }, editContent) => {
             console.log(editContent);
             if (editContent.image == 'deleted') {
@@ -415,7 +435,7 @@ export default new Vuex.Store({
                                 Authorization: 'Bearer ' + getters.getToken,
                             },
                         })
-                        .then(async () => {
+                        .then(function () {
                             commit('setStatus', '');
                         })
                         .catch(function (error) {
@@ -428,6 +448,7 @@ export default new Vuex.Store({
                 }
             } else {
                 try {
+                    console.log('test 2');
                     await instance
                         .post(`/post/modify`, editFormData, {
                             headers: {
@@ -435,7 +456,7 @@ export default new Vuex.Store({
                                 Authorization: 'Bearer ' + getters.getToken,
                             },
                         })
-                        .then(async () => {
+                        .then(function () {
                             commit('setStatus', '');
                         })
                         .catch(function (error) {

@@ -143,6 +143,10 @@ video {
   display: flex;
   align-items: top;
 }
+.flex-row-basic{
+  display: flex;
+  flex-direction: row;
+}
 .flex-left{
   display: flex;
   align-items: left;
@@ -199,6 +203,20 @@ video {
   }
   .img-file{
     width: 350px;
+  }
+  .resp-list-item{
+    flex-direction: row !important;
+    min-height: 0px !important;
+    padding: 0 !important;
+  }
+  .resp-join-date{
+    font-size: 11px !important;
+  }
+  .resp-icon{
+    font-size: 16px !important;
+  }
+  .resp-banner{
+    max-height: 150px !important;
   }
 }
 

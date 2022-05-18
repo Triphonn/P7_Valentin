@@ -24,25 +24,10 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             type: DataTypes.STRING,
         },
-        upvotes: {
+        likes: {
             allowNull: true,
             type: DataTypes.INTEGER,
             defaultValue: 0,
-        },
-        downvotes: {
-            allowNull: false,
-            type: DataTypes.INTEGER,
-            defaultValue: 0,
-        },
-        usersUpvoted: {
-            allowNull: false,
-            type: DataTypes.STRING,
-            defaultValue: '',
-        },
-        usersDownvoted: {
-            allowNull: false,
-            type: DataTypes.STRING,
-            defaultValue: '',
         },
     });
     return post;

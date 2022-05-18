@@ -1,6 +1,6 @@
 const fs = require('fs');
 const db = require('../db');
-const { posts, userProfile, comments } = db;
+const { posts, userProfile, comments, likes } = db;
 
 exports.createPost = async (req, res) => {
     try {
@@ -82,12 +82,47 @@ exports.commentOnePost = async (req, res) => {
     }
 };
 
+exports.likeOnePost = async (req, res) => {
+    try {
+        const post = await posts.findByPk(req.params.id);
+        const like = await likes.findOne({
+            where: { username: req.body.username, postId: req.params.id },
+        });
+
+        if (!like) {
+            await likes.create({
+                username: req.body.username,
+                postId: req.params.id,
+            });
+            const likesAdded = parseInt(post.likes) + 1;
+            await post.update({ likes: likesAdded });
+            res.status(200).json({ message: 'Votre like a été ajouté' });
+        }
+        if (like) {
+            await likes.destroy({
+                where: {
+                    username: req.body.username,
+                    postId: req.params.id,
+                },
+            });
+            const likesRemoved = parseInt(post.likes) - 1;
+            await post.update({ likes: likesRemoved });
+            res.status(200).json({ message: 'Votre like a été retiré' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
+};
+
 exports.modifyPost = async (req, res) => {
     try {
         let postId = '';
         let content = '';
         let image = '';
         let video = '';
+
+        console.log(req.file);
 
         if (!req.file) {
             content = req.body.content;
@@ -111,24 +146,30 @@ exports.modifyPost = async (req, res) => {
             where: { id: postId },
         });
         if (post.video || post.image) {
+            console.log('test 1');
             if (req.file) {
                 let filename = '';
                 let file = '';
                 if (post.video) {
+                    console.log('test 2');
                     filename = post.video.split('/videos/')[1];
                     file = 'videos';
                 } else {
+                    console.log('test 3');
                     file = 'images';
                     filename = post.image.split('/images/')[1];
                 }
                 fs.unlink(`${file}/${filename}`, async () => {
                     if (video) {
+                        console.log('test 4');
+                        console.log(video);
                         await post.update({
                             content: content,
                             video: video,
                             image: '',
                         });
                     } else {
+                        console.log('test 5');
                         await post.update({
                             content: content,
                             image: image,
@@ -137,24 +178,29 @@ exports.modifyPost = async (req, res) => {
                     }
                 });
             } else {
+                console.log('test 6');
                 await post.update({
                     content: content,
                 });
             }
         } else {
             if (req.file) {
+                console.log('test 7');
                 if (video) {
+                    console.log('test 8');
                     await post.update({
                         content: content,
                         video: video,
                     });
                 } else {
+                    console.log('test 9');
                     await post.update({
                         content: content,
                         image: image,
                     });
                 }
             } else {
+                console.log('test 10');
                 await post.update({
                     content: content,
                 });
@@ -230,6 +276,16 @@ exports.deletePost = async (req, res) => {
     }
 };
 
+exports.getAllLikes = async (req, res) => {
+    try {
+        const like = await likes.findAll();
+        res.status(201).json(like);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
+};
+
 exports.getOnePost = async (req, res) => {
     try {
         const post = await posts.findOne({
@@ -272,7 +328,7 @@ exports.getAllPosts = async (req, res) => {
     try {
         const post = await posts.findAll({
             limit: 15,
-            order: [['updatedAt', 'DESC']],
+            order: [['createdAt', 'DESC']],
         });
         res.status(201).json(post);
     } catch (error) {
@@ -288,7 +344,7 @@ exports.getPostsSingleUser = async (req, res) => {
                 username: req.params.username,
             },
             limit: 15,
-            order: [['updatedAt', 'DESC']],
+            order: [['createdAt', 'DESC']],
         });
         // for (let i = 0; i < post.length; i++) {
         //     post[i].createdAt = post[i].createdAt

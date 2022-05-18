@@ -7,7 +7,7 @@
          {{ accountError }}
       </v-snackbar>
       <div v-if="getUsernameAvatar != null">
-         <div v-if="isMobile" class="flex-center">
+         <div class="flex-center d-md-none">
             <a href="/">
             <v-img
                alt="Groupomania Logo"
@@ -19,8 +19,8 @@
             />
             </a>
          </div>
-         <nav-bar-mobile v-if="isMobile" :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" />
-         <nav-bar v-else :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @createpost="postOverlay" />
+         <nav-bar-mobile class="d-md-none" :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" />
+         <nav-bar class="d-none d-md-block" :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @createpost="postOverlay" />
          
          <v-main>
             <v-overlay :z-index="zIndex" :value="overlayPost">
@@ -31,18 +31,18 @@
                   <home-create-post :name="getUsernameAvatar.name" :username="getUsernameAvatar.username" :avatar="getUsernameAvatar.profilePicture" />
                </div>
                <div class="resp-div-post flex-center flex-column mg-pa-gap-0">
-                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :date="post.updatedAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="comments" :commentavatar="getUsernameAvatar.profilePicture" @overlayCom="commentsOverlay" />
+                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :likes="post.likes" :date="post.createdAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="comments" :commentavatar="getUsernameAvatar.profilePicture" @overlayCom="commentsOverlay" />
                </div>
                <div class="width-50">
                   <v-overlay :z-index="zIndex" :value="overlayComments" v-if="overlayComments">
-                     <posts class="mg-pa-gap-0 width-850" :key="singlePost.id" :avatar="singlePost.avatar" :date="singlePost.updatedAt" :content="singlePost.content" :image="post.image" :video="post.video" :name="singlePost.name" :username="singlePost.username"  :id="singlePost.id" :comments="comments" :commentavatar="getUsernameAvatar.profilePicture" />
+                     <posts class="mg-pa-gap-0 width-850" :key="singlePost.id" :avatar="singlePost.avatar" :likes="post.likes" :date="singlePost.createdAt" :content="singlePost.content" :image="post.image" :video="post.video" :name="singlePost.name" :username="singlePost.username"  :id="singlePost.id" :comments="comments" :commentavatar="getUsernameAvatar.profilePicture" />
                   </v-overlay>
                </div>
             </div>
          </v-main>
       </div>
       <div v-else>
-         <div v-if="isMobile" class="flex-center">
+         <div class="flex-center d-md-none">
             <a href="/">
             <v-img
                alt="Groupomania Logo"
@@ -54,19 +54,19 @@
             />
             </a>
          </div>
-         <nav-bar-mobile v-if="isMobile" />
-         <nav-bar v-else @login="overlayLogin" />
+         <nav-bar-mobile class="d-md-none" />
+         <nav-bar class="d-none d-md-block" @login="overlayLogin" />
          <v-main>
             <v-overlay :z-index="zIndex" :value="overlayLog">
                <login :mode="mode" @login="overlayLogin" />
             </v-overlay>
             <div class="flex-center flex-column mg-pa-gap-0" v-if="posts.length >= 0">
                <div class="resp-div-post flex-center flex-column mg-pa-gap-0">
-                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :date="post.updatedAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="comments" @overlayCom="commentsOverlay" />
+                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :likes="post.likes" :date="post.createdAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="comments" @overlayCom="commentsOverlay" />
                </div>
                <div class="width-50">
                   <v-overlay :z-index="zIndex" :value="overlayComments" v-if="overlayComments">
-                     <posts class="mg-pa-gap-0 width-850" :key="singlePost.id" :avatar="singlePost.avatar" :date="singlePost.updatedAt" :content="singlePost.content" :image="post.image" :video="post.video" :name="singlePost.name" :username="singlePost.username"  :id="singlePost.id" :comments="comments" />
+                     <posts class="mg-pa-gap-0 width-850" :key="singlePost.id" :avatar="singlePost.avatar" :likes="post.likes" :date="singlePost.createdAt" :content="singlePost.content" :image="post.image" :video="post.video" :name="singlePost.name" :username="singlePost.username"  :id="singlePost.id" :comments="comments" />
                   </v-overlay>
                </div>
             </div>
@@ -137,7 +137,7 @@ export default {
             for (let i = 0; i < data.length; i++) {
                // data[i].createdAt = data[i].createdAt.substring(0, 19).split('T').join(' ');
                const date1 = new Date();
-               const date2 = new Date(data[i].updatedAt);
+               const date2 = new Date(data[i].createdAt);
 
                const diffTime = Math.abs(date2 - date1);
                const diffSeconds = Math.ceil(diffTime / (1000));
@@ -146,13 +146,13 @@ export default {
                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
                if (diffSeconds <= 60 ){
-                  data[i].updatedAt = (diffSeconds - 1) + "sec"
+                  data[i].createdAt = (diffSeconds - 1) + "sec"
                } else if (diffSeconds >= 60 && diffMins <= 60){
-                  data[i].updatedAt = (diffMins - 1) + "min"
+                  data[i].createdAt = (diffMins - 1) + "min"
                } else if (diffMins >= 60 && diffHours <= 24) {
-                  data[i].updatedAt = (diffHours - 1) + "h"
+                  data[i].createdAt = (diffHours - 1) + "h"
                } else {
-                  data[i].updatedAt = (diffDays - 1) + 'j'
+                  data[i].createdAt = (diffDays - 1) + 'j'
                }
             }
             this.posts = data;

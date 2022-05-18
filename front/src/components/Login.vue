@@ -165,6 +165,7 @@ export default {
         switchToCreateAccount () {
             this.clearData();
             this.$emit('login', 1)
+            console.log(this.mode);
         },
         switchToLogin () {
             this.clearData();

@@ -28,13 +28,16 @@
                             v-model="postTextArea"
                             auto-grow
                             dense
-                            counter="200"
                             clearable
                             color="third"
                             @click:clear="postTextArea = ''"
                             :rules="[rules.length(200)]"
                         >
                         </v-textarea>
+                        <v-progress-circular
+                          :value="postTextArea"
+                          class="mr-2"
+                        ></v-progress-circular>
                         <div v-if="previewImage" class="flex-row-top width-150-150">
                           <v-img v-if="previewImage" class="img-file" width="150px" height="150px" :src="previewImage" >
                           </v-img>
@@ -122,9 +125,7 @@ export default {
             } else {
                 return false;
             }
-            
         },
-         
         ...mapState(['status', 'profileInfos'])
     },
     methods: {

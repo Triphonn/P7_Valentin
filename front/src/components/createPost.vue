@@ -109,7 +109,6 @@ export default {
             } else {
                 return false;
             }
-            
         },
          
         ...mapState(['status', 'profileInfos'])

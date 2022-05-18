@@ -1,7 +1,20 @@
 <template>
     <v-app>
         <div v-if="getUsernameAvatar != null">
-            <nav-bar :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @createpost="postOverlay" />
+            <div class="flex-center d-md-none">
+                <a href="/">
+                    <v-img
+                    alt="Groupomania Logo"
+                    class="shrink mr-2"
+                    contain
+                    src="../assets/icon-left-font-monochrome-white.png"
+                    transition="scale-transition"
+                    width="200"
+                    />
+                </a>
+            </div>
+            <nav-bar-mobile class="d-md-none" :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" />
+            <nav-bar class="d-none d-md-block" :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @createpost="postOverlay" />
             <v-main>
                 <v-overlay :z-index="zIndex" :value="overlayPost">
                     <create-post :mode="mode" @overlayClose="postOverlayHide" />
@@ -9,9 +22,24 @@
             </v-main>
         </div>
         <div v-else>
-            <nav-bar @login="overlayLogin" />
+            <div class="flex-center d-md-none">
+                <a href="/">
+                    <v-img
+                        alt="Groupomania Logo"
+                        class="shrink mr-2"
+                        contain
+                        src="../assets/icon-left-font-monochrome-white.png"
+                        transition="scale-transition"
+                        width="200"
+                    />
+                </a>
+            </div>
+
+            <nav-bar-mobile class="d-md-none" />
+            <nav-bar class="d-none d-md-block" @login="overlayLogin" />
+
             <v-overlay :z-index="zIndex" :value="overlayLog">
-                <login :mode="mode" />
+                <login :mode="loginmode" @login="overlayLogin" />
             </v-overlay>
         </div>
         <v-main v-if="mode == 'not_found'">
@@ -45,25 +73,25 @@
                 type="image, table-heading, list-item-two-line"
                 ></v-skeleton-loader>
             </v-col>
-            <v-card v-else class="mx-auto test" max-width="950" tile>
-                <v-row style="margin: 0;">
+            <v-card v-else style="border-radius: 25px !important;" class="mx-auto test border-radius-25" max-width="950" tile>
+                <v-row style="margin: 0;" class="width-100">
                     <v-img
                         v-if="!userInfos || userInfos.banner == null "
-                        class="img-file"
+                        class="img-file resp-banner"
                         height="200"
                         src="https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg"
                     ></v-img>
                     <v-img
                         v-else
-                        class="img-file"
+                        class="img-file resp-banner"
                         height="200"
                         :src="userInfos.banner"
                     ></v-img>
                 </v-row>
-                <v-row class="bg-color border-basic border-bottom-gray" style="margin: 0; flex-wrap: nowrap">
+                <v-row class="bg-color border-basic border-bottom-gray width-100" style="margin: 0; flex-wrap: nowrap">
                     <v-col>
-                        <v-list-item>
-                            <v-list-item-avatar size="100">
+                        <v-list-item class="resp-list-item">
+                            <v-list-item-avatar class="resp-list-avatar" size="100">
                                 <v-img
                                     class="avatar-22"
                                     :src="userInfos.profilePicture"
@@ -78,16 +106,29 @@
                                 <v-list-item-subtitle
                                     >@{{ userInfos.username }}</v-list-item-subtitle
                                 >
-                                <v-list-item-action-text style="margin: 2px 0 10px 0"
-                                    >{{ userInfos.bio }}</v-list-item-action-text
-                                >
-                                <span>
-                                    <v-icon>mdi-calendar-month</v-icon>
-                                    <v-list-item-action-text style="margin-left: 5px;"
-                                        >A rejoint Groupomania en {{ dateProfile }}</v-list-item-action-text
-                                    >
-                                </span>
+                                <div class="d-none d-md-flex flex-column-start">
+                                    <v-list-item-action-text style="margin: 2px 0 10px 0"
+                                        >{{ userInfos.bio }}
+                                    </v-list-item-action-text>
+                                    <span>
+                                        <v-icon class="resp-icon">mdi-calendar-month</v-icon>
+                                        <v-list-item-action-text class="resp-join-date" style="margin-left: 5px;"
+                                            >A rejoint Groupomania en {{ dateProfile }}
+                                            </v-list-item-action-text>
+                                    </span>
+                                </div>
                             </v-list-item-content>
+                        </v-list-item>
+                        <v-list-item class="d-md-none mg-pa-gap-0 ml-5">
+                            <v-list-item-action-text
+                                >{{ userInfos.bio }}</v-list-item-action-text
+                            >
+                            <span>
+                                <v-icon class="resp-icon">mdi-calendar-month</v-icon>
+                                <v-list-item-action-text class="resp-join-date" style="margin-left: 5px;"
+                                    >A rejoint Groupomania en {{ dateProfile }}</v-list-item-action-text
+                                >
+                            </span>
                         </v-list-item>
                     </v-col>
                     <v-btn v-if="userInfos.userId == user.userId" style="postition: absolute; top: 35px; right: 20px;" color="primary" @click="overlay = !overlay, editModeTrue" class="button">      
@@ -227,11 +268,11 @@
             </v-card>
             <div class="flex-center flex-column mg-pa-gap-0 pt-5" v-if="posts.length >= 0">
                <div v-if="mode != 'loading'" class="resp-div-post flex-center flex-column mg-pa-gap-0">
-                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :date="post.updatedAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="comments" :commentavatar="getUsernameAvatar.profilePicture" @overlayCom="commentsOverlay" />
+                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :date="post.updatedAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="comments" @overlayCom="commentsOverlay" />
                </div>
                <div class="width-50">
                   <v-overlay :z-index="zIndex" :value="overlayComments" v-if="overlayComments">
-                     <posts class="mg-pa-gap-0 width-850" :key="singlePost.id" :avatar="singlePost.avatar" :date="singlePost.updatedAt" :content="singlePost.content" :image="post.image" :video="post.video" :name="singlePost.name" :username="singlePost.username"  :id="singlePost.id" :comments="comments" :commentavatar="getUsernameAvatar.profilePicture" />
+                     <posts class="mg-pa-gap-0 width-850" :key="singlePost.id" :avatar="singlePost.avatar" :date="singlePost.updatedAt" :content="singlePost.content" :image="post.image" :video="post.video" :name="singlePost.name" :username="singlePost.username"  :id="singlePost.id" :comments="comments" />
                   </v-overlay>
                </div>
             </div>
@@ -242,7 +283,9 @@
 <script>
 import NavBar from '../components/NavBar.vue';
 import Posts from '../components/Post.vue';
+import Login from '../components/Login.vue'
 import CreatePost from '../components/createPost.vue';
+import NavBarMobile from '../components/NavBarMobile.vue';
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex';
 
 export default {
@@ -252,6 +295,8 @@ export default {
         NavBar,
         Posts,
         CreatePost,
+        NavBarMobile,
+        Login
     },
     data () {
         return {       
@@ -264,6 +309,7 @@ export default {
             overlay: false,
             zIndex: 1,
             mode: 'home',
+            loginmode: "signup",
             previewMode: '',
             overlayLog: false,
 
@@ -310,7 +356,8 @@ export default {
                 this.loading = false
             }
         }
-        
+
+        this.checkIsMobile()
         this.getPostsSingleUser()
         setInterval(() => {
             this.getPostsSingleUser()
@@ -366,7 +413,7 @@ export default {
 
         },
         ...mapGetters(['getProfileInfos']),
-        ...mapState(['status', 'user']),
+        ...mapState(['status', 'user', 'isMobile']),
     },
     methods: {
         async getPostsSingleUser(){
@@ -400,6 +447,14 @@ export default {
             setInterval(() => {
                 this.mode = ''
             }, 250);
+        },
+        checkIsMobile() {
+            if( screen.width <= 960 ) {
+               this.setMobileMode(true)
+            }
+            else {
+               this.setMobileMode(false) 
+            }
         },
         deleteAccount(){
             const self = this
@@ -534,16 +589,17 @@ export default {
             this.singlePost = this.posts.find(element => element.id == event);
         },
         overlayLogin (event) {
+            console.log(event);
             if ( event == 1 ) {
-               this.mode = 'signup'
+               this.loginmode = 'signup'
                this.overlayLog = true
             } else {
-               this.mode = 'login'
+               this.loginmode = 'login'
                this.overlayLog = true
             }
         },
         ...mapActions(['getOneProfile']),
-        ...mapMutations(['setStatus'])
+        ...mapMutations(['setStatus', 'setMobileMode'])
     },
 };
 </script>
@@ -582,5 +638,5 @@ export default {
    margin: 0;
    padding: 0;
    gap: 15px;
-}
+} 
 </style>

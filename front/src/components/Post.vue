@@ -61,7 +61,7 @@
                   @click.stop="imageHD = true"
                 >
                 </v-img>
-                <video v-if="video" ref="videoRef" :src="video" class="img-file" id="video-container" width="500px" autoplay controls onloadstart="this.volume=0" @click.stop="imageHD = true">
+                <video v-if="video" ref="videoRef" :src="video" class="img-file" id="video-container" width="500px" controls onloadstart="this.volume=0" @click.stop="imageHD = true">
                 </video>
               </div>
               <v-overlay @click.stop="imageHD = false" :z-index="zIndex" :value="imageHD">
@@ -84,7 +84,7 @@
                     </v-icon>
                   </v-btn>
                 </v-img>
-                <video v-if="video" ref="videoRef" :src="video" class="big-img-file normal-cursor" id="video-container" width="80%" onloadstart="this.volume=0.4" autoplay controls>
+                <video v-if="video" ref="videoRef" :src="video" class="big-img-file normal-cursor" id="video-container" onloadstart="this.volume=0.4" autoplay controls>
                   <v-btn
                     depressed
                     fab
@@ -128,10 +128,10 @@
                     </div>
                   </div>
                   <div v-if="previewVideoEdit" class="flex-row-top">
-                    <video v-if="previewVideoEdit" ref="videoRef" :src="previewVideoEdit" class="img-file" id="video-container" width="300px" height="200px" controls>
+                    <video v-if="previewVideoEdit" ref="videoRef" :src="previewVideoEdit" class="img-file" id="video-container" width="300px" height="200px" controls @loadeddata="loaded">
                     </video>
                     <div class="width-50 icon-basic tr-color cursor padding-basic">
-                      <v-icon v-if="previewVideoEdit" @click.stop="previewPost = null, previewVideoEdit = null" dense size="24" color="secondary">
+                      <v-icon v-if="previewVideoEdit" @click.stop="previewPost = 'deleted', previewVideoEdit = null" dense size="24" color="secondary">
                         mdi-close
                       </v-icon>
                     </div>
@@ -147,7 +147,7 @@
                   </div>
                   <v-card-actions class="form-row clear-pa-mg">
                       <v-spacer></v-spacer>
-                      <v-btn color="third" @click.stop="editOnePost" class="button button-radius" :disabled="!validatedFields">        
+                      <v-btn color="third" @click.stop="editOnePost" class="button button-radius" :disabled="!validatedFields" :loading="edited">        
                           <span v-if="status == 'loading'">Modification en cours...</span>
                           <span v-else>Modifier</span>
                       </v-btn>
@@ -162,8 +162,19 @@
               </div>
             </div>
             <div>
-              <div class="row icon-basic tr-color icon-bottom-bar">
-                <svg viewBox="0 0 24 24" aria-hidden="true" class="r-4qtqp9 r-yyyyoo r-1xvli5t r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-1hdv0qi"><g><path d="M12 21.638h-.014C9.403 21.59 1.95 14.856 1.95 8.478c0-3.064 2.525-5.754 5.403-5.754 2.29 0 3.83 1.58 4.646 2.73.814-1.148 2.354-2.73 4.645-2.73 2.88 0 5.404 2.69 5.404 5.755 0 6.376-7.454 13.11-10.037 13.157H12zM7.354 4.225c-2.08 0-3.903 1.988-3.903 4.255 0 5.74 7.034 11.596 8.55 11.658 1.518-.062 8.55-5.917 8.55-11.658 0-2.267-1.823-4.255-3.903-4.255-2.528 0-3.94 2.936-3.952 2.965-.23.562-1.156.562-1.387 0-.014-.03-1.425-2.965-3.954-2.965z"></path></g></svg>
+              <div class="row icon-basic tr-color icon-bottom-bar" @click.stop="postLike">
+                <div v-if="loadingLiked">
+                  <v-progress-circular
+                    indeterminate
+                    color="third"
+                    :size="27"
+                    :width="3"
+                  ></v-progress-circular>
+                </div>
+                <div v-else>
+                  <svg viewBox="0 0 24 24" aria-hidden="true" class="r-4qtqp9 r-yyyyoo r-1xvli5t r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-1hdv0qi"><g><path d="M12 21.638h-.014C9.403 21.59 1.95 14.856 1.95 8.478c0-3.064 2.525-5.754 5.403-5.754 2.29 0 3.83 1.58 4.646 2.73.814-1.148 2.354-2.73 4.645-2.73 2.88 0 5.404 2.69 5.404 5.755 0 6.376-7.454 13.11-10.037 13.157H12zM7.354 4.225c-2.08 0-3.903 1.988-3.903 4.255 0 5.74 7.034 11.596 8.55 11.658 1.518-.062 8.55-5.917 8.55-11.658 0-2.267-1.823-4.255-3.903-4.255-2.528 0-3.94 2.936-3.952 2.965-.23.562-1.156.562-1.387 0-.014-.03-1.425-2.965-3.954-2.965z"></path></g></svg>
+                  <span>{{ likes }}</span>
+                </div>
               </div>
             </div>
             <div>
@@ -255,7 +266,11 @@ export default {
          imageEdit: null,
          previewImageEdit: null,
          previewPost: null,
-         previewVideoEdit: null
+         previewVideoEdit: null,
+         testmode: false,
+         edited: false,
+         loadingLiked: false,
+         userLiked: null,
          }
       },
       props: {
@@ -269,6 +284,10 @@ export default {
         image: String,
         video: String,
         date: String,
+        likes: Number,
+      },
+      created(){
+        this.getAllLikes()
       },
       computed: {
         validatedFields: function () {
@@ -286,6 +305,13 @@ export default {
             }
           }
         },
+        // liked: function(){
+        //   if (this.$store.state.usersLiked.includes(this.$store.state.userInfos.username)){
+        //     return true
+        //   } else {
+        //     return false
+        //   }
+        // },
         checkPost: function(){
           if (this.username == this.$store.state.userInfos.username && this.user.isLoggedIn){
             return true
@@ -297,6 +323,17 @@ export default {
         ...mapState(['status', 'user', 'userInfos'])
       },
       methods: {
+        async getAllLikes(){
+          const username = this.$store.state.userInfos.username
+          const response = await fetch('http://localhost:3000/api/post/getAllLikes')
+          const data = await response.json();
+          const array = data.filter(e => e.username == username)
+          this.userLiked = array;
+          console.log(array);
+        },
+        loaded(){
+          this.testmode = true
+        },
         goToProfile: function () {
           this.$router.push(`/profile/${this.username}`);
           this.$router.go()
@@ -352,6 +389,27 @@ export default {
         postComment: function(){
           this.postOneComment({postId: this.id, content: this.commentTextArea, image: this.imageComment})
         },
+        postLike(){
+          this.loadingLiked = true
+          const username = this.$store.state.userInfos.username
+          const found = this.userLiked.find(x => x.postId == this.id)
+          if (found){
+            this.postOneLike({postId: this.id, username: username})
+            setTimeout(() => {
+              this.loadingLiked = false
+            }, 500);
+            this.likes = this.likes - 1
+            this.userLiked = this.userLiked.filter(e => e.postId != this.id, 1)
+          } else {
+            this.loadingLiked = true
+            this.postOneLike({postId: this.id, username: username})
+            setTimeout(() => {
+              this.loadingLiked = false
+            }, 500);
+            this.userLiked.push({postId: this.id, username})
+            this.likes = this.likes + 1
+          }
+        },
         deleteOnePost: function(){
           this.deletePost({postId: this.id})
           this.$router.go()
@@ -364,11 +422,15 @@ export default {
             this.previewVideoEdit = this.video
           }
         },
-        editOnePost(){
+        editOnePost () {
+          this.edited = true
           this.editPost({postId: this.id, content: this.postEdit, image: this.previewPost})
-          this.$router.go()
+          setTimeout(() => {
+            this.edited = false
+            this.$router.go();
+          }, 1000);
         },
-        ...mapActions(['postOneComment', 'deletePost', 'editPost']),
+        ...mapActions(['postOneComment', 'deletePost', 'editPost', 'postOneLike']),
       }
    }
 </script>
@@ -400,6 +462,9 @@ export default {
   margin-top: 4px;
   height: 100%;
 }
+.red-liked{
+  color: rgb(249, 24, 128) !important;
+}
 .img-file{
   max-width: 406px;
   max-height: 400px;
@@ -412,7 +477,7 @@ export default {
 }
 .big-img-file{
   max-width: 1500px;
-  max-height: 1000px;
+  max-height: 800px;
   background-size: cover;
   border-radius: 15px;
   object-fit: cover;
