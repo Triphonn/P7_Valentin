@@ -6,10 +6,15 @@
 npm install
 ```
 
+```
+Create /videos folder & /images folder to receive the files
+```
+
 ### Initializing database connection
 
+Create .env file :
+
 ```
-Create .env file : "
 PORT=3000
 
 MYSQL_ADDON_HOST=
@@ -19,7 +24,7 @@ MYSQL_ADDON_PASSWORD=
 
 AUTH_TOKEN=
 EMAIL_TOKEN=
-"
+
 ```
 
 ### Start back
