@@ -28,10 +28,15 @@
                            dense
                            clearable
                            @click:clear="postTextArea = ''"
-                           counter="200"
                            :rules="[rules.length(200)]"
                         >
                         </v-textarea>
+                        <div class="flex-end width-100">
+                          <v-progress-circular
+                            :value="postTextArea.length / 2"
+                            class="mr-2"
+                          ></v-progress-circular>
+                        </div>
                         <div v-if="previewImage" class="flex-row-top width-150-150">
                           <v-img v-if="previewImage" class="img-file" width="150px" height="150px" :src="previewImage" >
                           </v-img>

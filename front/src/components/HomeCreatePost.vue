@@ -36,7 +36,7 @@
                         </v-textarea>
                         <div class="flex-end width-100">
                           <v-progress-circular
-                            :value="postTextArea"
+                            :value="postTextArea.length / 2"
                             class="mr-2"
                           ></v-progress-circular>
                         </div>
