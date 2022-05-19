@@ -31,9 +31,9 @@
             </v-avatar>
         </div>
     </v-btn>
-    <v-btn v-else>
+    <v-btn v-else @click="login" class="width-btn-basic">
         <div class="flex-column-center reverse">
-            <span>S'inscrire</span>
+            <span>Se connecter</span>
 
             <v-icon class="clear-pa-mg">mdi-login-variant</v-icon>
         </div>
@@ -81,6 +81,7 @@ export default {
         },
         goToHome: function () {
           this.$router.push('/')
+          this.$router.go()
         },
         goToProfile: function () {
           this.$router.push(`/profile/${this.username}`);

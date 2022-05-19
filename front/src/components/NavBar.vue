@@ -49,7 +49,7 @@
           </template>
         </v-autocomplete>
       </div>
-      <div v-if=" user.isLoggedIn == true " class="flex-end">
+      <div v-if=" user.isLoggedIn == true " class="flex-auto flex-end">
           <v-btn
             text
             @click.stop="createpost"
@@ -74,7 +74,7 @@
               <span>Déconnexion</span>
           </v-btn>
       </div>
-      <div v-else class="flex-end">
+      <div v-else class="flex-auto flex-end">
 
           <v-btn
             text

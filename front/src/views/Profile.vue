@@ -13,7 +13,40 @@
                     />
                 </a>
             </div>
-            <nav-bar-mobile class="d-md-none" :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" />
+            <div class="mt-7 d-md-none" v-if="searchBarOverlay">
+                <v-autocomplete
+                    v-model="searchBar"
+                    :items="allProfiles"
+                    no-data-text="Aucun profil correspondant."
+                    clearable
+                    hide-details
+                    item-value="username"
+                    item-text="username"
+                    label="Qui recherchez-vous ?"
+                    append-icon=""
+                    dense
+                    flat
+                    outlined
+                    color="third"
+                    class="search-bar"
+                    return-object
+                >
+                    <template v-slot:item="{ item }">
+                        <v-list-item-avatar class="mr-3 clear-pa-mg" size="30" @click="redirectToProfile(item)">
+                                <img
+                                :src="item.profilePicture"
+                                alt="Photo de profil"
+                                class="border-radius"
+                                />
+                        </v-list-item-avatar>
+                        <div class="get-profile-force flex-left-center" @click="redirectToProfile(item)"
+                        ><span class="name-text">{{ item.name }}</span>
+                            <span class="username-text ml-3">@{{ item.username }}</span>
+                        </div>
+                    </template>
+                </v-autocomplete>
+            </div>
+            <nav-bar-mobile class="d-md-none" :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @searchBarOn="searchBarOverlay = !searchBarOverlay" />
             <nav-bar class="d-none d-md-block" :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @createpost="postOverlay" />
             <v-main>
                 <v-overlay :z-index="zIndex" :value="overlayPost">
@@ -34,8 +67,41 @@
                     />
                 </a>
             </div>
+            <div class="mt-7 d-md-none" v-if="searchBarOverlay">
+                <v-autocomplete
+                    v-model="searchBar"
+                    :items="allProfiles"
+                    no-data-text="Aucun profil correspondant."
+                    clearable
+                    hide-details
+                    item-value="username"
+                    item-text="username"
+                    label="Qui recherchez-vous ?"
+                    append-icon=""
+                    dense
+                    flat
+                    outlined
+                    color="third"
+                    class="search-bar"
+                    return-object
+                >
+                    <template v-slot:item="{ item }">
+                        <v-list-item-avatar class="mr-3 clear-pa-mg" size="30" @click="redirectToProfile(item)">
+                                <img
+                                :src="item.profilePicture"
+                                alt="Photo de profil"
+                                class="border-radius"
+                                />
+                        </v-list-item-avatar>
+                        <div class="get-profile-force flex-left-center" @click="redirectToProfile(item)"
+                        ><span class="name-text">{{ item.name }}</span>
+                            <span class="username-text ml-3">@{{ item.username }}</span>
+                        </div>
+                    </template>
+                </v-autocomplete>
+            </div>
 
-            <nav-bar-mobile class="d-md-none" />
+            <nav-bar-mobile class="d-md-none" @searchBarOn="searchBarOverlay = !searchBarOverlay" @login="overlayLogin" />
             <nav-bar class="d-none d-md-block" @login="overlayLogin" />
 
             <v-overlay :z-index="zIndex" :value="overlayLog">
@@ -138,144 +204,146 @@
                       <span>Editer le profil</span>
                     </v-btn>
                     <v-overlay :z-index="zIndex" :value="overlay">
-                      <v-card class="elevation-12 border-radius-15" width="600px">
-                            <v-toolbar dark color="primary">
-                                <v-app-bar-nav-icon>
-                                    <v-btn
-                                    depressed
-                                    fab
-                                    icon
-                                    color="primary"
-                                    @click="overlay = false"
-                                    >
-                                        <v-icon dense color="secondary">
-                                        mdi-close
-                                        </v-icon>
-                                    </v-btn>
-                                </v-app-bar-nav-icon>
-                                <v-toolbar-title>Éditer le profil</v-toolbar-title>
-                                <v-spacer></v-spacer>
-                                <v-btn
-                                    depressed
-                                    color="primary"
-                                    class="button button-radius"
-                                    @click="modifyProfile()"
-                                >
-                                    <span>Enregistrer</span>
-                                </v-btn>
-                            </v-toolbar>
-                            <v-card-text>
-                                <v-form>
-                                    <div>
-                                        <v-card height="200px" @mouseover="bannerHover = true" @mouseleave="bannerHover = false">
-                                            <img class="width-100 img-file clear-pa-mg" height="200px" :src="userBanner" />
+                        <div class="search-bar">
+                            <v-card class="border-radius-15 edit-card">
+                                    <v-toolbar dark color="primary">
+                                        <v-app-bar-nav-icon>
+                                            <v-btn
+                                            depressed
+                                            fab
+                                            icon
+                                            color="primary"
+                                            @click="overlay = false"
+                                            >
+                                                <v-icon dense color="secondary">
+                                                mdi-close
+                                                </v-icon>
+                                            </v-btn>
+                                        </v-app-bar-nav-icon>
+                                        <v-toolbar-title>Éditer le profil</v-toolbar-title>
+                                        <v-spacer></v-spacer>
+                                        <v-btn
+                                            depressed
+                                            color="primary"
+                                            class="button button-radius"
+                                            @click="modifyProfile()"
+                                        >
+                                            <span>Enregistrer</span>
+                                        </v-btn>
+                                    </v-toolbar>
+                                    <v-card-text>
+                                        <v-form>
+                                            <div>
+                                                <v-card height="200px" @mouseover="bannerHover = true" @mouseleave="bannerHover = false">
+                                                    <img class="width-100 img-file clear-pa-mg" height="200px" :src="userBanner" />
 
-                                            <v-overlay class="clear-pa-mg" absolute :z-index="zIndex" :value="bannerHover" >
-                                                <v-file-input hide-input prepend-icon="mdi-camera-outline" @change="onBannerChange" accept="image/*">
-                                                </v-file-input>
-                                            </v-overlay>
-                                        </v-card>
-                                    </div>
-                                    <v-list-item-avatar size="100" @mouseover="PPHover = true" @mouseleave="PPHover = false">
-                                        <img
-                                            class="avatar-22 ml-5"
-                                            :src="userAvatar"
-                                            alt="Photo de profil"
-                                        />
-                                        <v-overlay absolute :z-index="zIndex" :value="PPHover" >
-                                            <v-file-input hide-input prepend-icon="mdi-camera-outline" @change="onPPChange" accept="image/*">
-                                            </v-file-input>
-                                        </v-overlay>
-                                    </v-list-item-avatar>
-                                    <v-text-field
-                                        color="third"
-                                        class="form-row mg-15"
-                                        name="name"
-                                        label="Prénom/Nom"
-                                        type="text"
-                                        placeholder=""
-                                        v-model="name"
-                                    ></v-text-field>
-                                    <v-textarea
-                                        color="third"
-                                        class="form-row mg-15"
-                                        id="bio"
-                                        name="bio"
-                                        label="Bio"
-                                        type="bio"
-                                        v-model="bio"
-                                        auto-grow
-                                    ></v-textarea>
-                                    <div class="padding-bottom mg-auto flex-center">
-                                        <v-btn color="primary" @click="overlayDelete = true, overlay = false, mode = 'deleteAccount'" class="button button-radius" style="color: red;">        
-                                            <span>Supprimer définitivement son compte</span>
+                                                    <v-overlay class="clear-pa-mg" absolute :z-index="zIndex" :value="bannerHover" >
+                                                        <v-file-input hide-input prepend-icon="mdi-camera-outline" @change="onBannerChange" accept="image/*">
+                                                        </v-file-input>
+                                                    </v-overlay>
+                                                </v-card>
+                                            </div>
+                                            <v-list-item-avatar size="100" @mouseover="PPHover = true" @mouseleave="PPHover = false">
+                                                <img
+                                                    class="avatar-22 ml-5"
+                                                    :src="userAvatar"
+                                                    alt="Photo de profil"
+                                                />
+                                                <v-overlay absolute :z-index="zIndex" :value="PPHover" >
+                                                    <v-file-input hide-input prepend-icon="mdi-camera-outline" @change="onPPChange" accept="image/*">
+                                                    </v-file-input>
+                                                </v-overlay>
+                                            </v-list-item-avatar>
+                                            <v-text-field
+                                                color="third"
+                                                class="form-row mg-15"
+                                                name="name"
+                                                label="Prénom/Nom"
+                                                type="text"
+                                                placeholder=""
+                                                v-model="name"
+                                            ></v-text-field>
+                                            <v-textarea
+                                                color="third"
+                                                class="form-row mg-15"
+                                                id="bio"
+                                                name="bio"
+                                                label="Bio"
+                                                type="bio"
+                                                v-model="bio"
+                                                auto-grow
+                                            ></v-textarea>
+                                            <div class="padding-bottom mg-auto flex-center">
+                                                <v-btn color="primary" @click="overlayDelete = true, overlay = false, mode = 'deleteAccount'" class="button button-radius" style="color: red;">        
+                                                    <span>Supprimer définitivement son compte</span>
+                                                </v-btn>
+                                            </div>
+                                        </v-form>
+                                    </v-card-text>
+                                </v-card>
+                            </div>
+                        </v-overlay>
+                        <v-overlay :z-index="zIndex" :value="overlayDelete">
+                        <v-card class="elevation-12" width="600px">
+                                <v-toolbar dark color="primary">
+                                    <v-app-bar-nav-icon>
+                                        <v-btn
+                                        depressed
+                                        fab
+                                        icon
+                                        color="primary"
+                                        @click="overlayDelete = false"
+                                        >
+                                            <v-icon dense color="secondary">
+                                            mdi-close
+                                            </v-icon>
                                         </v-btn>
-                                    </div>
-                                </v-form>
-                            </v-card-text>
-                        </v-card>
-                    </v-overlay>
-                    <v-overlay :z-index="zIndex" :value="overlayDelete">
-                      <v-card class="elevation-12" width="600px">
-                            <v-toolbar dark color="primary">
-                                <v-app-bar-nav-icon>
-                                    <v-btn
-                                    depressed
-                                    fab
-                                    icon
-                                    color="primary"
-                                    @click="overlayDelete = false"
-                                    >
-                                        <v-icon dense color="secondary">
-                                        mdi-close
-                                        </v-icon>
-                                    </v-btn>
-                                </v-app-bar-nav-icon>
-                                <v-toolbar-title>Suppression du compte</v-toolbar-title>
-                            </v-toolbar>
-                            <v-card-text>
-                                <v-form>
-                                    <div class="px-4 pt-2">
-                                        <span>Cette action ne peut pas être annulée. Cela supprimera définitivement votre compte. <br> <span>Veuillez taper <b style="color: red">{{ this.userInfos.username }}</b> et confirmer votre <b style="color: red;">mot de passe</b> pour supprimer définitivement votre compte.</span></span>
-                                    </div>
-                                    <v-text-field
-                                        color="third"
-                                        class="form-row mg-15"
-                                        id="deleteConfirm"
-                                        name="deleteConfirm"
-                                        label="Confirmation"
-                                        type="text"
-                                        v-model="deleteConfirm"
-                                    ></v-text-field>
-                                    <v-text-field
-                                        color="third"
-                                        class="form-row mg-15"
-                                        id="password"
-                                        name="password"
-                                        label="Mot de passe"
-                                        type="password"
-                                        :error-messages="deleteErrors"
-                                        v-model="password"
-                                    ></v-text-field>
-                                    <div class="padding-bottom mg-auto flex-center">
-                                        <v-btn color="primary" @click="deleteAccount" class="button button-radius" style="color: red;" :disabled="!validatedFields">        
-                                            <span v-if="status == 'loading'">Suppression en cours...</span>
-                                            <span v-else>Supprimer définitivement son compte</span>
-                                        </v-btn>
-                                    </div>
-                                </v-form>
-                            </v-card-text>
-                        </v-card>
-                    </v-overlay>
-                </v-row>
-            </v-card>
+                                    </v-app-bar-nav-icon>
+                                    <v-toolbar-title>Suppression du compte</v-toolbar-title>
+                                </v-toolbar>
+                                <v-card-text>
+                                    <v-form>
+                                        <div class="px-4 pt-2">
+                                            <span>Cette action ne peut pas être annulée. Cela supprimera définitivement votre compte. <br> <span>Veuillez taper <b style="color: red">{{ this.userInfos.username }}</b> et confirmer votre <b style="color: red;">mot de passe</b> pour supprimer définitivement votre compte.</span></span>
+                                        </div>
+                                        <v-text-field
+                                            color="third"
+                                            class="form-row mg-15"
+                                            id="deleteConfirm"
+                                            name="deleteConfirm"
+                                            label="Confirmation"
+                                            type="text"
+                                            v-model="deleteConfirm"
+                                        ></v-text-field>
+                                        <v-text-field
+                                            color="third"
+                                            class="form-row mg-15"
+                                            id="password"
+                                            name="password"
+                                            label="Mot de passe"
+                                            type="password"
+                                            :error-messages="deleteErrors"
+                                            v-model="password"
+                                        ></v-text-field>
+                                        <div class="padding-bottom mg-auto flex-center">
+                                            <v-btn color="primary" @click="deleteAccount" class="button button-radius" style="color: red;" :disabled="!validatedFields">        
+                                                <span v-if="status == 'loading'">Suppression en cours...</span>
+                                                <span v-else>Supprimer définitivement son compte</span>
+                                            </v-btn>
+                                        </div>
+                                    </v-form>
+                                </v-card-text>
+                            </v-card>
+                        </v-overlay>
+                    </v-row>
+                </v-card>
             <div class="flex-center flex-column mg-pa-gap-0 pt-5 resp-post-profile" v-if="posts.length >= 0">
                <div v-if="mode != 'loading'" class="resp-div-post flex-center flex-column mg-pa-gap-0">
-                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :date="post.updatedAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="comments" @overlayCom="commentsOverlay" />
+                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :likes="post.likes" :date="post.createdAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="comments" @overlayCom="commentsOverlay" />
                </div>
                <div class="width-50">
                   <v-overlay :z-index="zIndex" :value="overlayComments" v-if="overlayComments">
-                     <posts class="mg-pa-gap-0 width-850" :key="singlePost.id" :avatar="singlePost.avatar" :date="singlePost.updatedAt" :content="singlePost.content" :image="post.image" :video="post.video" :name="singlePost.name" :username="singlePost.username"  :id="singlePost.id" :comments="comments" />
+                     <posts class="mg-pa-gap-0 width-850" :key="singlePost.id" :avatar="singlePost.avatar" :likes="singlePost.likes" :date="singlePost.createdAt" :content="singlePost.content" :image="post.image" :video="post.video" :name="singlePost.name" :username="singlePost.username"  :id="singlePost.id" :comments="comments" />
                   </v-overlay>
                </div>
             </div>
@@ -315,6 +383,10 @@ export default {
             loginmode: "signup",
             previewMode: '',
             overlayLog: false,
+
+            searchBarOverlay: false,
+            allProfiles: null,
+            searchBar: null,
 
             loading: true,
             getProfileError: '',
@@ -360,13 +432,18 @@ export default {
             }
         }
 
+        this.getAllProfile()
         this.getPostsSingleUser()
         setInterval(() => {
+            this.getAllProfile()
             this.getPostsSingleUser()
         }, 1800000);
 
     },
     computed: {
+        getFilteredProfiles(item, queryText, itemText){
+            return itemText.toLocaleLowerCase().startsWith(queryText.toLocaleLowerCase())
+        },
         profileInfos() {
             return this.$store.getters.getProfileInfos;
         },
@@ -418,6 +495,15 @@ export default {
         ...mapState(['status', 'user', 'isMobile']),
     },
     methods: {
+        async getAllProfile() {
+            const response = await fetch ('http://localhost:3000/api/profile/getAllProfiles')
+            const data = await response.json();
+            this.allProfiles = data
+        },
+        redirectToProfile(profile){
+            this.$router.push(`/profile/${profile.username}`);
+            this.$router.go()
+        },
         async getPostsSingleUser(){
             this.mode = 'loading'
             const username = this.$route.params.username;
@@ -426,7 +512,7 @@ export default {
             for (let i = 0; i < data.length; i++) {
                // data[i].createdAt = data[i].createdAt.substring(0, 19).split('T').join(' ');
                const date1 = new Date();
-               const date2 = new Date(data[i].updatedAt);
+               const date2 = new Date(data[i].createdAt);
 
                const diffTime = Math.abs(date2 - date1);
                const diffSeconds = Math.ceil(diffTime / (1000));
@@ -435,13 +521,13 @@ export default {
                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                
                if (diffSeconds <= 60 ){
-                  data[i].updatedAt = (diffSeconds - 1) + "sec"
+                  data[i].createdAt = (diffSeconds - 1) + "sec"
                } else if (diffSeconds >= 60 && diffMins <= 60){
-                  data[i].updatedAt = (diffMins - 1) + "min"
+                  data[i].createdAt = (diffMins - 1) + "min"
                } else if (diffMins >= 60 && diffHours <= 24) {
-                  data[i].updatedAt = (diffHours - 1) + "h"
+                  data[i].createdAt = (diffHours - 1) + "h"
                } else {
-                  data[i].updatedAt = (diffDays - 1) + 'j'
+                  data[i].createdAt = (diffDays - 1) + 'j'
                }
             }
             const dataFilter = data.filter(el => el.username == username)

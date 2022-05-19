@@ -68,7 +68,7 @@
                </div>
                <div class="width-50">
                   <v-overlay :z-index="zIndex" :value="overlayComments" v-if="overlayComments">
-                     <posts class="mg-pa-gap-0 width-850" :key="singlePost.id" :avatar="singlePost.avatar" :likes="post.likes" :date="singlePost.createdAt" :content="singlePost.content" :image="post.image" :video="post.video" :name="singlePost.name" :username="singlePost.username"  :id="singlePost.id" :comments="comments" :commentavatar="getUsernameAvatar.profilePicture" />
+                     <posts class="mg-pa-gap-0 width-850" :key="singlePost.id" :avatar="singlePost.avatar" :likes="singlePost.likes" :date="singlePost.createdAt" :content="singlePost.content" :image="singlePost.image" :video="singlePost.video" :name="singlePost.name" :username="singlePost.username"  :id="singlePost.id" :comments="comments" :commentavatar="getUsernameAvatar.profilePicture" />
                   </v-overlay>
                </div>
             </div>
@@ -87,7 +87,40 @@
             />
             </a>
          </div>
-         <nav-bar-mobile class="d-md-none" @searchBarOn="searchBarOverlay = !searchBarOverlay" />
+         <div class="mt-7 d-md-none" v-if="searchBarOverlay">
+            <v-autocomplete
+               v-model="searchBar"
+               :items="allProfiles"
+               no-data-text="Aucun profil correspondant."
+               clearable
+               hide-details
+               item-value="username"
+               item-text="username"
+               label="Qui recherchez-vous ?"
+               append-icon=""
+               dense
+               flat
+               outlined
+               color="third"
+               class="search-bar"
+               return-object
+            >
+               <template v-slot:item="{ item }">
+                  <v-list-item-avatar class="mr-3 clear-pa-mg" size="30" @click="redirectToProfile(item)">
+                        <img
+                           :src="item.profilePicture"
+                           alt="Photo de profil"
+                           class="border-radius"
+                        />
+                  </v-list-item-avatar>
+                  <div class="get-profile-force flex-left-center" @click="redirectToProfile(item)"
+                  ><span class="name-text">{{ item.name }}</span>
+                     <span class="username-text ml-3">@{{ item.username }}</span>
+                  </div>
+               </template>
+            </v-autocomplete>
+         </div>
+         <nav-bar-mobile class="d-md-none" @searchBarOn="searchBarOverlay = !searchBarOverlay" @login="overlayLogin" />
          <nav-bar class="d-none d-md-block" @login="overlayLogin" />
          <v-main>
             <v-overlay :z-index="zIndex" :value="overlayLog">
@@ -99,7 +132,7 @@
                </div>
                <div class="width-50">
                   <v-overlay :z-index="zIndex" :value="overlayComments" v-if="overlayComments">
-                     <posts class="mg-pa-gap-0 width-850" :key="singlePost.id" :avatar="singlePost.avatar" :likes="post.likes" :date="singlePost.createdAt" :content="singlePost.content" :image="post.image" :video="post.video" :name="singlePost.name" :username="singlePost.username"  :id="singlePost.id" :comments="comments" />
+                     <posts class="mg-pa-gap-0 width-850" :key="singlePost.id" :avatar="singlePost.avatar" :likes="singlePost.likes" :date="singlePost.createdAt" :content="singlePost.content" :image="singlePost.image" :video="singlePost.video" :name="singlePost.name" :username="singlePost.username"  :id="singlePost.id" :comments="comments" />
                   </v-overlay>
                </div>
             </div>

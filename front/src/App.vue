@@ -116,8 +116,14 @@ export default {
   position: absolute !important;
   bottom: 50px !important;
 }
+.edit-card{
+  width: 600px;
+}
+.width-btn-basic{
+  width: 80px;
+}
 .search-bar{
-  max-width: 500px;
+  max-width: 800px !important;
   width: 100%;
 }
 .username-text{
@@ -190,11 +196,10 @@ video {
 .flex-end{
   display: flex;
   flex-direction: row;
-  flex: 1 auto;
   justify-content: flex-end;
 }
 .flex-auto{
-  flex: 2 2 auto;
+  width: 33% !important;
 }
 .flex-left{
   display: flex;
@@ -248,6 +253,15 @@ video {
   overflow: hidden !important;
 }
 
+.embed-file{
+  max-width: 650px;
+  max-height: 500px;
+  width: 100%;
+  height: 375px;
+  background-size: cover;
+  object-fit: cover;
+}
+
 @media screen and (max-width: 960px) {
   .resp-div-post {
     width: 100% !important;
@@ -256,7 +270,10 @@ video {
     padding: 35px 0 50px 0 !important;
   }
   .img-file{
-    width: 350px;
+    width: 400px;
+  }
+  .embed-file{
+    height: 250px;
   }
   .resp-list-item{
     flex-direction: row !important;
@@ -280,6 +297,9 @@ video {
 @media screen and (max-width: 500px) {
   .img-file{
     width: 150px;
+  }
+  .embed-file{
+    height: 200px;
   }
 }
 
