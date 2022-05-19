@@ -50,7 +50,8 @@
           </v-row>
           <div v-if="!editPostMode">
             <div class="mb-3 width-100 div-resp resp-content">
-              <v-card-text class="text-content text-resp">{{ content }}</v-card-text>
+              <v-card-text v-if="contentModified != content" class="text-content text-resp">{{ contentModified }}</v-card-text>
+              <v-card-text v-else class="text-content text-resp">{{ content }}</v-card-text>
             </div>
             <div v-if="videoId" class="mb-3 width-100">
               <iframe class="embed-file" :src="videoId" frameborder="0" allowfullscreen></iframe>
@@ -131,7 +132,7 @@
                     </div>
                   </div>
                   <div v-if="previewVideoEdit" class="flex-row-top">
-                    <video v-if="previewVideoEdit" ref="videoRef" :src="previewVideoEdit" class="img-file" id="video-container" width="300px" height="200px" controls @loadeddata="loaded">
+                    <video v-if="previewVideoEdit" ref="videoRef" :src="previewVideoEdit" class="img-file" id="video-container" width="300px" height="200px" controls>
                     </video>
                     <div class="width-50 icon-basic tr-color cursor padding-basic">
                       <v-icon v-if="previewVideoEdit" @click.stop="previewPost = 'deleted', previewVideoEdit = null" dense size="24" color="secondary">
@@ -176,7 +177,8 @@
                 </div>
                 <div v-else>
                   <svg viewBox="0 0 24 24" aria-hidden="true" class="r-4qtqp9 r-yyyyoo r-1xvli5t r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-1hdv0qi"><g><path d="M12 21.638h-.014C9.403 21.59 1.95 14.856 1.95 8.478c0-3.064 2.525-5.754 5.403-5.754 2.29 0 3.83 1.58 4.646 2.73.814-1.148 2.354-2.73 4.645-2.73 2.88 0 5.404 2.69 5.404 5.755 0 6.376-7.454 13.11-10.037 13.157H12zM7.354 4.225c-2.08 0-3.903 1.988-3.903 4.255 0 5.74 7.034 11.596 8.55 11.658 1.518-.062 8.55-5.917 8.55-11.658 0-2.267-1.823-4.255-3.903-4.255-2.528 0-3.94 2.936-3.952 2.965-.23.562-1.156.562-1.387 0-.014-.03-1.425-2.965-3.954-2.965z"></path></g></svg>
-                  <span>{{ likes }}</span>
+                  <span v-if="likesModified != likes">{{ likesModified }}</span>
+                  <span v-else>{{ likes }}</span>
                 </div>
               </div>
             </div>
@@ -256,25 +258,31 @@ export default {
          overlay: false,
          PPHover: false,
          PPHover2: false,
+
          imageHD: false,
          previewImage: null,
          imageComment: null,
+
          zIndex: 99999999999999,
          overlayPostComment: false,
          commentTextArea: "",
+
          globalError: null,
          snackbar: false,
+
          editPostMode: false,
          postEdit: this.content,
          imageEdit: null,
          previewImageEdit: null,
          previewPost: null,
          previewVideoEdit: null,
-         testmode: false,
+
          edited: false,
          loadingLiked: false,
          userLiked: null,
          videoId: null,
+         likesModified: this.likes,
+         contentModified: this.content,
          }
       },
       props: {
@@ -369,10 +377,10 @@ export default {
         getUrl(){
           const fullreg = /(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)([^& \n<]+)(?:[^ \n<]+)?/g;
           let youtubeId = ''
-          if (this.content.match(fullreg)){
+          if (this.contentModified.match(fullreg)){
             youtubeId = this.content.match(fullreg).join()
             this.videoId = (this.transformYoutubeLinks(youtubeId))
-            this.content =  this.linkifyYouTubeURLs(this.content)
+            this.contentModified = this.linkifyYouTubeURLs(this.contentModified)
           } else {
           }
         },
@@ -388,9 +396,6 @@ export default {
             username = ''
           }
           this.userLiked = array;
-        },
-        loaded(){
-          this.testmode = true
         },
         goToProfile: function () {
           this.$router.push(`/profile/${this.username}`);
@@ -457,7 +462,7 @@ export default {
               setTimeout(() => {
                 this.loadingLiked = false
               }, 500);
-              this.likes = this.likes - 1
+              this.likesModified = this.likesModified - 1
               this.userLiked = this.userLiked.filter(e => e.postId != this.id, 1)
             } else {
               this.loadingLiked = true
@@ -466,7 +471,7 @@ export default {
                 this.loadingLiked = false
               }, 500);
               this.userLiked.push({postId: this.id, username})
-              this.likes = this.likes + 1
+              this.likesModified = this.likesModified + 1
             }
           } else {
             this.snackbar = true
