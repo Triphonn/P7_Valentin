@@ -10,7 +10,8 @@ router.put('/modifyProfile', auth, userProfile.modifyProfile);
 router.put('/uploadAvatar', auth, multer, userProfile.uploadAvatar);
 router.put('/uploadBanner', auth, multer, userProfile.uploadBanner);
 router.post('/delete', auth, userProfile.deleteProfile);
-router.get('/:username', userProfile.getOneProfile);
+router.get('/getAllProfiles', userProfile.getAllProfiles);
+router.get('/get/:username', userProfile.getOneProfile);
 router.get('/verifyprofile/:id', auth, userProfile.verifyProfile);
 
 module.exports = router;

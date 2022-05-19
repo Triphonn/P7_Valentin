@@ -19,7 +19,40 @@
             />
             </a>
          </div>
-         <nav-bar-mobile class="d-md-none" :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" />
+         <div class="mt-7 d-md-none" v-if="searchBarOverlay">
+            <v-autocomplete
+               v-model="searchBar"
+               :items="allProfiles"
+               no-data-text="Aucun profil correspondant."
+               clearable
+               hide-details
+               item-value="username"
+               item-text="username"
+               label="Qui recherchez-vous ?"
+               append-icon=""
+               dense
+               flat
+               outlined
+               color="third"
+               class="search-bar"
+               return-object
+            >
+               <template v-slot:item="{ item }">
+                  <v-list-item-avatar class="mr-3 clear-pa-mg" size="30" @click="redirectToProfile(item)">
+                        <img
+                           :src="item.profilePicture"
+                           alt="Photo de profil"
+                           class="border-radius"
+                        />
+                  </v-list-item-avatar>
+                  <div class="get-profile-force flex-left-center" @click="redirectToProfile(item)"
+                  ><span class="name-text">{{ item.name }}</span>
+                     <span class="username-text ml-3">@{{ item.username }}</span>
+                  </div>
+               </template>
+            </v-autocomplete>
+         </div>
+         <nav-bar-mobile class="d-md-none" :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @searchBarOn="searchBarOverlay = !searchBarOverlay" />
          <nav-bar class="d-none d-md-block" :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @createpost="postOverlay" />
          
          <v-main>
@@ -54,7 +87,7 @@
             />
             </a>
          </div>
-         <nav-bar-mobile class="d-md-none" />
+         <nav-bar-mobile class="d-md-none" @searchBarOn="searchBarOverlay = !searchBarOverlay" />
          <nav-bar class="d-none d-md-block" @login="overlayLogin" />
          <v-main>
             <v-overlay :z-index="zIndex" :value="overlayLog">
@@ -100,7 +133,11 @@ export default {
           loadSinglePostError: '',
           singlePost: null,
           snackbar: false,
-          accountError: null
+          accountError: null,
+
+          searchBarOverlay: false,
+          allProfiles: null,
+          searchBar: null,
         };
       },
       components: {
@@ -118,9 +155,11 @@ export default {
          }
          this.getAllPosts()
          this.checkIsMobile()
+         this.getAllProfile()
          // this.getAllComments();
          setInterval(() => {
             this.getAllPosts()
+            this.getAllProfile()
          }, 1800000);
 
          setInterval(() => {
@@ -128,9 +167,20 @@ export default {
          }, 300000);
       },
       computed: {
-         ...mapState(['isMobile'])
+         getFilteredProfiles(item, queryText, itemText){
+            return itemText.toLocaleLowerCase().startsWith(queryText.toLocaleLowerCase())
+         },
       },
       methods: {
+         async getAllProfile() {
+            const response = await fetch ('http://localhost:3000/api/profile/getAllProfiles')
+            const data = await response.json();
+            this.allProfiles = data
+         },
+         redirectToProfile(profile){
+            this.$router.push(`/profile/${profile.username}`);
+            this.$router.go()
+         },
          async getAllPosts(){
             const response = await fetch('http://localhost:3000/api/post/getAllPosts')
             const data = await response.json();
@@ -162,7 +212,6 @@ export default {
             const data = await response.json();
             for (let i = 0; i < data.length; i++) {
                data[i].createdAt = data[i].createdAt.substring(0, 19).split('T').join(' ');
-               console.log(data[i].id);
             }
             this.comments = data;
          },
@@ -184,7 +233,6 @@ export default {
          commentsOverlay(event){
             this.overlayComments = true
             this.singlePost = this.posts.find(element => element.id == event);
-            console.log(this.singlePost);
          },
          overlayLogin (event) {
             if ( event == 1 ) {
@@ -195,12 +243,18 @@ export default {
                this.overlayLog = true
             }
          },
+         goToSearchBar(){
+            this.searchBarOverlay = true
+         },
          ...mapMutations(['setMobileMode'])
       }
   }
 </script>
 
 <style scoped>
+.border-radius{
+  border-radius: 25px;
+}
 .overlay-content {
   max-width: 960px;
 }

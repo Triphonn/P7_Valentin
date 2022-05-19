@@ -130,11 +130,11 @@
                                 >
                             </span>
                         </v-list-item>
-                        <v-btn v-if="userInfos.userId == user.userId" color="primary" @click="overlay = !overlay, editModeTrue" class="button d-md-none">      
+                        <v-btn v-if="userInfos.userId == user.userId" color="primary" @click="overlay = !overlay, editModeTrue" class="button button-radius d-md-none">      
                             <span>Editer le profil</span>
                         </v-btn>
                     </v-col>
-                    <v-btn v-if="userInfos.userId == user.userId" style="postition: absolute; top: 35px; right: 20px;" color="primary" @click="overlay = !overlay, editModeTrue" class="button d-none d-md-block">      
+                    <v-btn v-if="userInfos.userId == user.userId" style="postition: absolute; top: 35px; right: 20px;" color="primary" @click="overlay = !overlay, editModeTrue" class="button button-radius d-none d-md-block">      
                       <span>Editer le profil</span>
                     </v-btn>
                     <v-overlay :z-index="zIndex" :value="overlay">
@@ -158,7 +158,7 @@
                                 <v-btn
                                     depressed
                                     color="primary"
-                                    class="button"
+                                    class="button button-radius"
                                     @click="modifyProfile()"
                                 >
                                     <span>Enregistrer</span>
@@ -167,8 +167,8 @@
                             <v-card-text>
                                 <v-form>
                                     <div>
-                                        <v-card @mouseover="bannerHover = true" @mouseleave="bannerHover = false">
-                                            <img class="img-file clear-pa-mg" width="100%" height="200px" :src="userBanner" />
+                                        <v-card height="200px" @mouseover="bannerHover = true" @mouseleave="bannerHover = false">
+                                            <img class="width-100 img-file clear-pa-mg" height="200px" :src="userBanner" />
 
                                             <v-overlay class="clear-pa-mg" absolute :z-index="zIndex" :value="bannerHover" >
                                                 <v-file-input hide-input prepend-icon="mdi-camera-outline" @change="onBannerChange" accept="image/*">
@@ -178,7 +178,7 @@
                                     </div>
                                     <v-list-item-avatar size="100" @mouseover="PPHover = true" @mouseleave="PPHover = false">
                                         <img
-                                            class="avatar-22"
+                                            class="avatar-22 ml-5"
                                             :src="userAvatar"
                                             alt="Photo de profil"
                                         />
@@ -207,7 +207,7 @@
                                         auto-grow
                                     ></v-textarea>
                                     <div class="padding-bottom mg-auto flex-center">
-                                        <v-btn color="primary" @click="overlayDelete = true, overlay = false, mode = 'deleteAccount'" class="button" style="color: red;">        
+                                        <v-btn color="primary" @click="overlayDelete = true, overlay = false, mode = 'deleteAccount'" class="button button-radius" style="color: red;">        
                                             <span>Supprimer définitivement son compte</span>
                                         </v-btn>
                                     </div>
@@ -258,7 +258,7 @@
                                         v-model="password"
                                     ></v-text-field>
                                     <div class="padding-bottom mg-auto flex-center">
-                                        <v-btn color="primary" @click="deleteAccount" class="button" style="color: red;" :disabled="!validatedFields">        
+                                        <v-btn color="primary" @click="deleteAccount" class="button button-radius" style="color: red;" :disabled="!validatedFields">        
                                             <span v-if="status == 'loading'">Suppression en cours...</span>
                                             <span v-else>Supprimer définitivement son compte</span>
                                         </v-btn>
@@ -269,7 +269,7 @@
                     </v-overlay>
                 </v-row>
             </v-card>
-            <div class="flex-center flex-column mg-pa-gap-0 pt-5" v-if="posts.length >= 0">
+            <div class="flex-center flex-column mg-pa-gap-0 pt-5 resp-post-profile" v-if="posts.length >= 0">
                <div v-if="mode != 'loading'" class="resp-div-post flex-center flex-column mg-pa-gap-0">
                   <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :date="post.updatedAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="comments" @overlayCom="commentsOverlay" />
                </div>
@@ -360,7 +360,6 @@ export default {
             }
         }
 
-        this.checkIsMobile()
         this.getPostsSingleUser()
         setInterval(() => {
             this.getPostsSingleUser()
@@ -451,14 +450,6 @@ export default {
                 this.mode = ''
             }, 250);
         },
-        checkIsMobile() {
-            if( screen.width <= 960 ) {
-               this.setMobileMode(true)
-            }
-            else {
-               this.setMobileMode(false) 
-            }
-        },
         deleteAccount(){
             const self = this
             
@@ -479,56 +470,6 @@ export default {
             })
             .catch((error) => {
               console.log(error);
-            })
-        },
-        createSinglePost(){
-            const self = this;
-
-            let today = new Date();
-            let dateToday = today.toISOString().substring(0, 19).split('T').join(' ');
-
-            this.$store.dispatch('createPost', {postText: this.postTextArea, postImage: this.imagePost, date: dateToday})
-            .then(function () {
-               if (self.status != 'error_save'){
-                  self.$router.go();
-               } else {
-                  self.snackbarPost = true;
-                  self.postError = 'Erreur de sauvegarde du brouillon';
-               }
-            })
-            .catch((error) => {
-              console.log(error);
-              this.snackbarPost = true;
-              this.postError = 'Erreur de sauvegarde du brouillon';
-            })
-        },
-        draftTab(){
-            if (!this.validatedFields) {
-               this.overlayPost = false;
-               this.clearPost();
-               
-            } else {
-               this.overlayClosingVerif = true
-            }
-        },
-        clearPost () {
-            this.postTextArea = '', this.overlayPost = false, this.overlayClosingVerif = false, this.imagePost = null, this.previewImage = null
-        },
-        saveDrafts() {
-            const self = this;
-            this.$store.dispatch('saveDrafts', {postText: this.postTextArea, postImage: this.imagePost})
-            .then(function () {
-               if (self.status != 'error_save'){
-                  self.$router.go();
-               } else {
-                  self.snackbarPost = true;
-                  self.postError = 'Erreur de sauvegarde du brouillon';
-               }
-            })
-            .catch((error) => {
-              console.log(error);
-              self.snackbarPost = true;
-              self.postError = 'Erreur de sauvegarde du brouillon';
             })
         },
         postOverlay() {
@@ -561,6 +502,7 @@ export default {
             this.$store.dispatch('modifyProfile', {banner: this.banner, avatar: this.avatar, name: this.name, bio: this.bio})
             .then(function () {
                self.overlay = false
+               self.$router.go()
             })
             .catch((error) => {
               console.log(error);
@@ -608,6 +550,9 @@ export default {
 </script>
 
 <style scoped>
+.button-radius{
+    border-radius: 20px !important;
+}
 .v-application .primary--text{
   color: var(--v-third-base) !important;
 }
@@ -641,5 +586,10 @@ export default {
    margin: 0;
    padding: 0;
    gap: 15px;
-} 
+}
+@media screen and (max-width: 960px) {
+    .resp-post-profile{
+        padding-bottom: 35px !important;
+    }
+}
 </style>

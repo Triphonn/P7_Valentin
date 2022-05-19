@@ -255,7 +255,17 @@ exports.getOneProfile = async (req, res) => {
                 username: req.params.username,
             },
         });
-        res.status(200).json(profile);
+        res.status(201).json(profile);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
+};
+
+exports.getAllProfiles = async (req, res) => {
+    try {
+        const profile = await userProfile.findAll();
+        res.status(201).json(profile);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error });
@@ -266,7 +276,7 @@ exports.verifyProfile = async (req, res) => {
     try {
         const profile = await userProfile.findByPk(req.params.id);
         if (profile) {
-            res.status(200).json(profile);
+            res.status(201).json(profile);
         } else {
             res.status(404).json({ message: 'Profil non crée' });
         }

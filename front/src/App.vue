@@ -15,6 +15,13 @@ export default {
 </script>
 
 <style>
+.all-profile{
+  gap: 2px;
+  border-radius: 25px;
+}
+.profile-searched{
+  border-radius: 25px;
+}
 .normal-cursor{
   cursor: default;
 }
@@ -87,8 +94,35 @@ export default {
 .bg-color{
   background-color: var(--v-fourth-base) !important;
 }
+.big-bg-color{
+  background-color: var(--v-background-base) !important;
+}
 .border-radius-15{
   border-radius: 15px !important;
+}
+.name-text{
+  font-size: 15px;
+}
+.get-profile-force{
+  flex-wrap: nowrap !important;
+  min-height: 40px !important;
+  flex: 1 1 100% !important;
+  letter-spacing: normal !important;
+  outline: none !important;
+  padding: 0 0 !important;
+  text-decoration: none !important;
+}
+.search-bar-mobile{
+  position: absolute !important;
+  bottom: 50px !important;
+}
+.search-bar{
+  max-width: 500px;
+  width: 100%;
+}
+.username-text{
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
 }
 .icon-basic{
   color: rgb(113, 118, 123) !important;
@@ -129,6 +163,12 @@ video {
   align-items: center;
   justify-content: center;
 }
+.flex-row-center{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
 .flex-row-evenly{
   display: flex;
   flex-direction: row;
@@ -147,10 +187,24 @@ video {
   display: flex;
   flex-direction: row;
 }
+.flex-end{
+  display: flex;
+  flex-direction: row;
+  flex: 1 auto;
+  justify-content: flex-end;
+}
+.flex-auto{
+  flex: 2 2 auto;
+}
 .flex-left{
   display: flex;
   align-items: left;
   justify-content: left;
+}
+.flex-left-center{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
 .v-card__subtitle, .v-card__text, .v-card__title {
   color: inherit;
@@ -217,6 +271,9 @@ video {
   }
   .resp-banner{
     max-height: 150px !important;
+  }
+  .v-menu__content{
+    left: 0 !important;
   }
 }
 

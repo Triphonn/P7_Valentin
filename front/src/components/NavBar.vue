@@ -4,7 +4,7 @@
       color="primary"
       dark
     >
-      <div class="d-flex align-center">
+      <div class="d-flex align-center flex-left flex-auto">
         <a href="/">
         <v-img
           alt="Groupomania Logo"
@@ -16,9 +16,40 @@
         />
         </a>
       </div>
-      <v-spacer></v-spacer>
-      <v-col v-if=" user.isLoggedIn == true " class="flex-row">
-        <v-spacer></v-spacer>
+      <div class="flex-column-center flex-auto search-bar">
+        <v-autocomplete
+          v-model="searchBar"
+          :items="allProfiles"
+          no-data-text="Aucun profil correspondant."
+          clearable
+          hide-details
+          item-value="username"
+          item-text="username"
+          label="Qui recherchez-vous ?"
+          append-icon=""
+          dense
+          flat
+          outlined
+          color="third"
+          class="search-bar"
+          return-object
+        >
+          <template v-slot:item="{ item }">
+            <v-list-item-avatar class="mr-3 clear-pa-mg" size="30" @click="redirectToProfile(item)">
+                  <img
+                      :src="item.profilePicture"
+                      alt="Photo de profil"
+                      class="border-radius"
+                  />
+            </v-list-item-avatar>
+            <div class="get-profile-force flex-left-center" @click="redirectToProfile(item)"
+              ><span class="name-text">{{ item.name }}</span>
+                <span class="username-text ml-3">@{{ item.username }}</span>
+            </div>
+          </template>
+        </v-autocomplete>
+      </div>
+      <div v-if=" user.isLoggedIn == true " class="flex-end">
           <v-btn
             text
             @click.stop="createpost"
@@ -42,8 +73,8 @@
           <v-btn @click.prevent="logout()" text>
               <span>Déconnexion</span>
           </v-btn>
-      </v-col>
-      <div v-else>
+      </div>
+      <div v-else class="flex-end">
 
           <v-btn
             text
@@ -58,7 +89,7 @@
         <span>Se connecter</span>
         </v-btn>
       </div>
-    </v-app-bar>
+  </v-app-bar>
 </template>
 
 <script>
@@ -71,36 +102,57 @@ export default {
       return {
          mode: 'home',
          overlay: false,
+         allProfiles: null,
+         searchBar: null,
+         PPHover: false,
          zIndex: 0,
-         }
+        }
       },
       props: {
         username: String,
         profilePicture: String,
       },
+      mounted(){
+        this.getAllProfile()
+        setInterval(() => {
+          this.getAllProfile()
+        }, 1800000);
+      },
       computed: {
+        getFilteredProfiles(item, queryText, itemText){
+          return itemText.toLocaleLowerCase().startsWith(queryText.toLocaleLowerCase())
+        },
         ...mapGetters(['getProfileInfos']),
         ...mapState(['status', 'user', 'profileInfos'])
       },
       methods: {
+        async getAllProfile() {
+          const response = await fetch ('http://localhost:3000/api/profile/getAllProfiles')
+          const data = await response.json();
+          this.allProfiles = data
+        },
+        redirectToProfile(profile){
+          this.$router.push(`/profile/${profile.username}`);
+          this.$router.go()
+        },
         goToProfile: function () {
-            this.$router.push(`/profile/${this.username}`);
-            this.$router.go()
+          this.$router.push(`/profile/${this.username}`);
+          this.$router.go()
         },
         logout: function() {
-            this.$store.dispatch('logout')
-            // this.$router.push('/')
-            this.$router.go('/')
-         },
-         signup: function () {
-           this.$emit('login', 1)
-         },
-         login: function () {
-           this.$emit('login', 0)
-         },
-         createpost: function () {
-           this.$emit('createpost')
-         }
+          this.$store.dispatch('logout')
+          // this.$router.push('/')
+          this.$router.go('/')
+        },
+        signup: function () {
+          this.$emit('login', 1)
+        },
+        login: function () {
+          this.$emit('login', 0)
+        },
+        createpost: function () {
+          this.$emit('createpost')
+        }
       }
    }
 </script>
@@ -116,5 +168,8 @@ export default {
 .flex-row{
   display: flex;
   flex-direction: row;
+}
+.border-radius{
+  border-radius: 25px;
 }
 </style>

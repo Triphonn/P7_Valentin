@@ -117,8 +117,9 @@ export default {
                 if (
                     this.name != '' &&
                     this.username != '' &&
-                    this.bio != '' &&
-                    this.file != ''
+                    this.file != '' &&
+                    !this.username.match(/^\s*$/) &&
+                    !this.name.match(/^\s*$/)
                 ) {
                     return true;
                 } else {

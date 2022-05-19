@@ -37,7 +37,7 @@
                       <path fill="currentColor" d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" />
                     </svg>
                   </template>
-                  <v-list class="clear-pa-mg">
+                  <v-list class="clear-pa-mg flex-end width-100">
                     <v-list-item class="cursor list-item-basic" @click="editPostOverlay">
                       <v-list-item-title>Éditer le post</v-list-item-title>
                     </v-list-item>
@@ -236,7 +236,7 @@
       v-model="snackbar"
       :timeout="1500"
     >
-      {{ commentError }}
+      {{ globalError }}
     </v-snackbar>
   </v-container>
 </template>
@@ -259,7 +259,7 @@ export default {
          zIndex: 99999999999999,
          overlayPostComment: false,
          commentTextArea: "",
-         commentError: null,
+         globalError: null,
          snackbar: false,
          editPostMode: false,
          postEdit: this.content,
@@ -363,7 +363,7 @@ export default {
             this.overlayPostComment = this.overlayPostComment ? false : true
           } else {
             this.snackbar = true
-            this.commentError = 'Vous devez être connecté pour commenter des publications.'
+            this.globalError = 'Vous devez être connecté pour commenter des publications.'
           }
         },
         clearPost () {
@@ -389,24 +389,29 @@ export default {
           this.postOneComment({postId: this.id, content: this.commentTextArea, image: this.imageComment})
         },
         postLike(){
-          this.loadingLiked = true
-          const username = this.$store.state.userInfos.username
-          const found = this.userLiked.find(x => x.postId == this.id)
-          if (found){
-            this.postOneLike({postId: this.id, username: username})
-            setTimeout(() => {
-              this.loadingLiked = false
-            }, 500);
-            this.likes = this.likes - 1
-            this.userLiked = this.userLiked.filter(e => e.postId != this.id, 1)
-          } else {
+          if (this.user.isLoggedIn){
             this.loadingLiked = true
-            this.postOneLike({postId: this.id, username: username})
-            setTimeout(() => {
-              this.loadingLiked = false
-            }, 500);
-            this.userLiked.push({postId: this.id, username})
-            this.likes = this.likes + 1
+            const username = this.$store.state.userInfos.username
+            const found = this.userLiked.find(x => x.postId == this.id)
+            if (found){
+              this.postOneLike({postId: this.id, username: username})
+              setTimeout(() => {
+                this.loadingLiked = false
+              }, 500);
+              this.likes = this.likes - 1
+              this.userLiked = this.userLiked.filter(e => e.postId != this.id, 1)
+            } else {
+              this.loadingLiked = true
+              this.postOneLike({postId: this.id, username: username})
+              setTimeout(() => {
+                this.loadingLiked = false
+              }, 500);
+              this.userLiked.push({postId: this.id, username})
+              this.likes = this.likes + 1
+            }
+          } else {
+            this.snackbar = true
+            this.globalError = 'Vous devez être connecté pour liker des publications.'
           }
         },
         deleteOnePost: function(){
@@ -435,6 +440,9 @@ export default {
 </script>
 
 <style scoped>
+.button-radius{
+  border-radius: 20px;
+}
 .v-overlay__content{
   display: flex !important;
   width: 50% !important;

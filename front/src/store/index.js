@@ -173,7 +173,7 @@ export default new Vuex.Store({
         getOneProfile: async ({ commit }, username) => {
             try {
                 await instance
-                    .get(`/profile/${username}`)
+                    .get(`/profile/get/${username}`)
                     .then(async (response) => {
                         console.log(response);
                         if (response.data == null) {

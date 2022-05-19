@@ -1,9 +1,9 @@
 <template>
     <v-bottom-navigation
-    color="third"
-    horizontal
-    class="fixed-bar mg-pa-gap-0"
-  >
+      color="third"
+      horizontal
+      class="fixed-bar mg-pa-gap-0"
+    >
     <v-btn @click.stop="goToHome">
         <div class="flex-column-center reverse">
             <span>Accueil</span>
@@ -12,7 +12,7 @@
         </div>
     </v-btn>
 
-    <v-btn>
+    <v-btn @click.stop="searchBarOverlay()">
         <div class="flex-column-center reverse">
             <span>Search</span>
 
@@ -52,6 +52,9 @@ export default {
          mode: 'home',
          overlay: false,
          value: null,
+         allProfiles: null,
+         searchBar: null,
+         searchBarOn: false,
          zIndex: 0,
          }
       },
@@ -60,10 +63,22 @@ export default {
         profilePicture: String,
       },
       computed: {
+        getFilteredProfiles(item, queryText, itemText){
+          return itemText.toLocaleLowerCase().startsWith(queryText.toLocaleLowerCase())
+        },
         ...mapGetters(['getProfileInfos']),
         ...mapState(['status', 'user', 'profileInfos'])
       },
       methods: {
+        async getAllProfile() {
+          const response = await fetch ('http://localhost:3000/api/profile/getAllProfiles')
+          const data = await response.json();
+          this.allProfiles = data
+        },
+        redirectToProfile(profile){
+          this.$router.push(`/profile/${profile.username}`);
+          this.$router.go()
+        },
         goToHome: function () {
           this.$router.push('/')
         },
@@ -84,7 +99,10 @@ export default {
         },
         createpost: function () {
           this.$emit('createpost')
-        }
+        },
+        searchBarOverlay(){
+          this.$emit('searchBarOn')
+        },
       }
    }
 </script>
