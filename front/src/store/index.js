@@ -175,7 +175,6 @@ export default new Vuex.Store({
                 await instance
                     .get(`/profile/get/${username}`)
                     .then(async (response) => {
-                        console.log(response);
                         if (response.data == null) {
                             commit('profileInfos', response.data);
                             commit('setStatus', 'error_get');
@@ -269,7 +268,6 @@ export default new Vuex.Store({
                         },
                     })
                     .then(async (response) => {
-                        console.log(response);
                         commit('updateBanner', response.data);
                         commit('setStatus', '');
                     })
@@ -410,7 +408,6 @@ export default new Vuex.Store({
             }
         },
         editPost: async ({ commit, getters, dispatch }, editContent) => {
-            console.log(editContent);
             if (editContent.image == 'deleted') {
                 dispatch('deletePostImage', { postId: editContent.postId });
             }
@@ -443,7 +440,6 @@ export default new Vuex.Store({
                 }
             } else {
                 try {
-                    console.log('test 2');
                     await instance
                         .post(`/post/modify`, editFormData, {
                             headers: {
@@ -466,7 +462,6 @@ export default new Vuex.Store({
         },
         deletePostImage: async ({ commit, getters }, postId) => {
             try {
-                console.log(postId);
                 await instance
                     .post(`/post/deletePostImage`, postId, {
                         headers: {
@@ -487,7 +482,6 @@ export default new Vuex.Store({
         },
         deletePost: async ({ commit, getters }, postId) => {
             try {
-                console.log(postId);
                 await instance
                     .post(`/post/delete`, postId, {
                         headers: {

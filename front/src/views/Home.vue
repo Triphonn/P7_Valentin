@@ -250,7 +250,6 @@ export default {
          },
          goForPost(event){
             const singlePost = this.posts.find(element => element.id == event);
-            console.log(singlePost);
             this.$router.push(`/${singlePost.username}/${singlePost.id}`);
          },
          overlayLogin (event) {

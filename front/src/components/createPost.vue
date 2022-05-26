@@ -157,7 +157,6 @@ export default {
          previewImageContent(e) {
             let urlCreator = window.URL || window.webkitURL;
             this.previewPost = e;
-            console.log(e);
             if(e.type.startsWith("video")){
               this.previewVideo = urlCreator.createObjectURL(this.previewPost);
               this.previewImage = null

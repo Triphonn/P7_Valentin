@@ -620,7 +620,6 @@ export default {
             this.singlePost = this.posts.find(element => element.id == event);
         },
         overlayLogin (event) {
-            console.log(event);
             if ( event == 1 ) {
                this.loginmode = 'signup'
                this.overlayLog = true

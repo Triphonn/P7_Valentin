@@ -230,7 +230,6 @@ export default {
                 data[i].createdAt = (diffDays - 1) + 'j'
               }
           }
-          console.log(data);
           this.comments = data;
         },
         async getSinglePost(){
