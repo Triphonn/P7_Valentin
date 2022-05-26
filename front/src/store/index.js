@@ -269,6 +269,7 @@ export default new Vuex.Store({
                         },
                     })
                     .then(async (response) => {
+                        console.log(response);
                         commit('updateBanner', response.data);
                         commit('setStatus', '');
                     })
@@ -345,53 +346,47 @@ export default new Vuex.Store({
                 content: comment.content,
             };
 
-            let commentFormData = new FormData();
-            commentFormData.append('image', comment.image);
-            commentFormData.append('content', JSON.stringify(commentData));
-
-            if (comment.image == null) {
-                try {
-                    await instance
-                        .post(`/post/${comment.postId}/comment`, commentData, {
-                            headers: {
-                                Authorization: 'Bearer ' + getters.getToken,
-                            },
-                        })
-                        .then(async () => {
-                            commit('setStatus', '');
-                        })
-                        .catch(function (error) {
-                            commit('setStatus', 'error_save');
-                            console.log(error);
-                        });
-                } catch (err) {
-                    commit('setStatus', 'error_save');
-                    throw 'Unable to save your comment';
-                }
-            } else {
-                try {
-                    await instance
-                        .post(
-                            `/post/${comment.postId}/comment`,
-                            commentFormData,
-                            {
-                                headers: {
-                                    'Content-Type': 'multipart/form-data',
-                                    Authorization: 'Bearer ' + getters.getToken,
-                                },
-                            }
-                        )
-                        .then(async () => {
-                            commit('setStatus', '');
-                        })
-                        .catch(function (error) {
-                            commit('setStatus', 'error_save');
-                            console.log(error);
-                        });
-                } catch (err) {
-                    commit('setStatus', 'error_save');
-                    throw 'Unable to save your comment';
-                }
+            try {
+                await instance
+                    .post(`/post/${comment.postId}/comment`, commentData, {
+                        headers: {
+                            Authorization: 'Bearer ' + getters.getToken,
+                        },
+                    })
+                    .then(async () => {
+                        commit('setStatus', '');
+                    })
+                    .catch(function (error) {
+                        commit('setStatus', 'error_save');
+                        console.log(error);
+                    });
+            } catch (err) {
+                commit('setStatus', 'error_save');
+                throw 'Unable to save your comment';
+            }
+        },
+        deleteComment: async ({ commit, getters }, commentDelete) => {
+            try {
+                const deleteData = {
+                    commentId: commentDelete.commentId,
+                    username: commentDelete.username,
+                };
+                await instance
+                    .post(`/post/deleteComment`, deleteData, {
+                        headers: {
+                            Authorization: 'Bearer ' + getters.getToken,
+                        },
+                    })
+                    .then(async () => {
+                        commit('setStatus', '');
+                    })
+                    .catch(function (error) {
+                        commit('setStatus', 'error_delete');
+                        console.log(error);
+                    });
+            } catch (err) {
+                commit('setStatus', 'error_delete');
+                throw 'Unable to delete your post';
             }
         },
         postOneLike: async ({ commit, getters }, likeData) => {

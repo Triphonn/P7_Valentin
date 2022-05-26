@@ -78,7 +78,7 @@
                 </div>
                 <v-card-actions class="form-row clear-pa-mg">
                     <v-spacer></v-spacer>
-                    <v-btn color="third" @click="createSinglePost()" class="button button-radius" :disabled="!validatedFields">        
+                    <v-btn color="third" @click="createSinglePost()" class="button button-radius" :disabled="!validatedFields" :loading="loading_button">        
                         <span v-if="status == 'loading'">Publication en cours...</span>
                         <span v-else>Publier</span>
                     </v-btn>
@@ -112,6 +112,7 @@ export default {
         },
         overlay: false,
         PPHover: false,
+        loading_button: false,
         zIndex: 99999999999999,
         }
     },
@@ -155,20 +156,27 @@ export default {
         },
         createSinglePost(){
             const self = this;
+            this.loading_button = true
 
             this.$store.dispatch('createPost', {postText: this.postTextArea, postImage: this.previewPost})
             .then(function () {
-               if (self.status != 'error_save'){
+              setTimeout(() => {
+                if (self.status != 'error_save'){
                   self.$router.go();
                } else {
+                  self.loading_button = false
                   self.snackbarPost = true;
                   self.postError = 'Erreur de publication, veuillez réessayer.';
                }
+              }, 500);
             })
             .catch((error) => {
-              console.log(error);
-              this.snackbarPost = true;
-              this.postError = 'Erreur de publication, veuillez réessayer.';
+              setTimeout(() => {
+                console.log(error);
+                this.loading_button = false
+                this.snackbarPost = true;
+                this.postError = 'Erreur de publication, veuillez réessayer.';
+              }, 500);
             })
         },
         clearPost () {

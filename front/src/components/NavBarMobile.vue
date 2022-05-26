@@ -2,7 +2,7 @@
     <v-bottom-navigation
       color="third"
       horizontal
-      class="fixed-bar mg-pa-gap-0"
+      class="fixed-bar width-button"
     >
     <v-btn @click.stop="goToHome">
         <div class="flex-column-center reverse">
@@ -20,18 +20,25 @@
         </div>
     </v-btn>
 
-    <v-btn v-if=" user.isLoggedIn == true " @click="goToProfile()">
-        <div class="flex-column-center reverse">
-          <span>Profil</span>
-            <v-avatar class="pp-2" size="24" right>
-              <img
-                  :src="profilePicture"
-                  alt="Photo de profil"
-              >
-            </v-avatar>
+      <v-btn @click="goToProfile">
+          <div class="flex-column-center reverse">
+            <span>Profil</span>
+              <v-avatar class="pp-2" size="24" right>
+                <img
+                    :src="profilePicture"
+                    alt="Photo de profil"
+                >
+              </v-avatar>
+          </div>
+      </v-btn>
+      <v-btn @click="logout">
+          <div class="flex-column-center reverse">
+            <span>Déconnexion</span>
+
+            <v-icon class="clear-pa-mg">mdi-logout-variant</v-icon>
         </div>
-    </v-btn>
-    <v-btn v-else @click="login" class="width-btn-basic">
+      </v-btn>
+    <v-btn v-if="!user.isLoggedIn" @click="login" class="width-btn-basic">
         <div class="flex-column-center reverse">
             <span>Se connecter</span>
 
@@ -55,6 +62,7 @@ export default {
          allProfiles: null,
          searchBar: null,
          searchBarOn: false,
+         overlayLogout: false,
          zIndex: 0,
          }
       },
@@ -117,8 +125,8 @@ export default {
 .reverse{
     flex-direction: column-reverse !important;
 }
-.mg-pa-gap-0{
-    flex-basis: 1 !important;
-    justify-content: space-evenly !important;
+.width-button button{
+  width: 25% !important;
+  padding: 0 !important;
 }
 </style>

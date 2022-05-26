@@ -46,24 +46,9 @@ exports.createPost = async (req, res) => {
 
 exports.commentOnePost = async (req, res) => {
     try {
-        let userId = '';
-        let postId = '';
-        let content = '';
-        let file = '';
-
-        if (!req.file) {
-            userId = req.body.userId;
-            content = req.body.content;
-            postId = req.params.id;
-        } else {
-            const body = JSON.parse(req.body.content);
-            userId = body.userId;
-            content = body.content;
-            postId = req.params.id;
-            file = `${req.protocol}://${req.get('host')}/images/${
-                req.file.filename
-            }`;
-        }
+        const userId = req.body.userId;
+        const content = req.body.content;
+        const postId = req.params.id;
 
         const profile = await userProfile.findByPk(userId);
 
@@ -73,7 +58,6 @@ exports.commentOnePost = async (req, res) => {
             avatar: profile.profilePicture,
             postId: postId,
             content: content,
-            file: file,
         });
         res.status(201).json({ message: 'Votre commentaire a été publié' });
     } catch (error) {
@@ -276,6 +260,20 @@ exports.deletePost = async (req, res) => {
     }
 };
 
+exports.deleteComment = async (req, res) => {
+    try {
+        console.log(req.body);
+        await comments.destroy({
+            where: { id: req.body.commentId, username: req.body.username },
+        });
+
+        res.status(200);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
+};
+
 exports.getAllLikes = async (req, res) => {
     try {
         const like = await likes.findAll();
@@ -311,6 +309,7 @@ exports.getOnePostCommments = async (req, res) => {
             where: {
                 postId: req.params.id,
             },
+            order: [['createdAt', 'DESC']],
         });
         if (!comment || comment == null) {
             res.status(201).json(null);

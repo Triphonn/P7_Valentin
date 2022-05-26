@@ -64,7 +64,7 @@
                   <home-create-post :name="getUsernameAvatar.name" :username="getUsernameAvatar.username" :avatar="getUsernameAvatar.profilePicture" />
                </div>
                <div class="resp-div-post flex-center flex-column mg-pa-gap-0">
-                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :likes="post.likes" :date="post.createdAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="comments" :commentavatar="getUsernameAvatar.profilePicture" @overlayCom="commentsOverlay" />
+                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :likes="post.likes" :date="post.createdAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="comments" :commentavatar="getUsernameAvatar.profilePicture" @overlayCom="goForPost" />
                </div>
                <div class="width-50">
                   <v-overlay :z-index="zIndex" :value="overlayComments" v-if="overlayComments">
@@ -128,7 +128,7 @@
             </v-overlay>
             <div class="flex-center flex-column mg-pa-gap-0" v-if="posts.length >= 0">
                <div class="resp-div-post flex-center flex-column mg-pa-gap-0">
-                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :likes="post.likes" :date="post.createdAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="comments" @overlayCom="commentsOverlay" />
+                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :likes="post.likes" :date="post.createdAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="comments" @overlayCom="goForPost" />
                </div>
                <div class="width-50">
                   <v-overlay :z-index="zIndex" :value="overlayComments" v-if="overlayComments">
@@ -149,7 +149,6 @@ import Login from '../components/Login.vue'
 import CreatePost from '../components/createPost.vue';
 import HomeCreatePost from '../components/HomeCreatePost.vue';
 import NavBarMobile from '../components/NavBarMobile.vue';
-import { mapMutations, mapState } from 'vuex';
 
 export default {
     name: 'Home',
@@ -187,7 +186,6 @@ export default {
             this.accountError = 'ERREUR : Vous n\'avez pas encore fini votre inscription, veuillez vous reconnecter pour finaliser votre inscription !';
          }
          this.getAllPosts()
-         this.checkIsMobile()
          this.getAllProfile()
          // this.getAllComments();
          setInterval(() => {
@@ -198,11 +196,6 @@ export default {
          setInterval(() => {
             this.getAllComments();
          }, 300000);
-      },
-      computed: {
-         getFilteredProfiles(item, queryText, itemText){
-            return itemText.toLocaleLowerCase().startsWith(queryText.toLocaleLowerCase())
-         },
       },
       methods: {
          async getAllProfile() {
@@ -248,14 +241,6 @@ export default {
             }
             this.comments = data;
          },
-         checkIsMobile() {
-            if( screen.width <= 960 ) {
-               this.setMobileMode(true)
-            }
-            else {
-               this.setMobileMode(false) 
-            }
-         },
          postOverlay() {
             this.mode = 'createPost'
             this.overlayPost = true
@@ -263,9 +248,10 @@ export default {
          postOverlayHide(){
             this.overlayPost = false
          },
-         commentsOverlay(event){
-            this.overlayComments = true
-            this.singlePost = this.posts.find(element => element.id == event);
+         goForPost(event){
+            const singlePost = this.posts.find(element => element.id == event);
+            console.log(singlePost);
+            this.$router.push(`/${singlePost.username}/${singlePost.id}`);
          },
          overlayLogin (event) {
             if ( event == 1 ) {
@@ -276,10 +262,6 @@ export default {
                this.overlayLog = true
             }
          },
-         goToSearchBar(){
-            this.searchBarOverlay = true
-         },
-         ...mapMutations(['setMobileMode'])
       }
   }
 </script>

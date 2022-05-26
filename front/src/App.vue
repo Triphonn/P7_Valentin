@@ -28,6 +28,9 @@ export default {
 .width-50p{
   width: 50px;
 }
+.width-40{
+  width: 40% !important;
+}
 .width-50{
   width: 50% !important;
 }
@@ -119,6 +122,17 @@ export default {
 .edit-card{
   width: 600px;
 }
+.logout-menu{
+  width: auto;
+  height: 100%;
+  position: relative; bottom: 30px;
+}
+.height-singlepost .main-post-hover .content-post{
+  min-height: 150px;
+}
+.resp-text-content{
+  max-width: 90% !important;
+}
 .width-btn-basic{
   width: 80px;
 }
@@ -166,6 +180,12 @@ video {
 .flex-column-center{
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.flex-column-reverse-center{
+  display: flex;
+  flex-direction: column-reverse;
   align-items: center;
   justify-content: center;
 }
@@ -249,6 +269,10 @@ video {
   overflow: hidden !important;
 }
 
+.div-text-resp{
+  max-width: 700px !important;
+}
+
 .div-resp{
   overflow: hidden !important;
 }
@@ -290,7 +314,7 @@ video {
     max-height: 150px !important;
   }
   .v-menu__content{
-    left: 0 !important;
+    margin-left: -11px;
   }
 }
 
@@ -301,6 +325,14 @@ video {
   .embed-file{
     height: 200px;
   }
+  
+}
+
+@media screen and (max-width: 600px) {
+  .resp-text-content{
+    max-width: 80% !important;
+  }
+  
 }
 
 @media (min-width: 960px) and (max-width: 1263px) {

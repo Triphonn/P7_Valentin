@@ -20,19 +20,6 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             type: DataTypes.STRING,
         },
-        file: {
-            allowNull: false,
-            type: DataTypes.STRING,
-        },
-        likes: {
-            allowNull: true,
-            type: DataTypes.INTEGER,
-            defaultValue: 0,
-        },
-        userLiked: {
-            allowNull: true,
-            type: DataTypes.STRING,
-        },
     });
     return comment;
 };

@@ -49,13 +49,11 @@
                     </v-snackbar>
                     <v-card-actions class="form-row">
                         <v-spacer></v-spacer>
-                        <v-btn color="third" @click="createAccount()" class="button button-radius" :disabled="disabled" v-if="mode == 'signup'">        
-                           <span v-if="status == 'loading' || status == 'profilCreated'">Création en cours...</span>
-                           <span v-else>Créer mon compte</span>
+                        <v-btn color="third" @click="createAccount()" class="button button-radius" :disabled="disabled" v-if="mode == 'signup'" :loading="loading_button">        
+                           <span>Créer mon compte</span>
                         </v-btn>
-                        <v-btn color="third" @click="login()" class="button button-radius" :class="{'button--disabled' : !validatedFields}" v-else>        
-                           <span v-if="status == 'loading' || status == 'profilCreated'">Connexion en cours...</span>
-                           <span v-else>Se connecter</span>
+                        <v-btn color="third" @click="login()" class="button button-radius" :class="{'button--disabled' : !validatedFields}" v-else :loading="loading_button">        
+                           <span>Se connecter</span>
                         </v-btn>
                     </v-card-actions>
                 </v-card>
@@ -84,6 +82,7 @@ export default {
           snackbar: false,
           overlayLog: false,
           zIndex: 1,
+          loading_button: false,
         };
       },
     mounted () {
@@ -176,9 +175,11 @@ export default {
             const userId = self.$store.state.user.userId;
             this.$store.dispatch('verifyProfile')
             .then(function () {
-               if (self.$store.state.status == 'profileCreated' || self.$store.state.userInfos != null) {
-                    self.$router.go();
-               }
+                setTimeout(() => {
+                    if (self.$store.state.status == 'profileCreated' || self.$store.state.userInfos != null) {
+                        self.$router.go();
+                    }
+                }, 500);
             })           
             .catch((error) => {
               console.log(error);
@@ -186,6 +187,7 @@ export default {
             })
         },
         login () {
+            this.loading_button = true
             const self = this;
             this.$store.dispatch('login', {
                email: this.email,
@@ -202,6 +204,7 @@ export default {
             
         },
         createAccount () {
+            this.loading_button = true
             const self = this;
             this.$store.dispatch('createAccount', {
                email: this.email,

@@ -482,7 +482,7 @@ export default {
                } else {
                   return false;
                }
-            } else if (this.mode == 'deleteAccount'){
+            } else {
                 if (this.deleteConfirm == this.userInfos.username && this.password != "") {
                     return true
                 } else {
@@ -588,7 +588,7 @@ export default {
             this.$store.dispatch('modifyProfile', {banner: this.banner, avatar: this.avatar, name: this.name, bio: this.bio})
             .then(function () {
                self.overlay = false
-               self.$router.go()
+            //    self.$router.go()
             })
             .catch((error) => {
               console.log(error);

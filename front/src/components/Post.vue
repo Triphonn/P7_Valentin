@@ -1,7 +1,7 @@
 <template>
   <v-container class="main-container bg-color width-100">
     <v-card class="main-post-hover bg-color width-100 flex-column border-bottom-gray">
-      <v-row class="no-wrap main-card tr-bg-color cursor width-100" @click.stop="overlayCom">
+      <v-row class="test-singlepost no-wrap main-card tr-bg-color cursor width-100" @click.stop="goForPost">
         <div class="avatar-22 flex-column-start">
           <v-list-item-avatar class="mr-1" size="50" @mouseover="PPHover = true" @mouseleave="PPHover = false" @click.stop="goToProfile()">
               <img
@@ -13,7 +13,7 @@
           </v-list-item-avatar>
           <!-- <div v-if="comments.length >= 1" class="gray-bar"></div> -->
         </div>
-        <div class="width-100 flex-column-start">
+        <div class="width-100 flex-column-start resp-text-content">
           <v-row class="no-wrap flex-between gap-5 width-100">
             <div class="no-wrap flex-left gap-5 width-100">
 
@@ -48,10 +48,10 @@
                 </v-menu>
             </div>
           </v-row>
-          <div v-if="!editPostMode">
-            <div class="mb-3 width-100 div-resp resp-content">
-              <v-card-text v-if="contentModified != content" class="text-content text-resp">{{ contentModified }}</v-card-text>
-              <v-card-text v-else class="text-content text-resp">{{ content }}</v-card-text>
+          <div v-if="!editPostMode" class="pr-8 content-post">
+            <div class="mb-3 width-100 div-resp">
+              <v-card-text v-if="contentModified != content" class="text-content">{{ contentModified }}</v-card-text>
+              <v-card-text v-else class="text-content">{{ content }}</v-card-text>
             </div>
             <div v-if="videoId" class="mb-3 width-100">
               <iframe class="embed-file" :src="videoId" frameborder="0" allowfullscreen></iframe>
@@ -115,7 +115,7 @@
                       v-model="postEdit"
                       auto-grow
                       dense
-                      counter="120"
+                      counter="200"
                       clearable
                       color="third"
                       @click:clear="postEdit = ''"
@@ -126,7 +126,7 @@
                     <v-img v-if="previewImageEdit" class="img-file" width="150px" height="150px" :src="previewImageEdit" >
                     </v-img>
                     <div class="width-50 icon-basic tr-color cursor padding-basic">
-                      <v-icon v-if="previewImageEdit" @click.stop="previewPost = 'deleted', previewImageEdit = null" dense size="24" color="secondary">
+                      <v-icon v-if="previewImageEdit" @click.stop="previewPost = 'deleted', previewImageEdit = ''" dense size="24" color="secondary">
                         mdi-close
                       </v-icon>
                     </div>
@@ -135,7 +135,7 @@
                     <video v-if="previewVideoEdit" ref="videoRef" :src="previewVideoEdit" class="img-file" id="video-container" width="300px" height="200px" controls>
                     </video>
                     <div class="width-50 icon-basic tr-color cursor padding-basic">
-                      <v-icon v-if="previewVideoEdit" @click.stop="previewPost = 'deleted', previewVideoEdit = null" dense size="24" color="secondary">
+                      <v-icon v-if="previewVideoEdit" @click.stop="previewPost = 'deleted', previewVideoEdit = ''" dense size="24" color="secondary">
                         mdi-close
                       </v-icon>
                     </div>
@@ -145,11 +145,16 @@
             <div class="width-100 mt-3">
               <div class="row flex-between px-16 width-100 mb-2">
                   <div @click.stop="">
-                      <div class="width-50 row icon-basic tr-color icon-bottom-bar cursor flex-center padding-basic">
-                          <v-file-input class="text-field-post" hide-input @blur="search = ''" prepend-icon="mdi-image-plus" @change="previewEditImage" accept="image/*, video/*" />
-                      </div>
+                      <v-btn color="third" @click.stop="editPostMode = !editPostMode" class="button button-radius">        
+                          <span>Annuler</span>
+                      </v-btn>
                   </div>
                   <v-card-actions class="form-row clear-pa-mg">
+                      <div @click.stop="">
+                        <div class="width-50 row icon-basic tr-color icon-bottom-bar cursor flex-center padding-basic mr-4">
+                            <v-file-input class="text-field-post" hide-input @blur="search = ''" prepend-icon="mdi-image-plus" @change="previewEditImage" accept="image/*, video/*" />
+                        </div>
+                      </div>
                       <v-spacer></v-spacer>
                       <v-btn color="third" @click.stop="editOnePost" class="button button-radius" :disabled="!validatedFields" :loading="edited">        
                           <span v-if="status == 'loading'">Modification en cours...</span>
@@ -191,28 +196,26 @@
           <div v-if="overlayPostComment">
               <v-textarea
                 @click.stop=""
-                class="form-row clear-pa-mg"
+                class="form-row clear-pa-mg search-bar"
+                label="Poster un commentaire"
                 id="comment"
                 name="comment"
                 type="comment"
                 v-model="commentTextArea"
                 auto-grow
                 rows="1"
+                outlined
                 dense
+                flat
                 clearable
+                counter="200"
+                @click:clear="commentTextArea = ''"
                 color="third"
               >
               </v-textarea>
-              <img v-if="previewImage" class="img-file" width="100px" height="100px" :src="previewImage" />
             <div class="width-100">
-                <div class="row flex-between px-16 width-100 mb-2">
-                    <div>
-                        <div class="width-50 row icon-basic tr-color icon-bottom-bar cursor flex-center padding-basic">
-                            <v-file-input @click.stop="" class="text-field-post" hide-input @blur="search = ''" prepend-icon="mdi-image-plus" @change="previewImageContent" accept="image/*" />
-                        </div>
-                    </div>
+                <div class="row flex-between width-100 mb-2">
                     <v-card-actions class="form-row clear-pa-mg">
-                        <v-spacer></v-spacer>
                         <v-btn color="third" @click.stop="postComment()" class="button button-radius" :disabled="!validatedFields">        
                             <span v-if="status == 'loading'">Publication en cours...</span>
                             <span v-else>Publier</span>
@@ -273,9 +276,9 @@ export default {
          editPostMode: false,
          postEdit: this.content,
          imageEdit: null,
-         previewImageEdit: null,
+         previewImageEdit: '',
          previewPost: null,
-         previewVideoEdit: null,
+         previewVideoEdit: '',
 
          edited: false,
          loadingLiked: false,
@@ -305,13 +308,13 @@ export default {
       computed: {
         validatedFields: function () {
           if (this.overlayPostComment){
-            if (this.commentTextArea != "" ) {
+            if (this.commentTextArea != "" && this.commentTextArea.length <= 200 && !this.commentTextArea.match(/^\s*$/)) {
                return true;
             } else {
                return false;
             }
           } else if (this.editPostMode) {
-            if (this.postEdit != this.content || this.previewImageEdit != this.image || this.previewVideoEdit != this.video){
+            if ((this.postEdit != "" && this.postEdit.length <= 200 && !this.postEdit.match(/^\s*$/)) && (this.postEdit != this.content || this.previewImageEdit != this.image || this.previewVideoEdit != this.video)){
               return true
             } else {
               return false
@@ -416,15 +419,13 @@ export default {
         login: function () {
           this.$emit('login', 0)
         },
-        overlayCom: function (){
-          this.$emit('overlayCom', this.id)
-        },
         createpost: function () {
           this.$emit('createpost')
         },
         overlayComment(){
           if (this.user.isLoggedIn){
             this.overlayPostComment = this.overlayPostComment ? false : true
+            this.commentTextArea = ''
           } else {
             this.snackbar = true
             this.globalError = 'Vous devez être connecté pour commenter des publications.'
@@ -443,10 +444,10 @@ export default {
             this.previewPost = e;
             if(e.type.startsWith("video")){
               this.previewVideoEdit = urlCreator.createObjectURL(this.previewPost);
-              this.previewImageEdit = null
+              this.previewImageEdit = ''
             } else {
               this.previewImageEdit = urlCreator.createObjectURL(this.previewPost);
-              this.previewVideoEdit = null
+              this.previewVideoEdit = ''
             }
         },
         postComment: function(){
@@ -489,6 +490,9 @@ export default {
           } else {
             this.previewVideoEdit = this.video
           }
+        },
+        goForPost(){
+          this.$emit('overlayCom', this.id)
         },
         editOnePost () {
           this.edited = true
@@ -614,4 +618,5 @@ export default {
   white-space: inherit;
   font-family: 'Chirp', sans-serif;
 }
+
 </style>

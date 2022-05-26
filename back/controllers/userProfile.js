@@ -182,9 +182,6 @@ exports.deleteProfile = async (req, res) => {
                         where: { username: username },
                     });
 
-                    await postdraft.destroy({
-                        where: { _id: userId },
-                    });
                     res.status(200).json({
                         message: 'Compte supprimé',
                     });
