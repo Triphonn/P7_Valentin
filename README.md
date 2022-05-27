@@ -3,7 +3,7 @@
 Hello, and welcome to the Groupomania repository.
 
 This project is a studying/training project, the goal was to make a company social network using back-end and front-end skills.
-We needed to use a framework to get in this huge world of diversity. I chose VueJS which was the easiest and understandable for me.
+We needed to use a framework to get in this huge world of diversity. I chose VueJS which was the easiest and the most understandable for me.
 
 ![logo](./logo.png)
 
