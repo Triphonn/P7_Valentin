@@ -30,6 +30,8 @@ For the front, you will use :
 cd front
 
 npm install
+
+npm run serve
 ```
 
 For the back, it is a bit more annoying, I'll let you check the README.md in the back folder, this will guide you to install the Back-End.
