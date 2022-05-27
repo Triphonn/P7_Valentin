@@ -1,6 +1,6 @@
 const fs = require('fs');
 const db = require('../db');
-const { posts, userProfile, comments, likes } = db;
+const { posts, userProfile, comments, likes, users } = db;
 
 exports.createPost = async (req, res) => {
     try {
@@ -106,8 +106,6 @@ exports.modifyPost = async (req, res) => {
         let image = '';
         let video = '';
 
-        console.log(req.file);
-
         if (!req.file) {
             content = req.body.content;
             postId = req.body.postId;
@@ -130,30 +128,24 @@ exports.modifyPost = async (req, res) => {
             where: { id: postId },
         });
         if (post.video || post.image) {
-            console.log('test 1');
             if (req.file) {
                 let filename = '';
                 let file = '';
                 if (post.video) {
-                    console.log('test 2');
                     filename = post.video.split('/videos/')[1];
                     file = 'videos';
                 } else {
-                    console.log('test 3');
                     file = 'images';
                     filename = post.image.split('/images/')[1];
                 }
                 fs.unlink(`${file}/${filename}`, async () => {
                     if (video) {
-                        console.log('test 4');
-                        console.log(video);
                         await post.update({
                             content: content,
                             video: video,
                             image: '',
                         });
                     } else {
-                        console.log('test 5');
                         await post.update({
                             content: content,
                             image: image,
@@ -162,29 +154,24 @@ exports.modifyPost = async (req, res) => {
                     }
                 });
             } else {
-                console.log('test 6');
                 await post.update({
                     content: content,
                 });
             }
         } else {
             if (req.file) {
-                console.log('test 7');
                 if (video) {
-                    console.log('test 8');
                     await post.update({
                         content: content,
                         video: video,
                     });
                 } else {
-                    console.log('test 9');
                     await post.update({
                         content: content,
                         image: image,
                     });
                 }
             } else {
-                console.log('test 10');
                 await post.update({
                     content: content,
                 });
@@ -233,27 +220,34 @@ exports.deletePostImage = async (req, res) => {
 
 exports.deletePost = async (req, res) => {
     try {
+        const user = await users.findByPk(req.body.userId);
+        const profile = await userProfile.findByPk(req.body.userId);
         const post = await posts.findOne({
             where: { id: req.body.postId },
         });
-        if (post.video || post.image) {
-            let filename = '';
-            let file = '';
-            if (post.video) {
-                filename = post.video.split('/videos/')[1];
-                file = 'videos';
-            } else {
-                filename = post.image.split('/images/')[1];
-                file = 'images';
-            }
-            fs.unlink(`${file}/${filename}`, async () => {
-                await post.destroy();
-            });
-        } else {
-            await post.destroy();
-        }
 
-        res.status(201);
+        if (profile.username == post.username || user.isAdmin === 1) {
+            if (post.video || post.image) {
+                let filename = '';
+                let file = '';
+                if (post.video) {
+                    filename = post.video.split('/videos/')[1];
+                    file = 'videos';
+                } else {
+                    filename = post.image.split('/images/')[1];
+                    file = 'images';
+                }
+                fs.unlink(`${file}/${filename}`, async () => {
+                    await post.destroy();
+                    res.status(201);
+                });
+            } else {
+                await post.destroy();
+                res.status(201);
+            }
+        } else {
+            res.status(401).json('Non autorisé');
+        }
     } catch (error) {
         console.error(error);
         res.status(500).json({ error });
@@ -262,12 +256,19 @@ exports.deletePost = async (req, res) => {
 
 exports.deleteComment = async (req, res) => {
     try {
-        console.log(req.body);
-        await comments.destroy({
-            where: { id: req.body.commentId, username: req.body.username },
+        const user = await users.findByPk(req.body.userId);
+        const profile = await userProfile.findByPk(req.body.userId);
+        const comment = await comments.findOne({
+            where: {
+                id: req.body.commentId,
+            },
         });
-
-        res.status(200);
+        if (profile.username == comment.username || user.isAdmin === 1) {
+            await comment.destroy();
+            res.status(200);
+        } else {
+            res.status(401).json('Non autorisé');
+        }
     } catch (error) {
         console.error(error);
         res.status(500).json({ error });

@@ -197,6 +197,7 @@ export default {
             })
             .catch((error) => {
                console.log(error);
+               this.loading_button = false
                this.snackbar = true;
                this.loginError = 'Adresse mail et/ou mot de passe invalide';
             })
@@ -209,10 +210,13 @@ export default {
                email: this.email,
                password: this.password,
             }).then(function () {
-            self.login();
+                setTimeout(() => {
+                    self.login();
+                }, 500);
             })
             .catch((error) => {
                console.log(error);
+               this.loading_button = false
                this.snackbar = true;
                this.loginError = 'Adresse mail déjà utilisée';
             })

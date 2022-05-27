@@ -34,7 +34,7 @@ export default new Vuex.Store({
     plugins: [
         createPersistedState({
             storage: window.sessionStorage,
-            paths: ['user', 'profileInfos', 'userInfos'],
+            paths: ['user', 'profileInfos', 'userInfos', 'isAdmin'],
         }),
     ],
     state: {
@@ -42,7 +42,7 @@ export default new Vuex.Store({
         user: user,
         profileInfos: null,
         userInfos: null,
-        isMobile: false,
+        isAdmin: null,
     },
     getters: {
         getProfileInfos(state) {
@@ -59,12 +59,12 @@ export default new Vuex.Store({
         setStatus: function (state, status) {
             state.status = status;
         },
-        setMobileMode: function (state, isMobile) {
-            state.isMobile = isMobile;
-        },
         logUser: function (state, user) {
             instance.defaults.headers.common['Authorization'] = user.token;
             state.user = user;
+        },
+        isAdmin: function (state, isAdmin) {
+            state.isAdmin = isAdmin;
         },
         profileInfos: function (state, profileInfos) {
             state.profileInfos = profileInfos;
@@ -101,7 +101,13 @@ export default new Vuex.Store({
                 instance
                     .post('/auth/login', userInfos)
                     .then(function (response) {
-                        commit('logUser', response.data);
+                        const usertoken = {
+                            userId: response.data.userId,
+                            token: response.data.token,
+                            isLoggedIn: response.data.isLoggedIn,
+                        };
+                        commit('logUser', usertoken);
+                        commit('isAdmin', response.data.isAdmin);
                         resolve(response);
                     })
                     .catch(function (error) {
@@ -365,7 +371,9 @@ export default new Vuex.Store({
         },
         deleteComment: async ({ commit, getters }, commentDelete) => {
             try {
+                const userId = getters.getUserId;
                 const deleteData = {
+                    userId,
                     commentId: commentDelete.commentId,
                     username: commentDelete.username,
                 };
@@ -482,8 +490,13 @@ export default new Vuex.Store({
         },
         deletePost: async ({ commit, getters }, postId) => {
             try {
+                const userId = getters.getUserId;
+                const dataDelete = {
+                    userId,
+                    postId: postId.postId,
+                };
                 await instance
-                    .post(`/post/delete`, postId, {
+                    .post(`/post/delete`, dataDelete, {
                         headers: {
                             Authorization: 'Bearer ' + getters.getToken,
                         },

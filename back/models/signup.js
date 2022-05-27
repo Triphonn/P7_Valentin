@@ -9,6 +9,11 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             type: DataTypes.STRING,
         },
+        isAdmin: {
+            allowNull: true,
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+        },
     });
     return User;
 };

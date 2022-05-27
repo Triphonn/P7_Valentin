@@ -38,7 +38,7 @@
                     </svg>
                   </template>
                   <v-list class="clear-pa-mg flex-end width-100">
-                    <v-list-item class="cursor list-item-basic" @click="editPostOverlay">
+                    <v-list-item class="cursor list-item-basic" @click="editPostOverlay" v-if="username == userInfos.username">
                       <v-list-item-title>Éditer le post</v-list-item-title>
                     </v-list-item>
                     <v-list-item class="cursor list-item-basic" @click="deleteOnePost">
@@ -322,7 +322,7 @@ export default {
           }
         },
         checkPost: function(){
-          if (this.username == this.$store.state.userInfos.username && this.user.isLoggedIn){
+          if ((this.username == this.$store.state.userInfos.username && this.user.isLoggedIn) || (this.$store.state.isAdmin === 1)){
             return true
           } else {
             return false
@@ -452,6 +452,7 @@ export default {
         },
         postComment: function(){
           this.postOneComment({postId: this.id, content: this.commentTextArea, image: this.imageComment})
+          this.$router.go()
         },
         postLike(){
           if (this.user.isLoggedIn){

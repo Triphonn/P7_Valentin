@@ -20,7 +20,7 @@
         </div>
     </v-btn>
 
-      <v-btn @click="goToProfile">
+      <v-btn v-if="user.isLoggedIn" @click="goToProfile">
           <div class="flex-column-center reverse">
             <span>Profil</span>
               <v-avatar class="pp-2" size="24" right>
@@ -31,7 +31,7 @@
               </v-avatar>
           </div>
       </v-btn>
-      <v-btn @click="logout">
+      <v-btn v-if="user.isLoggedIn" @click="logout">
           <div class="flex-column-center reverse">
             <span>Déconnexion</span>
 

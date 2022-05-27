@@ -70,6 +70,7 @@ exports.login = async (req, res) => {
                         userId: user.id,
                         token,
                         isLoggedIn: true,
+                        isAdmin: user.isAdmin,
                     });
                 })
                 .catch((error) => res.status(500).json({ error }));

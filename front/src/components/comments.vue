@@ -31,7 +31,7 @@
                         </div>
                         </div>
                         <div v-if="user.isLoggedIn" class="flex-center text-center icon-basic tr-color">
-                        <v-menu offset-y v-if="username == userInfos.username && user.isLoggedIn" :disabled="username != userInfos.username && user.isLoggedIn" rounded left>
+                        <v-menu offset-y v-if="checkPost" :disabled="!checkPost" rounded left>
                             <template v-slot:activator="{ on, attrs }">
                             <svg v-bind="attrs" v-on="on" class="cursor" style="width:24px;height:24px" viewBox="0 0 24 24">
                                 <path fill="currentColor" d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" />
@@ -39,7 +39,7 @@
                             </template>
                             <v-list class="clear-pa-mg flex-end width-100">
                             <v-list-item class="cursor list-item-basic" @click="deleteOneComment">
-                                <v-list-item-title>Supprimer le post</v-list-item-title>
+                                <v-list-item-title>Supprimer</v-list-item-title>
                             </v-list-item>
                             </v-list>
                         </v-menu>
@@ -101,6 +101,13 @@ export default {
         this.getUrl()
       },
       computed: {
+        checkPost: function(){
+          if ((this.username == this.$store.state.userInfos.username && this.user.isLoggedIn) || (this.$store.state.isAdmin === 1)){
+            return true
+          } else {
+            return false
+          }
+        },
         ...mapState(['status', 'user', 'userInfos'])
       },
       methods: {
