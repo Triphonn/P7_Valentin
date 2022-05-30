@@ -47,17 +47,17 @@
           </v-autocomplete>
         </div>
         <nav-bar-mobile class="d-md-none" :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @searchBarOn="searchBarOverlay = !searchBarOverlay" />
-        <nav-bar class="d-none d-md-block" :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @createpost="postOverlay" />
+        <nav-bar class="d-none d-md-block" :home="1" :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @createpost="postOverlay" />
         <v-main>
             <v-overlay :z-index="zIndex" :value="overlayPost">
                <create-post :mode="mode" @overlayClose="postOverlayHide" />
             </v-overlay>
             <div class="flex-center flex-column mg-pa-gap-0" v-if="singlePost">
                <div class="resp-div-post flex-center flex-column mg-pa-gap-0">
-                  <posts class="mg-pa-gap-0 border-radius-15 height-singlepost" :key="singlePost.id" :likes="singlePost.likes" :date="singlePost.createdAt" :avatar="singlePost.avatar" :content="singlePost.content" :image="singlePost.image" :video="singlePost.video" :name="singlePost.name" :username="singlePost.username" :id="singlePost.id" :comments="comments" />
+                  <posts class="mg-pa-gap-0 border-radius-15 height-singlepost" :key="singlePost.id" :userLiked="userLiked" :likes="singlePost.likes" :date="singlePost.createdAt" :avatar="singlePost.avatar" :content="singlePost.content" :image="singlePost.image" :video="singlePost.video" :name="singlePost.name" :username="singlePost.username" :id="singlePost.id" :comments="singlePost.comments" />
                </div>
             </div>
-            <comments v-for="comment in comments" :key="comment.id" :date="comment.createdAt" :avatar="comment.avatar" :content="comment.content" :name="comment.name" :username="comment.username" :id="comment.id" />
+            <comments v-for="comment in comments" :key="comment.id" :date="comment.createdAt" :avatar="comment.avatar" :content="comment.content" :name="comment.name" :username="comment.username" :postId="comment.postId" :id="comment.id" />
         </v-main>
     </div>
       <div v-else>
@@ -107,17 +107,17 @@
             </v-autocomplete>
         </div>
         <nav-bar-mobile class="d-md-none" @searchBarOn="searchBarOverlay = !searchBarOverlay" @login="overlayLogin" />
-        <nav-bar class="d-none d-md-block" @login="overlayLogin" />
+        <nav-bar class="d-none d-md-block" :home="1" @login="overlayLogin" />
         <v-main>
           <v-overlay :z-index="zIndex" :value="overlayLog">
               <login :mode="mode" @login="overlayLogin" />
           </v-overlay>
             <div class="flex-center flex-column mg-pa-gap-0" v-if="singlePost">
                 <div class="resp-div-post flex-center flex-column mg-pa-gap-0">
-                  <posts class="mg-pa-gap-0 border-radius-15 height-singlepost" :key="singlePost.id" :likes="singlePost.likes" :date="singlePost.createdAt" :avatar="singlePost.avatar" :content="singlePost.content" :image="singlePost.image" :video="singlePost.video" :name="singlePost.name" :username="singlePost.username" :id="singlePost.id" :comments="comments" />
+                  <posts class="mg-pa-gap-0 border-radius-15 height-singlepost" :key="singlePost.id" :userLiked="userLiked" :likes="singlePost.likes" :date="singlePost.createdAt" :avatar="singlePost.avatar" :content="singlePost.content" :image="singlePost.image" :video="singlePost.video" :name="singlePost.name" :username="singlePost.username" :id="singlePost.id" :comments="singlePost.comments" />
                 </div>
             </div>
-            <comments v-for="comment in comments" :key="comment.id" :date="comment.createdAt" :avatar="comment.avatar" :content="comment.content" :name="comment.name" :username="comment.username" :id="comment.id" />
+            <comments v-for="comment in comments" :key="comment.id" :date="comment.createdAt" :avatar="comment.avatar" :content="comment.content" :name="comment.name" :username="comment.username" :postId="comment.postId" :id="comment.id" />
         </v-main>
     </div>
     <v-snackbar
@@ -155,6 +155,7 @@ export default {
          PPHover: false,
          loading: false,
          imageHD: false,
+         userLiked: null,
 
          comments: null,
          loadSinglePostError: '',
@@ -184,6 +185,9 @@ export default {
             this.getAllProfile()
         }, 300000);
       },
+      created(){
+        this.getAllLikes()
+      },
       computed: {
         checkPost: function(){
           if (this.comment.username == this.$store.state.userInfos.username && this.user.isLoggedIn){
@@ -195,6 +199,19 @@ export default {
         ...mapState(['status', 'user', 'userInfos'])
       },
       methods: {
+        async getAllLikes(){
+            const response = await fetch('http://localhost:3000/api/post/getAllLikes')
+            const data = await response.json();
+            let username = ''
+            let array = ''
+            if (this.$store.state.user.isLoggedIn){
+               username = this.$store.state.userInfos.username
+               array = data.filter(e => e.username == username)
+            } else {
+               username = ''
+            }
+            this.userLiked = array;
+        },
         async getAllProfile() {
           const response = await fetch ('http://localhost:3000/api/profile/getAllProfiles')
           const data = await response.json();

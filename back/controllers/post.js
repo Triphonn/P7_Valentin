@@ -51,6 +51,7 @@ exports.commentOnePost = async (req, res) => {
         const postId = req.params.id;
 
         const profile = await userProfile.findByPk(userId);
+        const post = await posts.findByPk(postId);
 
         await comments.create({
             username: profile.username,
@@ -59,6 +60,8 @@ exports.commentOnePost = async (req, res) => {
             postId: postId,
             content: content,
         });
+        const commentsAdded = parseInt(post.comments) + 1;
+        await post.update({ comments: commentsAdded });
         res.status(201).json({ message: 'Votre commentaire a été publié' });
     } catch (error) {
         console.error(error);
@@ -178,7 +181,7 @@ exports.modifyPost = async (req, res) => {
             }
         }
 
-        res.status(201);
+        res.status(200);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error });
@@ -239,11 +242,11 @@ exports.deletePost = async (req, res) => {
                 }
                 fs.unlink(`${file}/${filename}`, async () => {
                     await post.destroy();
-                    res.status(201);
+                    res.status(200);
                 });
             } else {
                 await post.destroy();
-                res.status(201);
+                res.status(200);
             }
         } else {
             res.status(401).json('Non autorisé');
@@ -256,8 +259,10 @@ exports.deletePost = async (req, res) => {
 
 exports.deleteComment = async (req, res) => {
     try {
+        console.log(req.body);
         const user = await users.findByPk(req.body.userId);
         const profile = await userProfile.findByPk(req.body.userId);
+        const post = await posts.findByPk(req.body.postId);
         const comment = await comments.findOne({
             where: {
                 id: req.body.commentId,
@@ -265,6 +270,8 @@ exports.deleteComment = async (req, res) => {
         });
         if (profile.username == comment.username || user.isAdmin === 1) {
             await comment.destroy();
+            const commentsRemoved = parseInt(post.comments) - 1;
+            await post.update({ comments: commentsRemoved });
             res.status(200);
         } else {
             res.status(401).json('Non autorisé');
@@ -278,7 +285,7 @@ exports.deleteComment = async (req, res) => {
 exports.getAllLikes = async (req, res) => {
     try {
         const like = await likes.findAll();
-        res.status(201).json(like);
+        res.status(200).json(like);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error });
@@ -294,9 +301,9 @@ exports.getOnePost = async (req, res) => {
             },
         });
         if (!post || post == null) {
-            res.status(201).json(null);
+            res.status(200).json(null);
         } else {
-            res.status(201).json(post);
+            res.status(200).json(post);
         }
     } catch (error) {
         console.error(error);
@@ -313,9 +320,9 @@ exports.getOnePostCommments = async (req, res) => {
             order: [['createdAt', 'DESC']],
         });
         if (!comment || comment == null) {
-            res.status(201).json(null);
+            res.status(200).json(null);
         } else {
-            res.status(201).json(comment);
+            res.status(200).json(comment);
         }
     } catch (error) {
         console.error(error);
@@ -330,7 +337,19 @@ exports.getAllPosts = async (req, res) => {
             limit: 15,
             order: [['createdAt', 'DESC']],
         });
-        res.status(201).json(post);
+        res.status(200).json(post);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error });
+    }
+};
+
+exports.getAllComments = async (req, res) => {
+    try {
+        const comment = await comments.findAll({
+            order: [['createdAt', 'DESC']],
+        });
+        res.status(200).json(comment);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error });
@@ -353,7 +372,7 @@ exports.getPostsSingleUser = async (req, res) => {
         //         .split('T')
         //         .join(' ');
         // }
-        res.status(201).json(post);
+        res.status(200).json(post);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error });

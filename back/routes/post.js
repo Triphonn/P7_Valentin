@@ -16,6 +16,7 @@ router.get('/getAllLikes', post.getAllLikes);
 router.get('/:username/:id', post.getOnePost);
 router.get('/getcomments/:id/coms', post.getOnePostCommments);
 router.get('/getAllPosts', post.getAllPosts);
+router.get('/getAllComments', post.getAllComments);
 router.get('/getAllPosts/:username', post.getPostsSingleUser);
 
 module.exports = router;

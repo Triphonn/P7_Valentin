@@ -52,9 +52,10 @@
       <div v-if=" user.isLoggedIn == true " class="flex-auto flex-end">
           <v-btn
             text
+            v-if="home"
             @click.stop="createpost"
           >
-          <v-icon>mdi-plus-box</v-icon>
+            <v-icon>mdi-plus-box</v-icon>
           </v-btn>
           <v-skeleton-loader
             type="avatar"
@@ -63,7 +64,7 @@
           <v-btn v-else @click="goToProfile()" text>
             {{username}}
             <v-spacer></v-spacer>
-              <v-avatar class="pp-2" size="35" right>
+              <v-avatar class="pp-2 ml-1" size="35" right>
                 <img
                   :src="profilePicture"
                   alt="Photo de profil"
@@ -109,6 +110,7 @@ export default {
         }
       },
       props: {
+        home: Number,
         username: String,
         profilePicture: String,
       },

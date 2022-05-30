@@ -7,9 +7,13 @@ const fs = require('fs');
 exports.createProfile = async (req, res) => {
     try {
         const { userId, name, username, bio } = JSON.parse(req.body.profile);
-        const profilePicture = `${req.protocol}://${req.get('host')}/images/${
-            req.file.filename
-        }`;
+        let profilePicture =
+            'https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg';
+        if (req.file) {
+            profilePicture = `${req.protocol}://${req.get('host')}/images/${
+                req.file.filename
+            }`;
+        }
         const usernameCheck = await userProfile.findByPk(username);
         if (usernameCheck) {
             return res
@@ -91,7 +95,10 @@ exports.uploadAvatar = async (req, res) => {
             req.file.filename
         }`;
         const user = await userProfile.findByPk(userId);
-        if (user.profilePicture) {
+        if (
+            user.profilePicture !=
+            'https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg'
+        ) {
             const filename = user.profilePicture.split('/images/')[1];
             fs.unlink(`images/${filename}`, async () => {
                 await user.update({
@@ -159,33 +166,47 @@ exports.deleteProfile = async (req, res) => {
     try {
         const { userId, username, password } = req.body;
         const user = await users.findByPk(userId);
-        if (!user) {
+        const profileToDelete = await userProfile.findOne({
+            where: {
+                username: username,
+            },
+        });
+        const profile = await userProfile.findOne({
+            where: { userId: userId },
+        });
+        if (!profileToDelete) {
             res.status(404).json({ errror: 'Utilisateur non trouvé !' });
         } else {
-            bcrypt
-                // Check password security
-                .compare(password, user.password)
-                .then(async (valid) => {
-                    // If password is wrong return error
-                    if (!valid) {
-                        return res
-                            .status(401)
-                            .json({ error: 'Mot de passe incorrect !' });
-                    }
+            if (profile.username == username || user.isAdmin === 1) {
+                bcrypt
+                    // Check password security
+                    .compare(password, user.password)
+                    .then(async (valid) => {
+                        // If password is wrong return error
+                        if (!valid) {
+                            return res
+                                .status(401)
+                                .json({ error: 'Mot de passe incorrect !' });
+                        }
 
-                    await userProfile.destroy({
-                        where: { username: username },
-                    });
-                    await user.destroy();
+                        await userProfile.destroy({
+                            where: { username: username },
+                        });
+                        await users.destroy({
+                            where: { id: profileToDelete.userId },
+                        });
 
-                    await posts.destroy({
-                        where: { username: username },
-                    });
+                        await posts.destroy({
+                            where: { username: username },
+                        });
 
-                    res.status(200).json({
-                        message: 'Compte supprimé',
+                        res.status(200).json({
+                            message: 'Compte supprimé',
+                        });
                     });
-                });
+            } else {
+                res.status(401).json('Non autorisé');
+            }
         }
     } catch (error) {
         console.error(error);
@@ -252,7 +273,7 @@ exports.getOneProfile = async (req, res) => {
                 username: req.params.username,
             },
         });
-        res.status(201).json(profile);
+        res.status(200).json(profile);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error });
@@ -262,7 +283,7 @@ exports.getOneProfile = async (req, res) => {
 exports.getAllProfiles = async (req, res) => {
     try {
         const profile = await userProfile.findAll();
-        res.status(201).json(profile);
+        res.status(200).json(profile);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error });
@@ -273,7 +294,7 @@ exports.verifyProfile = async (req, res) => {
     try {
         const profile = await userProfile.findByPk(req.params.id);
         if (profile) {
-            res.status(201).json(profile);
+            res.status(200).json(profile);
         } else {
             res.status(404).json({ message: 'Profil non crée' });
         }

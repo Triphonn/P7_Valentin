@@ -42,7 +42,7 @@ export default new Vuex.Store({
         user: user,
         profileInfos: null,
         userInfos: null,
-        isAdmin: null,
+        isAdmin: 0,
     },
     getters: {
         getProfileInfos(state) {
@@ -88,6 +88,7 @@ export default new Vuex.Store({
             };
             state.profileInfos = null;
             state.userInfos = null;
+            state.isAdmin = 0;
             sessionStorage.removeItem('vuex');
         },
         setIsLoggedIn(state) {
@@ -376,6 +377,7 @@ export default new Vuex.Store({
                     userId,
                     commentId: commentDelete.commentId,
                     username: commentDelete.username,
+                    postId: commentDelete.postId,
                 };
                 await instance
                     .post(`/post/deleteComment`, deleteData, {

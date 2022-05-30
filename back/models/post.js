@@ -29,6 +29,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             defaultValue: 0,
         },
+        comments: {
+            allowNull: true,
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+        },
     });
     return post;
 };

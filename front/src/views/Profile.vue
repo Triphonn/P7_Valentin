@@ -27,7 +27,7 @@
                     dense
                     flat
                     outlined
-                    color="third"
+                    color="secondary"
                     class="search-bar"
                     return-object
                 >
@@ -47,7 +47,7 @@
                 </v-autocomplete>
             </div>
             <nav-bar-mobile class="d-md-none" :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @searchBarOn="searchBarOverlay = !searchBarOverlay" />
-            <nav-bar class="d-none d-md-block" :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @createpost="postOverlay" />
+            <nav-bar class="d-none d-md-block" :home="1" :username="getUsernameAvatar.username" :profilePicture="getUsernameAvatar.profilePicture" @createpost="postOverlay" />
             <v-main>
                 <v-overlay :z-index="zIndex" :value="overlayPost">
                     <create-post :mode="mode" @overlayClose="postOverlayHide" />
@@ -81,7 +81,7 @@
                     dense
                     flat
                     outlined
-                    color="third"
+                    color="secondary"
                     class="search-bar"
                     return-object
                 >
@@ -102,13 +102,13 @@
             </div>
 
             <nav-bar-mobile class="d-md-none" @searchBarOn="searchBarOverlay = !searchBarOverlay" @login="overlayLogin" />
-            <nav-bar class="d-none d-md-block" @login="overlayLogin" />
+            <nav-bar class="d-none d-md-block" :home="1" @login="overlayLogin" />
 
             <v-overlay :z-index="zIndex" :value="overlayLog">
                 <login :mode="loginmode" @login="overlayLogin" />
             </v-overlay>
         </div>
-        <v-main v-if="mode == 'not_found'">
+        <v-main v-if="mode == 'not_found'" class="test">
             <v-snackbar
                     v-model="snackbar"
                     :timeout="2500"
@@ -134,7 +134,6 @@
                 v-if="loading"
                 style="margin: 0 auto; max-width: 950px"
             >
-
                 <v-skeleton-loader
                 type="image, table-heading, list-item-two-line"
                 ></v-skeleton-loader>
@@ -151,7 +150,7 @@
                         v-else
                         class="img-file resp-banner"
                         height="200"
-                        :src="userInfos.banner"
+                        :src="bannerData"
                     ></v-img>
                 </v-row>
                 <v-row class="bg-color border-basic border-bottom-gray width-100" style="margin: 0; flex-wrap: nowrap">
@@ -160,21 +159,21 @@
                             <v-list-item-avatar class="resp-list-avatar" size="100">
                                 <v-img
                                     class="avatar-22"
-                                    :src="userInfos.profilePicture"
+                                    :src="avatarData"
                                     alt="Photo de profil"
                                 />
                             </v-list-item-avatar>
                             <v-list-item-content>
                                 <v-list-item-title
                                     class="title"
-                                    >{{ userInfos.name }}</v-list-item-title
+                                    >{{ nameData }}</v-list-item-title
                                 >
                                 <v-list-item-subtitle
                                     >@{{ userInfos.username }}</v-list-item-subtitle
                                 >
                                 <div class="d-none d-md-flex flex-column-start">
                                     <v-list-item-action-text style="margin: 2px 0 10px 0"
-                                        >{{ userInfos.bio }}
+                                        >{{ bioData }}
                                     </v-list-item-action-text>
                                     <span>
                                         <v-icon class="resp-icon">mdi-calendar-month</v-icon>
@@ -186,7 +185,7 @@
                             </v-list-item-content>
                         </v-list-item>
                         <v-list-item class="d-md-none mg-pa-gap-0 ml-5">
-                            <v-list-item-action-text
+                            <v-list-item-action-text class="text-preline"
                                 >{{ userInfos.bio }}</v-list-item-action-text
                             >
                             <span>
@@ -199,7 +198,13 @@
                         <v-btn v-if="userInfos.userId == user.userId" color="primary" @click="overlay = !overlay, editModeTrue" class="button button-radius d-md-none">      
                             <span>Editer le profil</span>
                         </v-btn>
+                        <v-btn v-if="userInfos.userId != user.userId && isAdmin" color="primary" @click="overlayDelete = true, overlay = false, mode = 'deleteAccount'" class="button button-radius d-md-none" style="color: red;">      
+                            <span>Supprimer le compte</span>
+                        </v-btn>
                     </v-col>
+                    <v-btn v-if="userInfos.userId != user.userId && isAdmin" color="red" @click="overlayDelete = true, overlay = false, mode = 'deleteAccount'" style="postition: absolute; top: 35px; right: 20px;" class="button button-radius d-none d-md-block">      
+                      <span>Supprimer le compte</span>
+                    </v-btn>
                     <v-btn v-if="userInfos.userId == user.userId" style="postition: absolute; top: 35px; right: 20px;" color="primary" @click="overlay = !overlay, editModeTrue" class="button button-radius d-none d-md-block">      
                       <span>Editer le profil</span>
                     </v-btn>
@@ -227,6 +232,7 @@
                                             color="primary"
                                             class="button button-radius"
                                             @click="modifyProfile()"
+                                            :disabled="!validatedFields"
                                         >
                                             <span>Enregistrer</span>
                                         </v-btn>
@@ -255,21 +261,25 @@
                                                 </v-overlay>
                                             </v-list-item-avatar>
                                             <v-text-field
-                                                color="third"
+                                                color="secondary"
                                                 class="form-row mg-15"
                                                 name="name"
                                                 label="Prénom/Nom"
                                                 type="text"
                                                 placeholder=""
+                                                counter="20"
+                                                :rules="[rules.length(20)]"
                                                 v-model="name"
                                             ></v-text-field>
                                             <v-textarea
-                                                color="third"
+                                                color="secondary"
                                                 class="form-row mg-15"
                                                 id="bio"
                                                 name="bio"
                                                 label="Bio"
                                                 type="bio"
+                                                counter="100"
+                                                :rules="[rules.length(100)]"
                                                 v-model="bio"
                                                 auto-grow
                                             ></v-textarea>
@@ -307,7 +317,7 @@
                                             <span>Cette action ne peut pas être annulée. Cela supprimera définitivement votre compte. <br> <span>Veuillez taper <b style="color: red">{{ this.userInfos.username }}</b> et confirmer votre <b style="color: red;">mot de passe</b> pour supprimer définitivement votre compte.</span></span>
                                         </div>
                                         <v-text-field
-                                            color="third"
+                                            color="secondary"
                                             class="form-row mg-15"
                                             id="deleteConfirm"
                                             name="deleteConfirm"
@@ -316,7 +326,7 @@
                                             v-model="deleteConfirm"
                                         ></v-text-field>
                                         <v-text-field
-                                            color="third"
+                                            color="secondary"
                                             class="form-row mg-15"
                                             id="password"
                                             name="password"
@@ -326,7 +336,7 @@
                                             v-model="password"
                                         ></v-text-field>
                                         <div class="padding-bottom mg-auto flex-center">
-                                            <v-btn color="primary" @click="deleteAccount" class="button button-radius" style="color: red;" :disabled="!validatedFields">        
+                                            <v-btn color="red" @click="deleteAccount" class="button button-radius" :disabled="!validatedFields">
                                                 <span v-if="status == 'loading'">Suppression en cours...</span>
                                                 <span v-else>Supprimer définitivement son compte</span>
                                             </v-btn>
@@ -337,15 +347,15 @@
                         </v-overlay>
                     </v-row>
                 </v-card>
-            <div class="flex-center flex-column mg-pa-gap-0 pt-5 resp-post-profile" v-if="posts.length >= 0">
+            <div class="flex-center flex-column mg-pa-gap-0 pt-5 resp-post-profile" v-if="posts.length > 0">
                <div v-if="mode != 'loading'" class="resp-div-post flex-center flex-column mg-pa-gap-0">
-                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :likes="post.likes" :date="post.createdAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="comments" @overlayCom="commentsOverlay" />
+                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :userLiked="userLiked" :likes="post.likes" :date="post.createdAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="post.comments" @overlayCom="goForPost" />
                </div>
-               <div class="width-50">
-                  <v-overlay :z-index="zIndex" :value="overlayComments" v-if="overlayComments">
-                     <posts class="mg-pa-gap-0 width-850" :key="singlePost.id" :avatar="singlePost.avatar" :likes="singlePost.likes" :date="singlePost.createdAt" :content="singlePost.content" :image="post.image" :video="post.video" :name="singlePost.name" :username="singlePost.username"  :id="singlePost.id" :comments="comments" />
-                  </v-overlay>
-               </div>
+            </div>
+            <div v-else class="flex-center">
+               <span>
+                    Cette personne n'a pas encore posté de publications.
+               </span>
             </div>
         </v-main>
     </v-app>
@@ -410,27 +420,28 @@ export default {
             deleteConfirm: '',
             overlayComments: false,
 
+            nameData: null,
+            bioData: null,
+            bannerData: null,
+            avatarData: null,
+            editMode: false,
+
+            userLiked: null,
+
             getUsernameAvatar: this.$store.state.userInfos,
 
             userInfos: this.$store.state.profileInfos,
             
             defaultBanner: 'https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg',
-            profilePicture: 'https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg',
+            profilePicture: null,
         };
     },
+    created(){
+        this.getAllLikes()
+    },
     mounted () {
-        if (this.userInfos == null && this.mode != 'not_found') {
-            this.getProfile();
-            this.mode = 'not_found'
-            this.loading = true
-        } else {
-            if (this.userInfos.username != this.$route.params.username){
-                this.getProfile();
-                this.loading = true
-            } else {
-                this.loading = false
-            }
-        }
+        this.loading = true
+        this.getProfile();
 
         this.getAllProfile()
         this.getPostsSingleUser()
@@ -438,7 +449,6 @@ export default {
             this.getAllProfile()
             this.getPostsSingleUser()
         }, 1800000);
-
     },
     computed: {
         getFilteredProfiles(item, queryText, itemText){
@@ -456,6 +466,7 @@ export default {
         },
         userBanner () {
             if (this.$store.state.profileInfos.banner != null && this.mode != 'modifying') {
+                console.log(this.mode);
                 return this.$store.state.profileInfos.banner;
             } else {
                 return this.defaultBanner;
@@ -469,6 +480,7 @@ export default {
             }
         },
         editModeTrue(){
+            this.editMode = true
             this.name = this.userInfos.name
             this.bio = this.userInfos.bio
         },
@@ -482,6 +494,12 @@ export default {
                } else {
                   return false;
                }
+            } else if (this.editMode){
+                if ((this.bio.length <= 100 && this.name.length <= 20) && (this.nameData != this.name || this.bioData != this.bio)){
+                    return true
+                } else {
+                    return false
+                }
             } else {
                 if (this.deleteConfirm == this.userInfos.username && this.password != "") {
                     return true
@@ -492,9 +510,22 @@ export default {
 
         },
         ...mapGetters(['getProfileInfos']),
-        ...mapState(['status', 'user', 'isMobile']),
+        ...mapState(['status', 'user', 'isMobile', 'isAdmin']),
     },
     methods: {
+        async getAllLikes(){
+            const response = await fetch('http://localhost:3000/api/post/getAllLikes')
+            const data = await response.json();
+            let username = ''
+            let array = ''
+            if (this.$store.state.user.isLoggedIn){
+               username = this.$store.state.userInfos.username
+               array = data.filter(e => e.username == username)
+            } else {
+               username = ''
+            }
+            this.userLiked = array;
+        },
         async getAllProfile() {
             const response = await fetch ('http://localhost:3000/api/profile/getAllProfiles')
             const data = await response.json();
@@ -532,7 +563,7 @@ export default {
             }
             const dataFilter = data.filter(el => el.username == username)
             this.posts = dataFilter;
-            setInterval(() => {
+            setTimeout(() => {
                 this.mode = ''
             }, 250);
         },
@@ -545,11 +576,13 @@ export default {
             this.$store.dispatch('deleteAccount', {usernameConfirm: this.deleteConfirm, password: this.password, deleteDate: dateToday})
             .then(function () {
                 setTimeout(() => {
-                    if (self.status != 'error_delete'){
+                    if (self.status != 'error_delete' && self.$store.state.isAdmin != 1){
                         self.$router.push('/');
                         self.$store.dispatch('logout')
+                    } else if (self.status != 'error_delete' && self.$store.state.isAdmin === 1){
+                        self.$router.push('/');
                     } else {
-                        self.deleteErrors = 'Mot de passe incorrect'
+                        self.deleteErrors = 'Erreur de suppression de compte, veuillez réessayer !'
                     }
                 }, 1500);
                 
@@ -564,31 +597,33 @@ export default {
         },
         postOverlayHide(){
             this.overlayPost = false
-         },
-        previewImageContent(e) {
-            this.mode = 'createPost';
-            let urlCreator = window.URL || window.webkitURL;
-            this.imagePost = e;
-            this.previewImage = urlCreator.createObjectURL(this.imagePost);
         },
         onBannerChange(e) {
-            this.mode = 'modifying';
             let urlCreator = window.URL || window.webkitURL;
             this.banner = e;
             this.defaultBanner = urlCreator.createObjectURL(this.banner);
+            this.mode = 'modifying';
         },
         onPPChange(e) {
             this.previewMode = 'avatar';
             let urlCreator = window.URL || window.webkitURL;
             this.avatar = e;
             this.profilePicture = urlCreator.createObjectURL(this.avatar);
+            console.log(this.profilePicture);
         },
         modifyProfile: function () {
             const self = this;
             this.$store.dispatch('modifyProfile', {banner: this.banner, avatar: this.avatar, name: this.name, bio: this.bio})
             .then(function () {
-               self.overlay = false
-            //    self.$router.go()
+                self.overlay = false
+                if (self.banner){
+                    self.bannerData = self.defaultBanner
+                } 
+                if (self.avatar){
+                    self.avatarData = self.profilePicture
+                }
+                self.nameData = self.name
+                self.bioData = self.bio
             })
             .catch((error) => {
               console.log(error);
@@ -600,7 +635,17 @@ export default {
             this.getOneProfile(username)
             .then(function () {
                if (self.status != 'error_get'){
-                    self.$router.go()
+                    if (self.$route.params.username != self.userInfos.username){
+                        setTimeout(() => {
+                            self.$router.go()
+                        }, 500);
+                    } else {
+                        self.nameData = self.userInfos.name
+                        self.bioData = self.userInfos.bio
+                        self.bannerData = self.userInfos.banner
+                        self.avatarData = self.userInfos.profilePicture
+                        self.loading = false
+                    }
                } else if (self.status == 'error_get'){
                     self.mode = 'not_found';
                     self.snackbar = true;
@@ -627,6 +672,10 @@ export default {
                this.loginmode = 'login'
                this.overlayLog = true
             }
+        },
+        goForPost(event){
+            const singlePost = this.posts.find(element => element.id == event);
+            this.$router.push(`/${singlePost.username}/${singlePost.id}`);
         },
         ...mapActions(['getOneProfile']),
         ...mapMutations(['setStatus', 'setMobileMode'])

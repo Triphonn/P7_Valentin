@@ -15,27 +15,33 @@
                                     <v-text-field
                                         class="form-row mg-15"
                                         name="name"
-                                        color="third"
+                                        color="secondary"
                                         label="Prénom/Nom"
                                         type="text"
+                                        counter="20"
+                                        :rules="[rules.length(20)]"
                                         v-model="name"
                                     ></v-text-field>
                                     <v-text-field
                                         class="form-row mg-15"
                                         id="username"
-                                        color="third"
+                                        color="secondary"
                                         name="username"
                                         label="Nom d'utilisateur"
                                         type="username"
+                                        :rules="[rules.length(16)]"
+                                        counter="16"
                                         v-model="username"
                                     ></v-text-field>
                                     <v-textarea
                                         class="form-row mg-15"
-                                        color="third"
+                                        color="secondary"
                                         id="bio"
                                         name="bio"
                                         label="Bio"
                                         type="bio"
+                                        counter="100"
+                                        :rules="[rules.length(100)]"
                                         v-model="bio"
                                         auto-grow
                                     ></v-textarea>
@@ -95,6 +101,9 @@ export default {
             url: null,
             profileError: '',
             snackbar: false,
+            rules: {
+                length: len => v => (v || '').length <= len || `Vous avez atteint le maximum de charactères (${len})`,
+            },
         };
     },
     props: {
@@ -116,8 +125,9 @@ export default {
             if (this.mode == 'create') {
                 if (
                     this.name != '' &&
-                    this.username != '' &&
-                    this.file != '' &&
+                    this.username != '' && 
+                    this.username.length <= 16 &&
+                    this.name.length <= 20 &&
                     !this.username.match(/^\s*$/) &&
                     !this.name.match(/^\s*$/)
                 ) {

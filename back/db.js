@@ -21,6 +21,5 @@ db.posts = require('./models/post')(sequelize, DataTypes);
 db.likes = require('./models/likes')(sequelize, DataTypes);
 db.comments = require('./models/comment')(sequelize, DataTypes);
 db.userProfile = require('./models/userProfile')(sequelize, DataTypes);
-db.deletedaccount = require('./models/deletedaccount')(sequelize, DataTypes);
 
 module.exports = db;

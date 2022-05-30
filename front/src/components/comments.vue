@@ -96,6 +96,7 @@ export default {
         avatar: String,
         content: String,
         date: String,
+        postId: Number,
       },
       created(){
         this.getUrl()
@@ -167,7 +168,7 @@ export default {
           }
         },
         deleteOneComment(){
-          this.deleteComment({commentId: this.id, username: this.username})
+          this.deleteComment({commentId: this.id, username: this.username, postId: this.postId})
           this.$router.go()
         },
         goToProfile: function () {

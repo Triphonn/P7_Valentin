@@ -15,6 +15,9 @@ export default {
 </script>
 
 <style>
+.text-preline{
+  white-space: pre-line !important;
+}
 .all-profile{
   gap: 2px;
   border-radius: 25px;
@@ -137,7 +140,8 @@ export default {
   width: 80px;
 }
 .search-bar{
-  max-width: 800px !important;
+  max-width: 600px !important;
+  padding-right: 50px;
   width: 100%;
 }
 .username-text{
@@ -364,6 +368,12 @@ video {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+span{
+  white-space: pre-line;
+  max-height: 55px;
+  overflow: hidden;
 }
 
 #app {

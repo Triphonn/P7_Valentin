@@ -66,7 +66,7 @@ exports.login = async (req, res) => {
                             expiresIn: '24h',
                         }
                     );
-                    res.status(201).json({
+                    res.status(200).json({
                         userId: user.id,
                         token,
                         isLoggedIn: true,
