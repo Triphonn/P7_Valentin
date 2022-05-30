@@ -4,15 +4,15 @@ This is the back-end of the Groupomania Social Network project.
 
 Here you can find all your back routes and stuff.
 
-**Don't forget to create /videos folder & /images folders in the main folder in case you want to receive the files**
-
 ## Environment Variables
 
 To run this project, you will need to add the following environment variables to your .env file
 
-`PORT=3000`
+A file is already existing with these variables, you can just edit with yours.
 
-This will automatically connect your own database.
+This will connect your own database.
+
+`PORT=3000`
 
 `MYSQL_ADDON_HOST`
 
@@ -22,7 +22,7 @@ This will automatically connect your own database.
 
 `MYSQL_ADDON_PASSWORD`
 
-This is for the token granted by jsonWebToken to the user.
+And this is for the token granted by jsonWebToken to the user.
 
 `AUTH_TOKEN=`
 
