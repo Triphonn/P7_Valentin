@@ -24,15 +24,17 @@ cd P7_Valentin
 
 Now, you have to install the dependencies of each part.
 
+For the back, it is a bit more annoying, I'll let you check the README.md in the back folder, this will guide you to install the Back-End and then you will be able to start the front.
+
 For the front, you will use :
 
 ```bash
 cd front
 
 npm install
-```
 
-For the back, it is a bit more annoying, I'll let you check the README.md in the back folder, this will guide you to install the Back-End.
+npm run serve
+```
 
 ## Issues
 

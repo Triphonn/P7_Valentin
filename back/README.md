@@ -43,3 +43,5 @@ If your environment variables are up and you install all the dependencies, you c
 ```bash
 nodemon server
 ```
+
+Now that you started your back, you can return on the main README to start the front.
