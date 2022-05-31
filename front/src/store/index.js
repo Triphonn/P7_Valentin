@@ -157,6 +157,7 @@ export default new Vuex.Store({
             });
         },
         verifyProfile: ({ commit, getters }) => {
+            /////////// Verify if user have profile or not, if not throw error
             return new Promise((resolve, reject) => {
                 const userId = getters.getUserId;
                 instance
@@ -370,33 +371,6 @@ export default new Vuex.Store({
                 throw 'Unable to save your comment';
             }
         },
-        deleteComment: async ({ commit, getters }, commentDelete) => {
-            try {
-                const userId = getters.getUserId;
-                const deleteData = {
-                    userId,
-                    commentId: commentDelete.commentId,
-                    username: commentDelete.username,
-                    postId: commentDelete.postId,
-                };
-                await instance
-                    .post(`/post/deleteComment`, deleteData, {
-                        headers: {
-                            Authorization: 'Bearer ' + getters.getToken,
-                        },
-                    })
-                    .then(async () => {
-                        commit('setStatus', '');
-                    })
-                    .catch(function (error) {
-                        commit('setStatus', 'error_delete');
-                        console.log(error);
-                    });
-            } catch (err) {
-                commit('setStatus', 'error_delete');
-                throw 'Unable to delete your post';
-            }
-        },
         postOneLike: async ({ commit, getters }, likeData) => {
             try {
                 await instance
@@ -468,6 +442,33 @@ export default new Vuex.Store({
                     commit('setStatus', 'error_delete');
                     throw 'Unable to delete your post';
                 }
+            }
+        },
+        deleteComment: async ({ commit, getters }, commentDelete) => {
+            try {
+                const userId = getters.getUserId;
+                const deleteData = {
+                    userId,
+                    commentId: commentDelete.commentId,
+                    username: commentDelete.username,
+                    postId: commentDelete.postId,
+                };
+                await instance
+                    .post(`/post/deleteComment`, deleteData, {
+                        headers: {
+                            Authorization: 'Bearer ' + getters.getToken,
+                        },
+                    })
+                    .then(async () => {
+                        commit('setStatus', '');
+                    })
+                    .catch(function (error) {
+                        commit('setStatus', 'error_delete');
+                        console.log(error);
+                    });
+            } catch (err) {
+                commit('setStatus', 'error_delete');
+                throw 'Unable to delete your post';
             }
         },
         deletePostImage: async ({ commit, getters }, postId) => {

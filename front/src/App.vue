@@ -80,6 +80,9 @@ export default {
   border-bottom: 1px solid rgb(47, 51, 54);
   border-radius: 15px !important;
 }
+.border-bottom-gray-profile{
+  border-bottom: 1px solid rgb(47, 51, 54);
+}
 .border-basic{
   border-left: 1px solid rgb(47, 51, 54);
   border-right: 1px solid rgb(47, 51, 54);

@@ -153,7 +153,7 @@
                         :src="bannerData"
                     ></v-img>
                 </v-row>
-                <v-row class="bg-color border-basic border-bottom-gray width-100" style="margin: 0; flex-wrap: nowrap">
+                <v-row class="bg-color border-basic border-bottom-gray-profile width-100" style="margin: 0; flex-wrap: nowrap">
                     <v-col>
                         <v-list-item class="resp-list-item">
                             <v-list-item-avatar class="resp-list-avatar" size="100">
@@ -347,16 +347,18 @@
                         </v-overlay>
                     </v-row>
                 </v-card>
-            <div class="flex-center flex-column mg-pa-gap-0 pt-5 resp-post-profile" v-if="posts.length > 0">
-               <div v-if="mode != 'loading'" class="resp-div-post flex-center flex-column mg-pa-gap-0">
-                  <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :userLiked="userLiked" :likes="post.likes" :date="post.createdAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="post.comments" @overlayCom="goForPost" />
-               </div>
-            </div>
-            <div v-else class="flex-center">
-               <span>
-                    Cette personne n'a pas encore posté de publications.
-               </span>
-            </div>
+                <div v-if="loaded">
+                    <div class="flex-center flex-column mg-pa-gap-0 pt-5 resp-post-profile" v-if="posts.length > 0">
+                        <div v-if="mode != 'loading'" class="resp-div-post flex-center flex-column mg-pa-gap-0">
+                            <posts class="mg-pa-gap-0 border-radius-15" v-for="post in posts" :key="post.id" :userLiked="userLiked" :likes="post.likes" :date="post.createdAt" :avatar="post.avatar" :content="post.content" :image="post.image" :video="post.video" :name="post.name" :username="post.username" :id="post.id" :comments="post.comments" @overlayCom="goForPost" />
+                        </div>
+                    </div>
+                    <div v-else class="flex-center">
+                        <span>
+                                Cette personne n'a pas encore posté de publications.
+                        </span>
+                    </div>
+                </div>
         </v-main>
     </v-app>
 </template>
@@ -398,6 +400,7 @@ export default {
             allProfiles: null,
             searchBar: null,
 
+            loaded: false,
             loading: true,
             getProfileError: '',
             snackbar: false,
@@ -458,6 +461,7 @@ export default {
             return this.$store.getters.getProfileInfos;
         },
         dateProfile: function () {
+            /////// replace the month signup date into month (ex: 01 -> janvier)
             const month = parseInt(this.userInfos.createdAt.substring(5, 7));
             const year = parseInt(this.userInfos.createdAt.substring(0, 4));
             const arr = [{id: 1, val: 'janvier'}, {id: 2, val: 'février'}, {id: 3, val: 'mars'}, {id: 4, val: 'avril'}, {id: 5, val: 'mai'}, {id: 6, val: 'juin'}, {id: 7, val: 'juillet'}, {id: 8, val: 'août'}, {id: 9, val: 'septembre'}, {id: 10, val: 'octobre'}, {id: 11, val: 'novembre'}, {id: 12, val: 'décembre'}]
@@ -466,7 +470,6 @@ export default {
         },
         userBanner () {
             if (this.$store.state.profileInfos.banner != null && this.mode != 'modifying') {
-                console.log(this.mode);
                 return this.$store.state.profileInfos.banner;
             } else {
                 return this.defaultBanner;
@@ -609,7 +612,6 @@ export default {
             let urlCreator = window.URL || window.webkitURL;
             this.avatar = e;
             this.profilePicture = urlCreator.createObjectURL(this.avatar);
-            console.log(this.profilePicture);
         },
         modifyProfile: function () {
             const self = this;
@@ -638,13 +640,16 @@ export default {
                     if (self.$route.params.username != self.userInfos.username){
                         setTimeout(() => {
                             self.$router.go()
-                        }, 500);
+                        }, 200);
                     } else {
                         self.nameData = self.userInfos.name
                         self.bioData = self.userInfos.bio
                         self.bannerData = self.userInfos.banner
                         self.avatarData = self.userInfos.profilePicture
                         self.loading = false
+                        setTimeout(() => {
+                            self.loaded = true
+                        }, 150);
                     }
                } else if (self.status == 'error_get'){
                     self.mode = 'not_found';

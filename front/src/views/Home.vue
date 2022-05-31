@@ -156,7 +156,6 @@ export default {
           overlayComments: false,
           zIndex: 1,
           posts: [],
-          comments: [],
           loadSinglePostError: '',
           singlePost: null,
           snackbar: false,
@@ -166,7 +165,7 @@ export default {
           allProfiles: null,
           searchBar: null,
 
-          userLiked: null,
+          userLiked: [],
         };
       },
       components: {
@@ -178,7 +177,9 @@ export default {
          NavBarMobile
       },
       created(){
-         this.getAllLikes()
+         if (this.$store.state.user.isLoggedIn){
+            this.getAllLikes()
+         }
       },
       mounted () {
          if (this.getUsernameAvatar == null && this.$store.state.user.isLoggedIn){
@@ -192,10 +193,6 @@ export default {
             this.getAllPosts()
             this.getAllProfile()
          }, 1800000);
-
-         setInterval(() => {
-            this.getAllComments();
-         }, 300000);
       },
       methods: {
          async getAllLikes(){
@@ -245,14 +242,6 @@ export default {
                }
             }
             this.posts = data;
-         },
-         async getAllComments(id){
-            const response = await fetch(`http://localhost:3000/api/post/getcomments/${id}/coms`)
-            const data = await response.json();
-            for (let i = 0; i < data.length; i++) {
-               data[i].createdAt = data[i].createdAt.substring(0, 19).split('T').join(' ');
-            }
-            this.comments = data;
          },
          postOverlay() {
             this.mode = 'createPost'

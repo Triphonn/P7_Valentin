@@ -304,6 +304,7 @@ export default {
         this.getUrl()
       },
       computed: {
+        //// Validate the differents text-fields 
         validatedFields: function () {
           if (this.overlayPostComment){
             if (this.commentTextArea != "" && this.commentTextArea.length <= 200 && !this.commentTextArea.match(/^\s*$/)) {
@@ -319,6 +320,7 @@ export default {
             }
           }
         },
+        ////// check if user can edit/delete
         checkPost: function(){
           if ((this.username == this.$store.state.userInfos.username && this.user.isLoggedIn) || (this.$store.state.isAdmin === 1)){
             return true
@@ -330,6 +332,7 @@ export default {
         ...mapState(['status', 'user', 'userInfos'])
       },
       methods: {
+        ///////// Turn youtube links into video embed and then delete the link in the text field so the post is softer
         createYoutubeEmbed (key) {
           return 'https://www.youtube.com/embed/' + key + '';
         },
@@ -385,28 +388,17 @@ export default {
           } else {
           }
         },
+        /////// Function to go to user's profile when click on username/name/avatar shown on posts
         goToProfile: function () {
           this.$router.push(`/profile/${this.username}`);
           this.$router.go()
         },
+        ////// Function to go to the post I clicked on
         goToPost: function() {
           this.$router.push(`/${this.username}/${this.id}`);
           this.$router.go()
         },
-        logout: function() {
-          this.$store.dispatch('logout')
-          this.$router.push('/')
-          this.$router.go()
-        },
-        signup: function () {
-          this.$emit('login', 1)
-        },
-        login: function () {
-          this.$emit('login', 0)
-        },
-        createpost: function () {
-          this.$emit('createpost')
-        },
+        ////////// Active comments overlay to comment one post
         overlayComment(){
           if (this.user.isLoggedIn){
             this.overlayPostComment = this.overlayPostComment ? false : true
@@ -449,6 +441,7 @@ export default {
               setTimeout(() => {
                 this.loadingLiked = false
               }, 500);
+              /////////// Add userId in an array to check if user liked or not
               this.likesModified = this.likesModified - 1
               this.userLikedArray = this.userLikedArray.filter(e => e.postId != this.id, 1)
             } else {
@@ -461,6 +454,7 @@ export default {
               this.likesModified = this.likesModified + 1
             }
           } else {
+            ////// you cant like if you are not connected
             this.snackbar = true
             this.globalError = 'Vous devez être connecté pour liker des publications.'
           }
@@ -478,7 +472,9 @@ export default {
           }
         },
         goForPost(){
-          this.$emit('overlayCom', this.id)
+          if (!this.editPostMode) {
+            this.$emit('overlayCom', this.id)
+          }
         },
         editOnePost () {
           this.edited = true
