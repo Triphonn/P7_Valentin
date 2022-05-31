@@ -1,7 +1,7 @@
 <template>
-    <v-container ma-0 pa-0 fluid fill-height style="width: 100% !important;">
-        <v-layout column align-center justify-center>
-            <v-flex xs12 sm8 md4>
+    <v-container ma-0 pa-0 fluid fill-height class="test-resp" style="width: 100% !important;">
+        <v-layout column align-center justify-center class="test-resp">
+            <v-flex xs12 sm8 md4 class="test-resp">
                 <v-card class="elevation-12" rounded="lg">
                     <v-toolbar dark color="primary" class="layout align-center justify-center">
                         <v-toolbar-title v-if="mode == 'signup'" >Inscription</v-toolbar-title>

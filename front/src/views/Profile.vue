@@ -209,8 +209,8 @@
                       <span>Editer le profil</span>
                     </v-btn>
                     <v-overlay :z-index="zIndex" :value="overlay">
-                        <div class="search-bar">
-                            <v-card class="border-radius-15 edit-card">
+                        <div class="test-resp">
+                            <v-card class="border-radius-15 edit-card test-resp">
                                     <v-toolbar dark color="primary">
                                         <v-app-bar-nav-icon>
                                             <v-btn
@@ -284,7 +284,7 @@
                                                 auto-grow
                                             ></v-textarea>
                                             <div class="padding-bottom mg-auto flex-center">
-                                                <v-btn color="primary" @click="overlayDelete = true, overlay = false, mode = 'deleteAccount'" class="button button-radius" style="color: red;">        
+                                                <v-btn color="primary" @click="overlayDelete = true, overlay = false, mode = 'deleteAccount'" class="button button-radius mt-2" style="color: red;">        
                                                     <span>Supprimer définitivement son compte</span>
                                                 </v-btn>
                                             </div>
@@ -294,7 +294,7 @@
                             </div>
                         </v-overlay>
                         <v-overlay :z-index="zIndex" :value="overlayDelete">
-                        <v-card class="elevation-12" width="600px">
+                        <v-card class="elevation-12 test-resp" width="600px">
                                 <v-toolbar dark color="primary">
                                     <v-app-bar-nav-icon>
                                         <v-btn
@@ -690,6 +690,9 @@ export default {
 
 <style scoped>
 .button-radius{
+    border-radius: 20px !important;
+}
+.border-radius{
     border-radius: 20px !important;
 }
 .v-application .primary--text{

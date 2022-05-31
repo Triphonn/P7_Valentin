@@ -323,6 +323,10 @@ video {
   .v-menu__content{
     margin-left: -11px;
   }
+  .search-bar{
+    max-width: 960px !important;
+    width: 100%;
+  }
 }
 
 @media screen and (max-width: 500px) {
@@ -339,7 +343,10 @@ video {
   .resp-text-content{
     max-width: 80% !important;
   }
-  
+  .test-resp{
+    max-width: 960px !important;
+    width: 100% !important;
+  }
 }
 
 @media (min-width: 960px) and (max-width: 1263px) {
