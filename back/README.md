@@ -26,7 +26,9 @@ You have now all your environment variables to start the project.
 
 Install the back-end with npm, that you've installed with [NodeJS](https://nodejs.org/en/download/).
 
-Now, go to the front directory :
+First, open a new terminal.
+
+Now, go to the back directory :
 
 ```bash
 cd back
@@ -38,6 +40,12 @@ And then, you can use npm to install all the specific tools and dependencies for
 npm install
 ```
 
+Nodemon has some issues right now, so you need to install it globaly :
+
+```bash
+npm install -g nodemon
+```
+
 If your environment variables are up and you install all the dependencies with npm, you can now start the project using :
 
 Nodemon will start your project and connect the database to you. If you have some issues starting the server, make sure your environment variables are all fulfilled and correct.
@@ -45,5 +53,15 @@ Nodemon will start your project and connect the database to you. If you have som
 ```bash
 nodemon server
 ```
+
+If you have some issues with the installation, try this :
+
+Open a Powershell in Admin mode and paste this command :
+
+```bash
+Set-ExecutionPolicy Unrestricted
+```
+
+Now you can close the Powershell and it should work.
 
 Now that you started your back, you can return on the main README to start the front.
