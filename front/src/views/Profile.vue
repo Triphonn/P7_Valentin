@@ -284,7 +284,7 @@
                                                 auto-grow
                                             ></v-textarea>
                                             <div class="padding-bottom mg-auto flex-center">
-                                                <v-btn color="primary" @click="overlayDelete = true, overlay = false, mode = 'deleteAccount'" class="button button-radius mt-2" style="color: red;">        
+                                                <v-btn color="primary" @click="overlayDelete = true, overlay = false, editMode = false, mode = 'deleteAccount'" class="button button-radius mt-2" style="color: red;">        
                                                     <span>Supprimer définitivement son compte</span>
                                                 </v-btn>
                                             </div>
