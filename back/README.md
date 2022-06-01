@@ -4,25 +4,19 @@ This is the back-end of the Groupomania Social Network project.
 
 Here you can find all your back routes and stuff.
 
+You can run your project with free database hosting like [Clever Cloud](https://www.clever-cloud.com/fr/).
+
 ## Environment Variables
 
-To run this project, you will need to add the following environment variables to your .env file
+To run this project, you will need to add the following environment variables to your .env file.
 
-A file is already existing with these variables, you can just edit with yours.
+An example file is already existing with these variables, you can just edit with yours.
 
-This will connect your own database.
+(Follow the template.env file) And you will need a database using mysql (for sequelize).
 
-`PORT=3000`
+This is for the authentification token granted by jsonWebToken to the user, you can put whatever you want.
 
-`MYSQL_ADDON_HOST`
-
-`MYSQL_ADDON_DB`
-
-`MYSQL_ADDON_USER`
-
-`MYSQL_ADDON_PASSWORD`
-
-And this is for the token granted by jsonWebToken to the user.
+jsonWebToken is a plugin that allows you to verify if user's token is valid to his account, if not it will block the request.
 
 `AUTH_TOKEN=`
 
@@ -30,15 +24,23 @@ You have now all your environment variables to start the project.
 
 ## Installation
 
-Install the back-end with npm
+Install the back-end with npm, that you've installed with [NodeJS](https://nodejs.org/en/download/).
 
-Make sure your cmd is in the /back folder, then :
+Now, go to the front directory :
+
+```bash
+cd front
+```
+
+And then, you can use npm to install all the specific tools and dependencies for this project :
 
 ```bash
 npm install
 ```
 
-If your environment variables are up and you install all the dependencies, you can now start the project using :
+If your environment variables are up and you install all the dependencies with npm, you can now start the project using :
+
+Nodemon will start your project and connect the database to you. If you have some issues starting the server, make sure your environment variables are all fulfilled and correct.
 
 ```bash
 nodemon server

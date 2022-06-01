@@ -141,7 +141,7 @@
             <v-card v-else style="border-radius: 25px !important;" class="mx-auto test border-radius-25" max-width="950" tile>
                 <v-row style="margin: 0;" class="width-100">
                     <v-img
-                        v-if="!userInfos || userInfos.banner == null "
+                        v-if="!profileInfos || profileInfos.banner == null "
                         class="img-file resp-banner"
                         height="200"
                         src="https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg"
@@ -169,7 +169,7 @@
                                     >{{ nameData }}</v-list-item-title
                                 >
                                 <v-list-item-subtitle
-                                    >@{{ userInfos.username }}</v-list-item-subtitle
+                                    >@{{ profileInfos.username }}</v-list-item-subtitle
                                 >
                                 <div class="d-none d-md-flex flex-column-start">
                                     <v-list-item-action-text style="margin: 2px 0 10px 0"
@@ -186,7 +186,7 @@
                         </v-list-item>
                         <v-list-item class="d-md-none mg-pa-gap-0 ml-5">
                             <v-list-item-action-text class="text-preline"
-                                >{{ userInfos.bio }}</v-list-item-action-text
+                                >{{ profileInfos.bio }}</v-list-item-action-text
                             >
                             <span>
                                 <v-icon class="resp-icon">mdi-calendar-month</v-icon>
@@ -195,17 +195,17 @@
                                 >
                             </span>
                         </v-list-item>
-                        <v-btn v-if="userInfos.userId == user.userId" color="primary" @click="overlay = !overlay, editModeTrue" class="button button-radius d-md-none">      
+                        <v-btn v-if="profileInfos.userId == user.userId" color="primary" @click="overlay = !overlay, editModeTrue" class="button button-radius d-md-none">      
                             <span>Editer le profil</span>
                         </v-btn>
-                        <v-btn v-if="userInfos.userId != user.userId && isAdmin" color="primary" @click="overlayDelete = true, overlay = false, mode = 'deleteAccount'" class="button button-radius d-md-none" style="color: red;">      
+                        <v-btn v-if="profileInfos.userId != user.userId && isAdmin" color="primary" @click="overlayDelete = true, overlay = false, mode = 'deleteAccount'" class="button button-radius d-md-none" style="color: red;">      
                             <span>Supprimer le compte</span>
                         </v-btn>
                     </v-col>
-                    <v-btn v-if="userInfos.userId != user.userId && isAdmin" color="red" @click="overlayDelete = true, overlay = false, mode = 'deleteAccount'" style="postition: absolute; top: 35px; right: 20px;" class="button button-radius d-none d-md-block">      
+                    <v-btn v-if="profileInfos.userId != user.userId && isAdmin" color="red" @click="overlayDelete = true, overlay = false, mode = 'deleteAccount'" style="postition: absolute; top: 35px; right: 20px;" class="button button-radius d-none d-md-block">      
                       <span>Supprimer le compte</span>
                     </v-btn>
-                    <v-btn v-if="userInfos.userId == user.userId" style="postition: absolute; top: 35px; right: 20px;" color="primary" @click="overlay = !overlay, editModeTrue" class="button button-radius d-none d-md-block">      
+                    <v-btn v-if="profileInfos.userId == user.userId" style="postition: absolute; top: 35px; right: 20px;" color="primary" @click="overlay = !overlay, editModeTrue" class="button button-radius d-none d-md-block">      
                       <span>Editer le profil</span>
                     </v-btn>
                     <v-overlay :z-index="zIndex" :value="overlay">
@@ -314,7 +314,7 @@
                                 <v-card-text>
                                     <v-form>
                                         <div class="px-4 pt-2">
-                                            <span>Cette action ne peut pas être annulée. Cela supprimera définitivement votre compte. <br> <span>Veuillez taper <b style="color: red">{{ this.userInfos.username }}</b> et confirmer votre <b style="color: red;">mot de passe</b> pour supprimer définitivement votre compte.</span></span>
+                                            <span>Cette action ne peut pas être annulée. Cela supprimera définitivement votre compte. <br> <span>Veuillez taper <b style="color: red">{{ this.profileInfos.username }}</b> et confirmer votre <b style="color: red;">mot de passe</b> pour supprimer définitivement votre compte.</span></span>
                                         </div>
                                         <v-text-field
                                             color="secondary"
@@ -433,18 +433,18 @@ export default {
 
             getUsernameAvatar: this.$store.state.userInfos,
 
-            userInfos: this.$store.state.profileInfos,
+            profileInfos: this.$store.state.profileInfos,
             
             defaultBanner: 'https://cdn.discordapp.com/attachments/843841677004374049/970734533924253797/banner-default.jpg',
             profilePicture: null,
         };
     },
     created(){
+        this.loading = true
         this.getAllLikes()
+        this.getProfile();
     },
     mounted () {
-        this.loading = true
-        this.getProfile();
 
         this.getAllProfile()
         this.getPostsSingleUser()
@@ -457,13 +457,10 @@ export default {
         getFilteredProfiles(item, queryText, itemText){
             return itemText.toLocaleLowerCase().startsWith(queryText.toLocaleLowerCase())
         },
-        profileInfos() {
-            return this.$store.getters.getProfileInfos;
-        },
         dateProfile: function () {
             /////// replace the month signup date into month (ex: 01 -> janvier)
-            const month = parseInt(this.userInfos.createdAt.substring(5, 7));
-            const year = parseInt(this.userInfos.createdAt.substring(0, 4));
+            const month = parseInt(this.profileInfos.createdAt.substring(5, 7));
+            const year = parseInt(this.profileInfos.createdAt.substring(0, 4));
             const arr = [{id: 1, val: 'janvier'}, {id: 2, val: 'février'}, {id: 3, val: 'mars'}, {id: 4, val: 'avril'}, {id: 5, val: 'mai'}, {id: 6, val: 'juin'}, {id: 7, val: 'juillet'}, {id: 8, val: 'août'}, {id: 9, val: 'septembre'}, {id: 10, val: 'octobre'}, {id: 11, val: 'novembre'}, {id: 12, val: 'décembre'}]
             const index = arr.find((el) => el.id === month)
             return `${index.val}`+ ` ${year}`;
@@ -484,8 +481,8 @@ export default {
         },
         editModeTrue(){
             this.editMode = true
-            this.name = this.userInfos.name
-            this.bio = this.userInfos.bio
+            this.name = this.profileInfos.name
+            this.bio = this.profileInfos.bio
         },
         closeVerification() {
             this.overlayClosingVerif = true;
@@ -498,13 +495,13 @@ export default {
                   return false;
                }
             } else if (this.editMode){
-                if ((this.bio.length <= 100 && this.name.length <= 20) && (this.nameData != this.name || this.bioData != this.bio)){
+                if ((this.bio.length <= 100 && this.name.length <= 20) && (this.nameData != this.name || this.bioData != this.bio || this.userBanner != this.bannerData || this.userAvatar != this.avatarData)){
                     return true
                 } else {
                     return false
                 }
             } else {
-                if (this.deleteConfirm == this.userInfos.username && this.password != "") {
+                if (this.deleteConfirm == this.profileInfos.username && this.password != "") {
                     return true
                 } else {
                     return false
@@ -637,15 +634,15 @@ export default {
             this.getOneProfile(username)
             .then(function () {
                if (self.status != 'error_get'){
-                    if (self.$route.params.username != self.userInfos.username){
+                    if (self.$route.params.username != self.profileInfos.username){
                         setTimeout(() => {
                             self.$router.go()
                         }, 200);
                     } else {
-                        self.nameData = self.userInfos.name
-                        self.bioData = self.userInfos.bio
-                        self.bannerData = self.userInfos.banner
-                        self.avatarData = self.userInfos.profilePicture
+                        self.nameData = self.profileInfos.name
+                        self.bioData = self.profileInfos.bio
+                        self.bannerData = self.$store.state.profileInfos.banner
+                        self.avatarData = self.$store.state.profileInfos.profilePicture
                         self.loading = false
                         setTimeout(() => {
                             self.loaded = true
