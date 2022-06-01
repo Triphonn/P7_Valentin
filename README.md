@@ -13,7 +13,7 @@ Here, I will explain how to intall my project.
 
 First, you will need [NodeJS](https://nodejs.org/en/download/) and [VSCode](https://code.visualstudio.com/download) or any text editor.
 
-Then, you can clone the repo with (if you have Git installed) :
+Then, you can clone the repo with (if you have Git installed, if not you can install [Git](https://git-scm.com/downloads)) :
 
 ```bash
 git clone https://github.com/Triphonn/P7_Valentin
