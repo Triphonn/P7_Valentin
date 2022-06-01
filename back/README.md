@@ -29,7 +29,7 @@ Install the back-end with npm, that you've installed with [NodeJS](https://nodej
 Now, go to the front directory :
 
 ```bash
-cd front
+cd back
 ```
 
 And then, you can use npm to install all the specific tools and dependencies for this project :
